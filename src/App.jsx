@@ -391,34 +391,48 @@ const Header = ({ activeSection }) => {
   return ( <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen ? 'bg-gray-900/80 backdrop-blur-lg shadow-md' : 'bg-transparent'}`}><nav className="container mx-auto px-4 py-4 flex justify-between items-center"><a href="#" className="text-xl sm:text-2xl font-bold text-white mr-4">{portfolioData.personalInfo.name}</a><div className="hidden md:flex items-center space-x-8">{navLinks.map(link => ( <a key={link} href={`#${link}`} className={`${navLinkClasses} ${activeSection === link ? activeLinkClasses : inactiveLinkClasses}`}>{link}</a> ))}</div><button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden z-50 flex-shrink-0"><svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}></path></svg></button></nav><div className={`md:hidden absolute top-full left-0 right-0 bg-gray-900/95 backdrop-blur-lg transition-transform duration-300 ease-in-out ${isMenuOpen ? 'transform translate-y-0' : 'transform -translate-y-full pointer-events-none'}`}><div className="flex flex-col items-center space-y-4 py-8">{navLinks.map(link => ( <a key={link} href={`#${link}`} onClick={() => setIsMenuOpen(false)} className={`text-lg capitalize transition-colors duration-300 ${activeSection === link ? 'text-cyan-400' : 'text-gray-300 hover:text-cyan-400'}`}>{link}</a> ))}</div></div></header> );
 };
 
-// --- HERO SECTION ---
+// --- HERO SECTION (with Profile Picture) ---
 const Hero = () => {
     return (
-        <section id="hero" className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-            <div className="text-center">
-                <AnimateOnScroll>
-                    <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">
-                        Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-500">{portfolioData.personalInfo.name}</span>
-                    </h1>
-                </AnimateOnScroll>
-                 <AnimateOnScroll delay={150}>
-                    <p className="text-xl md:text-2xl text-gray-300 mb-8">{portfolioData.personalInfo.title}</p>
-                 </AnimateOnScroll>
-                 <AnimateOnScroll delay={300}>
-                    <div className="relative max-w-3xl mx-auto mb-8">
-                        <p className="text-gray-400">
-                            {portfolioData.personalInfo.bio}
-                        </p>
+        <section id="hero" className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-16">
+            <div className="container mx-auto">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                    {/* Image Column */}
+                    <AnimateOnScroll className="flex justify-center">
+                        <img 
+                            src="/Profile pic.jpg" // This path works because the image is in the 'public' folder
+                            alt="Ashwin" 
+                            className="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-cyan-500/50 shadow-2xl"
+                        />
+                    </AnimateOnScroll>
+
+                    {/* Text Column */}
+                    <div className="text-center md:text-left">
+                        <AnimateOnScroll delay={150}>
+                            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">
+                                Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-500">Ashwin</span>
+                            </h1>
+                        </AnimateOnScroll>
+                        <AnimateOnScroll delay={300}>
+                            <p className="text-xl md:text-2xl text-gray-300 mb-8">{portfolioData.personalInfo.title}</p>
+                        </AnimateOnScroll>
+                        <AnimateOnScroll delay={450}>
+                            <div className="relative max-w-xl mx-auto md:mx-0 mb-8">
+                                <p className="text-gray-400">
+                                    {portfolioData.personalInfo.bio}
+                                </p>
+                            </div>
+                        </AnimateOnScroll>
+                        <AnimateOnScroll delay={600}>
+                            <div className="flex justify-center md:justify-start items-center gap-4">
+                                 <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                    <DownloadIcon className="w-5 h-5 mr-2" />
+                                    Download Resume
+                                </a>
+                            </div>
+                        </AnimateOnScroll>
                     </div>
-                </AnimateOnScroll>
-                <AnimateOnScroll delay={450}>
-                    <div className="flex justify-center items-center gap-4">
-                         <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                            <DownloadIcon className="w-5 h-5 mr-2" />
-                            Download Resume
-                        </a>
-                    </div>
-                </AnimateOnScroll>
+                </div>
             </div>
         </section>
     );
@@ -842,63 +856,4 @@ export default function App() {
         [data-section="skills"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 14 4-4'/%3E%3Cpath d='M12 14 8 10'/%3E%3Cpath d='M12 6v8'/%3E%3Cpath d='M12 22a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z'/%3E%3Cpath d='M12 2v2'/%3E%3C/svg%3E"); }
         [data-section="projects"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 11 2-2-2-2'/%3E%3Cpath d='M11 13h4'/%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3C/svg%3E"); }
         [data-section="assistant"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8'/%3E%3Crect width='16' height='12' x='4' y='8' rx='2'/%3E%3Cpath d='M2 14h2'/%3E%3Cpath d='M20 14h2'/%3E%3Cpath d='M15 13v2'/%3E%3Cpath d='M9 13v2'/%3E%3C/svg%3E"); }
-        [data-section="certifications"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15.232 5.232 3.536 3.536'/%3E%3Cpath d='M2 18h.01'/%3E%3Cpath d='M21 12a9 9 0 1 1-9-9c2.512 0 4.888.972 6.666 2.664L12 13'/%3E%3Cpath d='M17 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z'/%3E%3Cpath d='m4.243 19.757 2.121-2.121'/%3E%3C/svg%3E"); }
-        [data-section="contact"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m22 2-7 20-4-9-9-4Z'/%3E%3Cpath d='M22 2 11 13'/%3E%3C/svg%3E"); }
-
-        /* --- Skill Category Title Animations --- */
-        .skill-category-title {
-            padding-bottom: 12px;
-        }
-        .skill-category-title span {
-            display: inline-block;
-            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1) 0.2s, opacity 0.5s ease-out 0.2s;
-            transform: translateY(20px);
-            opacity: 0;
-        }
-        .opacity-100 .skill-category-title span {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .skill-category-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background: #06b6d4;
-            border-radius: 1px;
-            transition: width 0.7s cubic-bezier(0.23, 1, 0.32, 1) 0.4s;
-        }
-        .opacity-100 .skill-category-title::after {
-            width: 50px;
-        }
-
-        /* --- Skill Badge Stagger Animation --- */
-        .skill-badge-wrapper {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-        }
-        .skill-card-animator.opacity-100 .skill-badge-wrapper {
-            opacity: 1;
-            transform: translateY(0);
-        }
-      `}</style>
-      <Header activeSection={activeSection} />
-      <main>
-        <div id="hero" ref={sectionRefs.hero}><Hero /></div>
-        <div id="roadmap" ref={sectionRefs.roadmap}><CareerRoadmapSection /></div>
-        <div id="skills" ref={sectionRefs.skills}><SkillsSection /></div>
-        <div id="projects" ref={sectionRefs.projects}><ProjectsSection /></div>
-        <div id="assistant" ref={sectionRefs.assistant}><AIAssistantSection /></div>
-        <div id="certifications" ref={sectionRefs.certifications}><CertificationsSection /></div>
-        <div id="contact" ref={sectionRefs.contact}><ContactSection /></div>
-      </main>
-      <Footer />
-    </div>
-  );
-}
-
-
+        [data-section="certifications"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24
