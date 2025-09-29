@@ -648,50 +648,42 @@ const CertificationsSection = () => (
     </Section> 
 );
 
-// --- CONTACT SECTION ---
+// --- CONTACT SECTION (Updated for Formspree) ---
 const ContactSection = () => {
     const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
+    const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({...prev, [name]: value}));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
         setSubmitStatus(null);
         
-        const serviceID = 'service_qo3daqa';
-        const templateID = 'template_oydachb';
+        try {
+            // Your new Formspree URL is here
+            const response = await fetch('https://formspree.io/f/mdkwevkg', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
 
-        const templateParams = {
-            from_name: formData.name,
-            from_email: formData.email,
-            subject: formData.subject,
-            message: formData.message,
-        };
-
-        if (window.emailjs) {
-            window.emailjs.send(serviceID, templateID, templateParams)
-                .then((response) => {
-                    console.log('SUCCESS!', response.status, response.text);
-                    setSubmitStatus('success');
-                    setFormData({ name: '', email: '', subject: '', message: '' });
-                }, (err) => {
-                    console.error('FAILED...', err);
-                    setSubmitStatus('error');
-                })
-                .finally(() => {
-                    setIsSubmitting(false);
-                    setTimeout(() => setSubmitStatus(null), 6000);
-                });
-        } else {
-            console.error("EmailJS script not loaded");
+            if (response.ok) {
+                setSubmitStatus('success');
+                setFormData({ name: '', email: '', subject: '', message: '' }); // Clear form
+            } else {
+                throw new Error('Form submission failed');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
             setSubmitStatus('error');
+        } finally {
             setIsSubmitting(false);
+            setTimeout(() => setSubmitStatus(null), 6000);
         }
     };
 
@@ -754,7 +746,7 @@ const ContactSection = () => {
                 </div>
             </AnimateOnScroll>
         </Section>
-    )
+    );
 };
 
 
@@ -767,16 +759,6 @@ export default function App() {
   const sectionRefs = { hero: useRef(null), roadmap: useRef(null), skills: useRef(null), projects: useRef(null), assistant: useRef(null), certifications: useRef(null), contact: useRef(null) };
 
   useEffect(() => {
-    // --- Add and Initialize EmailJS Script ---
-    const script = document.createElement('script');
-    script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
-    script.async = true;
-    script.onload = () => {
-        // Initialize EmailJS after the script has loaded, using your Public Key
-        window.emailjs.init({ publicKey: '5yR1c4-eOjbrDEOQe' });
-    };
-    document.body.appendChild(script);
-
     document.title = `${portfolioData.personalInfo.name} | ${portfolioData.personalInfo.title}`;
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) { metaDescription.setAttribute('content', portfolioData.personalInfo.bio); } 
