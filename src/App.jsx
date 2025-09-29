@@ -323,7 +323,15 @@ const AnimateOnScroll = ({ children, delay = 0, className = '' }) => {
 
 // --- GEMINI API CALLER ---
 const callGeminiAPI = async (prompt) => {
-    const apiKey = ""; // Canvas will provide the key
+    // 1. Read the API key from Vite's environment variables
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+    // 2. Add a check to ensure the key is loaded correctly
+    if (!apiKey) {
+        console.error("VITE_GEMINI_API_KEY is not defined. Make sure it's set in your Vercel environment variables.");
+        throw new Error("API key is not configured.");
+    }
+    
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     try {
@@ -914,4 +922,3 @@ export default function App() {
     </div>
   );
 }
-
