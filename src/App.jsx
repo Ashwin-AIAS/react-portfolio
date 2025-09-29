@@ -856,4 +856,62 @@ export default function App() {
         [data-section="skills"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 14 4-4'/%3E%3Cpath d='M12 14 8 10'/%3E%3Cpath d='M12 6v8'/%3E%3Cpath d='M12 22a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z'/%3E%3Cpath d='M12 2v2'/%3E%3C/svg%3E"); }
         [data-section="projects"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 11 2-2-2-2'/%3E%3Cpath d='M11 13h4'/%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3C/svg%3E"); }
         [data-section="assistant"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8'/%3E%3Crect width='16' height='12' x='4' y='8' rx='2'/%3E%3Cpath d='M2 14h2'/%3E%3Cpath d='M20 14h2'/%3E%3Cpath d='M15 13v2'/%3E%3Cpath d='M9 13v2'/%3E%3C/svg%3E"); }
-        [data-section="certifications"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24
+        [data-section="certifications"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15.232 5.232 3.536 3.536'/%3E%3Cpath d='M2 18h.01'/%3E%3Cpath d='M21 12a9 9 0 1 1-9-9c2.512 0 4.888.972 6.666 2.664L12 13'/%3E%3Cpath d='M17 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z'/%3E%3Cpath d='m4.243 19.757 2.121-2.121'/%3E%3C/svg%3E"); }
+        [data-section="contact"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m22 2-7 20-4-9-9-4Z'/%3E%3Cpath d='M22 2 11 13'/%3E%3C/svg%3E"); }
+
+        /* --- Skill Category Title Animations --- */
+        .skill-category-title {
+            padding-bottom: 12px;
+        }
+        .skill-category-title span {
+            display: inline-block;
+            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1) 0.2s, opacity 0.5s ease-out 0.2s;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        .opacity-100 .skill-category-title span {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .skill-category-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #06b6d4;
+            border-radius: 1px;
+            transition: width 0.7s cubic-bezier(0.23, 1, 0.32, 1) 0.4s;
+        }
+        .opacity-100 .skill-category-title::after {
+            width: 50px;
+        }
+
+        /* --- Skill Badge Stagger Animation --- */
+        .skill-badge-wrapper {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        .skill-card-animator.opacity-100 .skill-badge-wrapper {
+            opacity: 1;
+            transform: translateY(0);
+        }
+      `}</style>
+      <Header activeSection={activeSection} />
+      <main>
+        <div id="hero" ref={sectionRefs.hero}><Hero /></div>
+        <div id="roadmap" ref={sectionRefs.roadmap}><CareerRoadmapSection /></div>
+        <div id="skills" ref={sectionRefs.skills}><SkillsSection /></div>
+        <div id="projects" ref={sectionRefs.projects}><ProjectsSection /></div>
+        <div id="assistant" ref={sectionRefs.assistant}><AIAssistantSection /></div>
+        <div id="certifications" ref={sectionRefs.certifications}><CertificationsSection /></div>
+        <div id="contact" ref={sectionRefs.contact}><ContactSection /></div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
