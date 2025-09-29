@@ -20,7 +20,7 @@ const portfolioData = {
       institution: "Reva University, Bengaluru, India",
       period: "2018 - 2022",
       details: "• Key Project: Development of an Automated Hydroponic Plant Grow System using Arduino and computer vision (OpenCV).\n• Published a paper on the project at the 4th National Conference on New Trends in Mechanical Engineering (NCNTME-2022).",
-      paperUrl: "https://docs.google.com/document/d/1KvUwEla7vlWd6N0bAy_tHdxUPUw5BuPI/edit?usp=sharing&ouid=111443545880928316642&rtpof=true&sd=true"
+      paperUrl: "https://drive.google.com/file/d/1quhbB8EjNY-0763xEIUO81fEDs_fX9Kc/view?usp=sharing"
     },
     {
       type: 'work',
