@@ -773,7 +773,7 @@ export default function App() {
     script.async = true;
     script.onload = () => {
         // Initialize EmailJS after the script has loaded, using your Public Key
-        window.emailjs.init({ publicKey: 'CyDvjHP-WO-FjElza' });
+        window.emailjs.init({ publicKey: '5yR1c4-eOjbrDEOQe' });
     };
     document.body.appendChild(script);
 
