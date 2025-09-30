@@ -107,7 +107,7 @@ const portfolioData = {
 };
 
 
-// --- SVG ICONS ---
+// --- SVG IONS ---
 const GitHubIcon = (props) => ( <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> );
 const LinkedInIcon = (props) => ( <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> );
 const ExternalLinkIcon = (props) => ( <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg> );
@@ -600,7 +600,7 @@ const AIAssistantSection = () => {
                             value={jobDesc}
                             onChange={(e) => setJobDesc(e.target.value)}
                             placeholder="Paste job description here..."
-                            className="w-full h-40 p-3 rounded-md bg-gray-900/50 border border-gray-600 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+                            className="w-full h-40 p-3 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
                             disabled={isGenerating}
                         />
                         <button 
@@ -665,7 +665,6 @@ const ContactSection = () => {
         setSubmitStatus(null);
         
         try {
-            // Your new Formspree URL is here
             const response = await fetch('https://formspree.io/f/mdkwevkg', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -721,19 +720,19 @@ const ContactSection = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
-                                <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 focus:ring-2 focus:ring-cyan-500"/>
+                                <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} required className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500"/>
                             </div>
                             <div className="mb-4">
                                 <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
-                                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 focus:ring-2 focus:ring-cyan-500"/>
+                                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500"/>
                             </div>
                             <div className="mb-4">
                                 <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-1">Subject</label>
-                                <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleInputChange} required className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 focus:ring-2 focus:ring-cyan-500"/>
+                                <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleInputChange} required className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500"/>
                             </div>
                             <div className="mb-6">
                                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">Message</label>
-                                <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} required rows="4" className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 focus:ring-2 focus:ring-cyan-500"></textarea>
+                                <textarea id="message" name="message" value={formData.message} onChange={handleInputChange} required rows="4" className="w-full p-2.5 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500"></textarea>
                             </div>
                             <button type="submit" disabled={isSubmitting} className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transition">
                                 <SendIcon className={`w-5 h-5 mr-2 ${isSubmitting ? 'animate-spin' : ''}`} />
