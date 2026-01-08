@@ -581,7 +581,8 @@ const AIAssistantSection = () => {
             const result = await callGeminiAPI(prompt);
             setGeneratedText(result);
         } catch (err) {
-            setError('Sorry, something went wrong. Please try again.');
+            console.error("Full error object:", err);
+            setError(`Error: ${err.message || 'Something went wrong detected'}. Check console for details.`);
         } finally {
             setIsGenerating(false);
         }
