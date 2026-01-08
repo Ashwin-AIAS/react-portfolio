@@ -331,8 +331,8 @@ const callGeminiAPI = async (prompt) => {
         throw new Error("API key is not configured.");
     }
 
-    // Updated to use specific stable version to avoid 404s on aliases
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-002:generateContent?key=${apiKey}`;
+    // Updated to use the latest Gemini 3.0 Pro model as requested (2026 standard)
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-pro:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl, {
