@@ -106,9 +106,9 @@ const portfolioData = {
   ]
 };
 
-// --- GEMINI API CALLER WITH RETRY LOGIC ---
+// --- GEMINI API CALLER ---
 const callGeminiAPI = async (userQuery, systemPrompt) => {
-    const apiKey = ""; // Key is provided by the execution environment
+    const apiKey = ""; // Key provided by environment
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
     const payload = {
@@ -124,12 +124,10 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-
             if (response.ok) {
                 const data = await response.json();
                 return data.candidates?.[0]?.content?.parts?.[0]?.text;
             }
-
             const delay = Math.pow(2, i) * 1000;
             await new Promise(resolve => setTimeout(resolve, delay));
         } catch (error) {
@@ -138,7 +136,7 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
-    throw new Error("Failed to reach AI service after multiple attempts.");
+    throw new Error("AI analysis unavailable.");
 };
 
 // --- SVG ICONS ---
@@ -273,7 +271,7 @@ const AIAssistantVisual = ({ isGenerating }) => (
     </div>
 );
 
-// --- SKILL BADGE COMPONENT ---
+// --- SKILL BADGE ---
 const SkillBadge = ({ skillName }) => {
     const badgeMap = {
         Python: 'https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54',
@@ -489,19 +487,23 @@ const AIAssistantSection = () => {
         setError('');
         setGeneratedText('');
 
-        // Updated systemPrompt to be more explicit about who the "I" refers to.
-        const systemPrompt = `You are a professional AI career assistant writing a first-person elevator pitch on behalf of Ashwin Muniappan. 
-        Analyze the provided portfolio details and the job description to write a professional 3-4 sentence pitch in the first person (using "I"). 
-        Your goal is to explain why Ashwin is the ideal candidate by linking his specific technical background (e.g., Reinforcement Learning, Autonomous Systems, and Sensor Fusion) directly to the specific requirements mentioned in the job post. 
-        Maintain a tone that is confident, technical, and eager to contribute to the employer's goals.`;
+        // ENFORCED THIRD-PERSON SYSTEM PROMPT
+        const systemPrompt = `You are a professional AI Match Analysis tool. 
+        Your task is to analyze Ashwin Muniappan's portfolio and determine how well he fits a specific job role.
+        STRICT RULES:
+        1. NEVER use "I," "me," or "my." 
+        2. ALWAYS speak about the candidate in the third person using "Ashwin" or "the candidate."
+        3. Write exactly 3-4 professional sentences.
+        4. Focus on matching specific skills (Reinforcement Learning, Sensor Fusion, Python) to the job requirements.
+        5. Tone: Objective, professional, and analytical.`;
         
-        const userQuery = `Portfolio Context: ${JSON.stringify(portfolioData)}\n\nTarget Job Description: ${jobDesc}`;
+        const userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nJob for Analysis: ${jobDesc}`;
 
         try {
             const result = await callGeminiAPI(userQuery, systemPrompt);
             setGeneratedText(result);
         } catch (err) {
-            setError('The AI service is currently busy or unavailable. Please try again in a few seconds.');
+            setError('The AI service is currently busy. Please try again.');
         } finally {
             setIsGenerating(false);
         }
@@ -512,20 +514,29 @@ const AIAssistantSection = () => {
             <AnimateOnScroll>
                 <Card className="max-w-3xl mx-auto !p-0">
                     <div className="p-6">
-                        <h3 className="text-xl font-bold text-white flex items-center mb-4"><BotIcon className="w-6 h-6 mr-2 text-cyan-500" /> For Recruiters</h3>
+                        <div className="flex items-center justify-between mb-4">
+                             <h3 className="text-xl font-bold text-white flex items-center"><BotIcon className="w-6 h-6 mr-2 text-cyan-500" /> Technical Match Analysis</h3>
+                             <span className="text-[10px] bg-cyan-900/30 text-cyan-400 border border-cyan-500/20 px-2 py-1 rounded uppercase tracking-widest font-bold">AI Powered</span>
+                        </div>
                         <AIAssistantVisual isGenerating={isGenerating} />
-                        <p className="text-gray-400 mt-4 mb-4">Paste a job description below to see how Ashwin's background fits the role.</p>
-                        <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="w-full h-40 p-3 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500 transition" disabled={isGenerating} />
-                        <button onClick={handleGenerate} disabled={isGenerating} className="mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transform hover:scale-105 transition">
+                        <p className="text-gray-400 mt-4 mb-4 text-sm italic">Paste a job description below to see an objective AI-generated analysis of Ashwin's technical fit.</p>
+                        <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="w-full h-40 p-3 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500 transition text-sm" disabled={isGenerating} />
+                        <button onClick={handleGenerate} disabled={isGenerating} className="mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transform hover:scale-[1.02] transition shadow-lg">
                             <SparklesIcon className={`w-5 h-5 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
-                            {isGenerating ? 'Analyzing...' : 'Generate Analysis'}
+                            {isGenerating ? 'Analyzing Match...' : 'Generate Fit Report'}
                         </button>
-                        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
+                        {error && <p className="text-red-500 text-xs mt-4 text-center">{error}</p>}
                     </div>
                     {generatedText && (
-                        <div className="border-t border-gray-700 p-6 bg-gray-900/50">
-                            <h4 className="font-semibold text-gray-200 mb-2">Pitch Summary (In Ashwin's Voice):</h4>
-                            <p className="text-gray-400 whitespace-pre-wrap">{generatedText}</p>
+                        <div className="border-t border-gray-700 p-6 bg-gray-900/90">
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Candidate Fit Report</h4>
+                            </div>
+                            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{generatedText}</p>
+                            </div>
+                            <p className="text-[10px] text-gray-500 mt-4 italic">This report is an automated technical evaluation based on the candidate's verified portfolio data.</p>
                         </div>
                     )}
                 </Card>
@@ -626,7 +637,7 @@ export default function App() {
     }, []);
 
     return (
-        <div className="bg-gray-900 min-h-screen text-white">
+        <div className="bg-gray-900 min-h-screen text-white selection:bg-cyan-500/30">
             <style>{`
                 .section-title span { display: inline-block; transition: all 0.7s; transform: translateY(100%); opacity: 0; }
                 .opacity-100 .section-title span { transform: translateY(0); opacity: 1; }
