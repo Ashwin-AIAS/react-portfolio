@@ -489,8 +489,13 @@ const AIAssistantSection = () => {
         setError('');
         setGeneratedText('');
 
-        const systemPrompt = `You are a professional AI career assistant for Ashwin. Analyze the provided portfolio and job description to write a professional 3-4 sentence pitch.`;
-        const userQuery = `Portfolio: ${JSON.stringify(portfolioData)}\n\nJob Description: ${jobDesc}`;
+        // Updated systemPrompt to be more explicit about who the "I" refers to.
+        const systemPrompt = `You are a professional AI career assistant writing a first-person elevator pitch on behalf of Ashwin Muniappan. 
+        Analyze the provided portfolio details and the job description to write a professional 3-4 sentence pitch in the first person (using "I"). 
+        Your goal is to explain why Ashwin is the ideal candidate by linking his specific technical background (e.g., Reinforcement Learning, Autonomous Systems, and Sensor Fusion) directly to the specific requirements mentioned in the job post. 
+        Maintain a tone that is confident, technical, and eager to contribute to the employer's goals.`;
+        
+        const userQuery = `Portfolio Context: ${JSON.stringify(portfolioData)}\n\nTarget Job Description: ${jobDesc}`;
 
         try {
             const result = await callGeminiAPI(userQuery, systemPrompt);
@@ -519,7 +524,7 @@ const AIAssistantSection = () => {
                     </div>
                     {generatedText && (
                         <div className="border-t border-gray-700 p-6 bg-gray-900/50">
-                            <h4 className="font-semibold text-gray-200 mb-2">Pitch Summary:</h4>
+                            <h4 className="font-semibold text-gray-200 mb-2">Pitch Summary (In Ashwin's Voice):</h4>
                             <p className="text-gray-400 whitespace-pre-wrap">{generatedText}</p>
                         </div>
                     )}
