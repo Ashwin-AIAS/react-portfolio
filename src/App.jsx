@@ -108,7 +108,17 @@ const portfolioData = {
 
 // --- GEMINI API CALLER ---
 const callGeminiAPI = async (userQuery, systemPrompt) => {
-    const apiKey = ""; // Key provided by environment
+    // Robust check for environment variables to avoid build warnings
+    let apiKey = "";
+    try {
+        // Fallback sequence for different environments
+        apiKey = (typeof process !== 'undefined' && process.env?.VITE_GEMINI_API_KEY) || 
+                 (typeof window !== 'undefined' && window._env_?.VITE_GEMINI_API_KEY) ||
+                 "";
+    } catch (e) {
+        apiKey = "";
+    }
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
     const payload = {
@@ -124,19 +134,27 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+
             if (response.ok) {
                 const data = await response.json();
-                return data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("Empty response.");
+                return text;
             }
+
+            if (response.status === 401 || response.status === 403) {
+                throw new Error("Missing or invalid API Key. Please ensure VITE_GEMINI_API_KEY is set in Vercel.");
+            }
+
             const delay = Math.pow(2, i) * 1000;
             await new Promise(resolve => setTimeout(resolve, delay));
         } catch (error) {
-            if (i === maxRetries - 1) throw error;
+            if (i === maxRetries - 1 || error.message.includes("API Key")) throw error;
             const delay = Math.pow(2, i) * 1000;
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
-    throw new Error("AI analysis unavailable.");
+    throw new Error("Analysis failed. Please try again.");
 };
 
 // --- SVG ICONS ---
@@ -503,7 +521,8 @@ const AIAssistantSection = () => {
             const result = await callGeminiAPI(userQuery, systemPrompt);
             setGeneratedText(result);
         } catch (err) {
-            setError('The AI service is currently busy. Please try again.');
+            console.error("AI Assistant Error:", err);
+            setError(err.message || 'The AI service is currently busy. Please try again.');
         } finally {
             setIsGenerating(false);
         }
@@ -519,13 +538,13 @@ const AIAssistantSection = () => {
                              <span className="text-[10px] bg-cyan-900/30 text-cyan-400 border border-cyan-500/20 px-2 py-1 rounded uppercase tracking-widest font-bold">AI Powered</span>
                         </div>
                         <AIAssistantVisual isGenerating={isGenerating} />
-                        <p className="text-gray-400 mt-4 mb-4 text-sm italic">Paste a job description below to see an objective AI-generated analysis of Ashwin's technical fit.</p>
+                        <p className="text-gray-400 mt-4 mb-4 text-sm italic">Paste a job description below to generate an objective AI analysis of Ashwin's technical fit.</p>
                         <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="w-full h-40 p-3 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500 transition text-sm" disabled={isGenerating} />
                         <button onClick={handleGenerate} disabled={isGenerating} className="mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transform hover:scale-[1.02] transition shadow-lg">
                             <SparklesIcon className={`w-5 h-5 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
                             {isGenerating ? 'Analyzing Match...' : 'Generate Fit Report'}
                         </button>
-                        {error && <p className="text-red-500 text-xs mt-4 text-center">{error}</p>}
+                        {error && <p className="text-red-500 text-xs mt-4 text-center px-4">{error}</p>}
                     </div>
                     {generatedText && (
                         <div className="border-t border-gray-700 p-6 bg-gray-900/90">
