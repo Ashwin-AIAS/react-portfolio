@@ -108,13 +108,11 @@ const portfolioData = {
 
 // --- GEMINI API CALLER ---
 const callGeminiAPI = async (userQuery, systemPrompt) => {
-    // Robust check for environment variables to avoid build warnings
+    // We check for the Vercel/Vite environment variable safely to avoid build warnings
     let apiKey = "";
     try {
-        // Fallback sequence for different environments
-        apiKey = (typeof process !== 'undefined' && process.env?.VITE_GEMINI_API_KEY) || 
-                 (typeof window !== 'undefined' && window._env_?.VITE_GEMINI_API_KEY) ||
-                 "";
+        // String literal access prevents compiler from crashing if import.meta is missing
+        apiKey = import.meta.env["VITE_GEMINI_API_KEY"] || "";
     } catch (e) {
         apiKey = "";
     }
@@ -126,6 +124,7 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
         systemInstruction: { parts: [{ text: systemPrompt }] }
     };
 
+    // Mandatory Exponential Backoff Retry Logic
     const maxRetries = 5;
     for (let i = 0; i < maxRetries; i++) {
         try {
@@ -138,12 +137,12 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
             if (response.ok) {
                 const data = await response.json();
                 const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) throw new Error("Empty response.");
+                if (!text) throw new Error("No analysis generated.");
                 return text;
             }
 
             if (response.status === 401 || response.status === 403) {
-                throw new Error("Missing or invalid API Key. Please ensure VITE_GEMINI_API_KEY is set in Vercel.");
+                throw new Error("Missing or Invalid API Key. Ensure VITE_GEMINI_API_KEY is set in Vercel settings.");
             }
 
             const delay = Math.pow(2, i) * 1000;
@@ -154,10 +153,10 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
-    throw new Error("Analysis failed. Please try again.");
+    throw new Error("The AI service is currently busy. Please try again.");
 };
 
-// --- SVG ICONS ---
+// --- ICONS ---
 const GitHubIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>);
 const LinkedInIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>);
 const ExternalLinkIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>);
@@ -538,7 +537,7 @@ const AIAssistantSection = () => {
                              <span className="text-[10px] bg-cyan-900/30 text-cyan-400 border border-cyan-500/20 px-2 py-1 rounded uppercase tracking-widest font-bold">AI Powered</span>
                         </div>
                         <AIAssistantVisual isGenerating={isGenerating} />
-                        <p className="text-gray-400 mt-4 mb-4 text-sm italic">Paste a job description below to generate an objective AI analysis of Ashwin's technical fit.</p>
+                        <p className="text-gray-400 mt-4 mb-4 text-sm italic">Paste a job description below to see an objective AI-generated analysis of Ashwin's technical fit.</p>
                         <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="w-full h-40 p-3 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500 transition text-sm" disabled={isGenerating} />
                         <button onClick={handleGenerate} disabled={isGenerating} className="mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transform hover:scale-[1.02] transition shadow-lg">
                             <SparklesIcon className={`w-5 h-5 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
