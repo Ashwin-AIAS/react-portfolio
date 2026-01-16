@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
    
-// --- PERSONALIZED DATA ---      
+// --- PERSONALIZED DATA ---       
 const portfolioData = {
   personalInfo: {
     name: "Ashwin",
