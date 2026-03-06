@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';          
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';          
    
 // --- PERSONALIZED DATA ---       
 const portfolioData = {
@@ -218,7 +219,7 @@ const GraduationCapIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2
 
 // --- VISUAL COMPONENTS ---
 const LidarFusionVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
         <style>{`
             @keyframes lidar-scan {
                 0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
@@ -258,7 +259,7 @@ const GenerativeAIVisual = () => {
         return () => clearInterval(interval);
     }, []);
     return (
-        <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+        <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
             <style>{`
                 @keyframes radar-sweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
                 .radar-sweep::after { content: ''; position: absolute; left: 50%; top: 0; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(96, 165, 250, 0.2)); }
@@ -275,7 +276,7 @@ const GenerativeAIVisual = () => {
 };
 
 const RLVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center p-4">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center p-4">
         <style>{`
             @keyframes agent-move { 0%, 20% { top: 12.5%; left: 12.5%; } 35% { top: 12.5%; left: 37.5%; } 50% { top: 37.5%; left: 37.5%; } 65% { top: 37.5%; left: 62.5%; } 80%, 100% { top: 62.5%; left: 62.5%; } }
             .rl-agent { animation: agent-move 5s ease-in-out infinite; }
@@ -289,7 +290,7 @@ const RLVisual = () => (
 );
 
 const RoundaboutVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
         <style>{`
             @keyframes drive-around-1 { 0% { transform: rotate(0deg) translateX(55px) rotate(-0deg); } 100% { transform: rotate(360deg) translateX(55px) rotate(-360deg); } }
             @keyframes drive-around-2 { 0% { transform: rotate(120deg) translateX(55px) rotate(-120deg); } 100% { transform: rotate(480deg) translateX(55px) rotate(-480deg); } }
@@ -316,7 +317,7 @@ const RoundaboutVisual = () => (
 
 // --- NEW VISUAL COMPONENTS ---
 const RAGSystemVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
         <style>{`
             @keyframes rag-doc-flow { 0% { transform: translateX(-40px); opacity: 0; } 30% { transform: translateX(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: translateX(40px); opacity: 0; } }
             @keyframes rag-pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.3); opacity: 1; } }
@@ -348,7 +349,7 @@ const RAGSystemVisual = () => (
 );
 
 const MiniCNNVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
         <style>{`
             @keyframes cnn-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
             @keyframes cnn-data { 0% { transform: translateX(-10px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(10px); opacity: 0; } }
@@ -376,7 +377,7 @@ const MiniCNNVisual = () => (
 );
 
 const BatSwingVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
         <style>{`
             @keyframes bat-swing { 0% { transform: rotate(-45deg); } 50% { transform: rotate(45deg); } 100% { transform: rotate(-45deg); } }
             @keyframes swing-trail { 0% { opacity: 0; } 30% { opacity: 0.6; } 100% { opacity: 0; } }
@@ -415,7 +416,7 @@ const FaceReconVisual = () => {
         return { x: 50 + x, y: 45 + y * 0.6, z: Math.sin(phi + rotation * Math.PI / 180) };
     });
     return (
-        <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+        <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
             <svg viewBox="0 0 100 100" className="w-32 h-32">
                 {points.map((p, i) => (
                     <circle key={i} cx={p.x} cy={p.y} r={1 + p.z * 0.5} fill={p.z > 0 ? '#06b6d4' : '#164e63'} opacity={0.5 + p.z * 0.3} />
@@ -434,7 +435,7 @@ const FaceReconVisual = () => {
 };
 
 const RadarAIVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
         <style>{`
             @keyframes radar-sweep-ai { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
             @keyframes radar-blip { 0%, 80% { opacity: 0; transform: scale(0); } 90% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.5); } }
@@ -461,7 +462,7 @@ const RadarAIVisual = () => (
 );
 
 const WebhookVisual = () => (
-    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
         <style>{`
             @keyframes webhook-flow { 0% { transform: translateX(-8px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(8px); opacity: 0; } }
             @keyframes webhook-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(234, 75, 113, 0.4); } 50% { box-shadow: 0 0 0 6px rgba(234, 75, 113, 0); } }
@@ -492,20 +493,15 @@ const WebhookVisual = () => (
 );
 
 const AIAssistantVisual = ({ isGenerating }) => (
-    <div className="w-full h-24 bg-gray-900/50 rounded-t-lg p-4 relative overflow-hidden">
-        <style>{`
-            @keyframes scan-glow { 0% { box-shadow: 0 0 5px 2px rgba(6, 182, 212, 0.5); } 50% { box-shadow: 0 0 15px 5px rgba(6, 182, 212, 0.8); } 100% { box-shadow: 0 0 5px 2px rgba(6, 182, 212, 0.5); } }
-            @keyframes scanner-move { 0% { top: -10px; } 100% { top: 100%; } }
-        `}</style>
-        <div className="space-y-2">
-            <div className="w-3/4 h-2 bg-gray-700 rounded-full"></div>
-            <div className="w-full h-2 bg-gray-700 rounded-full"></div>
-            <div className="w-1/2 h-2 bg-gray-700 rounded-full"></div>
-            <div className="w-5/6 h-2 bg-gray-700 rounded-full"></div>
+    <div className="w-full h-20 bg-black/30 rounded-t-2xl p-4 relative overflow-hidden border-b border-white/[0.04]">
+        <div className="space-y-2.5">
+            <div className="w-3/4 h-1.5 bg-white/[0.04] rounded-full"></div>
+            <div className="w-full h-1.5 bg-white/[0.04] rounded-full"></div>
+            <div className="w-1/2 h-1.5 bg-white/[0.04] rounded-full"></div>
         </div>
         {isGenerating && (
-            <div className="absolute top-0 left-0 w-full h-full">
-                <div className="absolute left-0 w-full h-1 bg-cyan-400 scanner-line" style={{ animation: 'scanner-move 1.5s linear infinite, scan-glow 1.5s ease-in-out infinite' }}></div>
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/[0.03] overflow-hidden">
+                <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-blue-500 to-transparent" style={{ animation: 'loading-bar 1.5s linear infinite' }}></div>
             </div>
         )}
     </div>
@@ -557,30 +553,25 @@ const SkillBadge = ({ skillName }) => {
 // --- HELPERS ---
 const AnimateOnScroll = ({ children, delay = 0, className = '' }) => {
     const ref = useRef(null);
-    const [isInView, setIsInView] = useState(false);
-    useEffect(() => {
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) { setIsInView(true); observer.unobserve(entry.target); }
-        }, { threshold: 0.1 });
-        if (ref.current) observer.observe(ref.current);
-        return () => { if (ref.current) observer.unobserve(ref.current); };
-    }, []);
+    const isInView = useInView(ref, { once: true, margin: '-10% 0px' });
     return (
-        <div ref={ref} className={`transition-all duration-700 ${className} ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${delay}ms` }}>
+        <motion.div ref={ref} initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }} animate={isInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}} transition={{ duration: 0.8, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }} className={className}>
             {children}
-        </div>
+        </motion.div>
     );
 };
 
-const Card = ({ children, className }) => (<div className={`bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden ${className}`}>{children}</div>);
+const Card = ({ children, className }) => (<div className={`glass-card overflow-hidden ${className || ''}`}>{children}</div>);
 
-const Section = ({ id, title, children }) => (
-    <section id={id} className="py-20 md:py-28 px-4">
-        <div className="container mx-auto max-w-5xl">
+const Section = ({ id, title, subtitle, children }) => (
+    <section id={id} className="py-32 md:py-44 px-6">
+        <div className="container mx-auto max-w-6xl">
             <AnimateOnScroll>
-                <h2 className="section-title text-3xl md:text-4xl font-bold text-center mb-12 text-white relative" data-section={id}>
-                    <span>{title}</span>
-                </h2>
+                <div className="text-center mb-20">
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">{title}</h2>
+                    {subtitle && <p className="mt-4 text-lg md:text-xl text-white/40 font-light max-w-2xl mx-auto">{subtitle}</p>}
+                    <div className="mt-6 mx-auto w-16 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+                </div>
             </AnimateOnScroll>
             {children}
         </div>
@@ -597,49 +588,68 @@ const Header = ({ activeSection }) => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-    const navLinkClasses = "relative capitalize transition-colors duration-300 py-2 after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-0.5 after:bg-cyan-400 after:transition-all after:duration-300";
     return (
-        <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || isMenuOpen ? 'bg-gray-900/80 backdrop-blur-lg shadow-md' : 'bg-transparent'}`}>
-            <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-                <a href="#" className="text-xl sm:text-2xl font-bold text-white mr-4">{portfolioData.personalInfo.name}</a>
-                <div className="hidden md:flex items-center space-x-8">
-                    {navLinks.map(link => (<a key={link} href={`#${link}`} className={`${navLinkClasses} ${activeSection === link ? "text-cyan-400 after:w-full" : "text-gray-300 hover:text-cyan-400 after:w-0"}`}>{link}</a>))}
+        <motion.header initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || isMenuOpen ? 'bg-black/70 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.04]' : 'bg-transparent'}`}>
+            <nav className="container mx-auto px-6 h-14 flex justify-between items-center max-w-6xl">
+                <a href="#" className="text-sm font-semibold text-white/90 tracking-tight">{portfolioData.personalInfo.name}</a>
+                <div className="hidden md:flex items-center gap-8">
+                    {navLinks.map(link => (<a key={link} href={`#${link}`} className={`relative text-xs font-medium tracking-wide capitalize transition-all duration-300 py-1 ${activeSection === link ? 'text-white' : 'text-white/50 hover:text-white/80'}`}>{link}{activeSection === link && <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400" />}</a>))}
                 </div>
                 <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden z-50 flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} /></svg>
+                    <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} /></svg>
                 </button>
             </nav>
-            <div className={`md:hidden absolute top-full left-0 right-0 bg-gray-900/95 backdrop-blur-lg transition-transform duration-300 ${isMenuOpen ? 'transform translate-y-0' : 'transform -translate-y-full pointer-events-none'}`}>
-                <div className="flex flex-col items-center space-y-4 py-8">
-                    {navLinks.map(link => (<a key={link} href={`#${link}`} onClick={() => setIsMenuOpen(false)} className={`text-lg capitalize transition-colors duration-300 ${activeSection === link ? 'text-cyan-400' : 'text-gray-300 hover:text-cyan-400'}`}>{link}</a>))}
-                </div>
-            </div>
-        </header>
+            <AnimatePresence>{isMenuOpen && (
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="md:hidden absolute top-full left-0 right-0 bg-black/90 backdrop-blur-2xl border-b border-white/[0.04]">
+                    <div className="flex flex-col items-center gap-6 py-10">
+                        {navLinks.map(link => (<a key={link} href={`#${link}`} onClick={() => setIsMenuOpen(false)} className={`text-sm font-light capitalize transition-colors duration-300 ${activeSection === link ? 'text-white' : 'text-white/40 hover:text-white/70'}`}>{link}</a>))}
+                    </div>
+                </motion.div>
+            )}</AnimatePresence>
+        </motion.header>
     );
 };
 
 // --- HERO ---
 const Hero = () => (
-    <section id="hero" className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-16">
-        <div className="container mx-auto">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-                <AnimateOnScroll className="flex justify-center">
-                    <img src="/Profile pic.jpg" alt="Ashwin" className="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-cyan-500/50 shadow-2xl" />
+    <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
+        {/* Ambient background glow */}
+        <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(139,92,246,0.15) 40%, transparent 70%)' }}></div>
+            {/* Orbiting particles */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="w-2 h-2 bg-blue-400/60 rounded-full" style={{ animation: 'orbit-1 15s linear infinite' }}></div>
+                <div className="w-1.5 h-1.5 bg-violet-400/40 rounded-full" style={{ animation: 'orbit-2 20s linear infinite' }}></div>
+                <div className="w-1 h-1 bg-cyan-400/50 rounded-full" style={{ animation: 'orbit-3 12s linear infinite' }}></div>
+            </div>
+        </div>
+        <div className="container mx-auto max-w-6xl relative z-10">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+                <AnimateOnScroll className="flex justify-center order-1 md:order-1">
+                    <div className="relative">
+                        {/* Animated ring */}
+                        <div className="absolute -inset-4 rounded-full" style={{ background: 'conic-gradient(from 0deg, rgba(59,130,246,0.3), rgba(139,92,246,0.2), rgba(244,114,182,0.15), rgba(59,130,246,0.3))', animation: 'ring-rotate 8s linear infinite', filter: 'blur(8px)' }}></div>
+                        <img src="/Profile pic.jpg" alt="Ashwin" className="relative w-56 h-56 md:w-72 md:h-72 rounded-full object-cover border-2 border-white/10 shadow-2xl" />
+                    </div>
                 </AnimateOnScroll>
-                <div className="text-center md:text-left">
-                    <AnimateOnScroll delay={150}>
-                        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4">Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-500">Ashwin</span></h1>
+                <div className="text-center md:text-left order-2">
+                    <AnimateOnScroll delay={100}>
+                        <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">AI Engineer for Autonomous Systems</p>
                     </AnimateOnScroll>
-                    <AnimateOnScroll delay={300}>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-8">{portfolioData.personalInfo.title}</p>
+                    <AnimateOnScroll delay={200}>
+                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">Hi, I'm <span className="text-gradient">Ashwin</span></h1>
                     </AnimateOnScroll>
-                    <AnimateOnScroll delay={450}>
-                        <p className="text-gray-400 max-w-xl mx-auto md:mx-0 mb-8">{portfolioData.personalInfo.bio}</p>
+                    <AnimateOnScroll delay={400}>
+                        <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0 mb-10">{portfolioData.personalInfo.bio}</p>
                     </AnimateOnScroll>
                     <AnimateOnScroll delay={600}>
-                        <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
-                            <DownloadIcon className="w-5 h-5 mr-2" /> Download Resume
-                        </a>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                            <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-premium btn-primary"><DownloadIcon className="w-4 h-4 mr-2" /> Download Resume</a>
+                            <div className="flex items-center gap-4 justify-center">
+                                <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
+                                <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
+                            </div>
+                        </div>
                     </AnimateOnScroll>
                 </div>
             </div>
@@ -649,23 +659,28 @@ const Hero = () => (
 
 // --- ROADMAP ---
 const CareerRoadmapSection = () => (
-    <Section id="roadmap" title="Career Roadmap">
-        <div className="relative border-l-2 border-gray-700 pl-8 space-y-12">
+    <Section id="roadmap" title="Career Roadmap" subtitle="Education & professional experience">
+        <div className="relative border-l border-white/[0.06] pl-10 space-y-16 ml-2">
             {portfolioData.careerRoadmap.map((item, index) => (
-                <AnimateOnScroll key={index} delay={index * 150}>
+                <AnimateOnScroll key={index} delay={index * 100}>
                     <div className="relative">
-                        <div className="absolute -left-10 w-5 h-5 bg-cyan-500 rounded-full border-4 border-gray-900 flex items-center justify-center text-gray-900">
-                            {item.type === 'work' ? <BriefcaseIcon className="w-3 h-3" /> : <GraduationCapIcon className="w-3 h-3" />}
+                        <div className="absolute -left-[2.85rem] w-4 h-4 rounded-full border-2 border-blue-500/50 bg-black flex items-center justify-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
                         </div>
-                        <p className="text-sm font-semibold text-cyan-400">{item.period}</p>
-                        <h3 className="text-xl font-bold text-white mt-1">{item.title}</h3>
-                        <p className="text-md text-gray-400">{item.institution}</p>
-                        <p className="text-gray-400 mt-2 whitespace-pre-line">{item.details}</p>
-                        {item.paperUrl && (
-                            <a href={item.paperUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-cyan-300 bg-cyan-900/50 hover:bg-cyan-800/50">
-                                <DownloadIcon className="w-4 h-4 mr-2" /> Download Paper
-                            </a>
-                        )}
+                        <div className="glass-card p-6 md:p-8">
+                            <div className="flex items-center gap-3 mb-3">
+                                <span className="text-xs font-medium text-blue-400/80 tracking-wider uppercase">{item.period}</span>
+                                <span className="px-2 py-0.5 text-[10px] font-medium tracking-widest uppercase rounded-full bg-white/[0.04] border border-white/[0.06] text-white/40">{item.type}</span>
+                            </div>
+                            <h3 className="text-xl font-semibold text-white/90 mb-1">{item.title}</h3>
+                            <p className="text-sm text-white/40 font-light mb-3">{item.institution}</p>
+                            <p className="text-sm text-white/30 font-light leading-relaxed whitespace-pre-line">{item.details}</p>
+                            {item.paperUrl && (
+                                <a href={item.paperUrl} target="_blank" rel="noopener noreferrer" className="btn-premium btn-secondary mt-4 text-sm px-5 py-2">
+                                    <DownloadIcon className="w-3.5 h-3.5 mr-2" /> Download Paper
+                                </a>
+                            )}
+                        </div>
                     </div>
                 </AnimateOnScroll>
             ))}
@@ -675,20 +690,20 @@ const CareerRoadmapSection = () => (
 
 // --- SKILLS ---
 const SkillsSection = () => (
-    <Section id="skills" title="Skills">
-        <div className="space-y-12">
+    <Section id="skills" title="Skills" subtitle="Technologies & tools I work with">
+        <div className="space-y-10">
             {Object.entries(portfolioData.skills).map(([category, skills], index) => (
-                <AnimateOnScroll key={category} delay={index * 150} className="skill-card-animator">
-                    <Card className="!p-6">
-                        <h3 className="skill-category-title text-xl font-bold text-white mb-6 text-center relative"><span>{category}</span></h3>
-                        <div className="flex flex-wrap items-center justify-center gap-3">
+                <AnimateOnScroll key={category} delay={index * 100}>
+                    <div className="glass-card p-8">
+                        <h3 className="text-lg font-semibold text-white/80 mb-6 tracking-tight">{category}</h3>
+                        <div className="flex flex-wrap items-center gap-3">
                             {skills.map((skill, si) => (
-                                <div key={skill} className="skill-badge-wrapper" style={{ transitionDelay: `${300 + si * 80}ms` }}>
+                                <div key={skill} style={{ transitionDelay: `${300 + si * 60}ms` }}>
                                     <SkillBadge skillName={skill} />
                                 </div>
                             ))}
                         </div>
-                    </Card>
+                    </div>
                 </AnimateOnScroll>
             ))}
         </div>
@@ -697,34 +712,36 @@ const SkillsSection = () => (
 
 // --- PROJECTS ---
 const ProjectsSection = () => (
-    <Section id="projects" title="Projects">
+    <Section id="projects" title="Projects" subtitle="Featured work & technical explorations">
         <div className="grid md:grid-cols-2 gap-8">
             {portfolioData.projects.map((project, index) => (
-                <AnimateOnScroll key={index} delay={index * 150}>
-                    <Card className="flex flex-col h-full">
-                        {project.visualComponent === 'LidarFusion' && <LidarFusionVisual />}
-                        {project.visualComponent === 'GenerativeAI' && <GenerativeAIVisual />}
-                        {project.visualComponent === 'ReinforcementLearning' && <RLVisual />}
-                        {project.visualComponent === 'Roundabout' && <RoundaboutVisual />}
-                        {project.visualComponent === 'RAGSystem' && <RAGSystemVisual />}
-                        {project.visualComponent === 'MiniCNN' && <MiniCNNVisual />}
-                        {project.visualComponent === 'BatSwing' && <BatSwingVisual />}
-                        {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
-                        {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
-                        {project.visualComponent === 'Webhook' && <WebhookVisual />}
-                        <div className="p-6 flex flex-col flex-grow">
-                            <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                            <p className="text-gray-400 mb-4 flex-grow whitespace-pre-line">{project.description}</p>
-                            <div className="mb-4 mt-auto">
-                                <p className="text-sm font-semibold text-gray-300 mb-2">Technologies:</p>
+                <AnimateOnScroll key={index} delay={index * 80}>
+                    <Card className="flex flex-col h-full group">
+                        <div className="relative">
+                            {project.visualComponent === 'LidarFusion' && <LidarFusionVisual />}
+                            {project.visualComponent === 'GenerativeAI' && <GenerativeAIVisual />}
+                            {project.visualComponent === 'ReinforcementLearning' && <RLVisual />}
+                            {project.visualComponent === 'Roundabout' && <RoundaboutVisual />}
+                            {project.visualComponent === 'RAGSystem' && <RAGSystemVisual />}
+                            {project.visualComponent === 'MiniCNN' && <MiniCNNVisual />}
+                            {project.visualComponent === 'BatSwing' && <BatSwingVisual />}
+                            {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
+                            {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
+                            {project.visualComponent === 'Webhook' && <WebhookVisual />}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        </div>
+                        <div className="p-6 md:p-8 flex flex-col flex-grow">
+                            <h3 className="text-lg font-semibold text-white/90 mb-3 tracking-tight">{project.title}</h3>
+                            <p className="text-sm text-white/35 font-light mb-6 flex-grow whitespace-pre-line leading-relaxed">{project.description}</p>
+                            <div className="mb-5 mt-auto">
                                 <div className="flex flex-wrap gap-2">
                                     {project.technologies.map(tech => (
-                                        <span key={tech} className="bg-gray-700 text-gray-300 text-xs font-medium px-2.5 py-1 rounded">{tech}</span>
+                                        <span key={tech} className="tech-tag">{tech}</span>
                                     ))}
                                 </div>
                             </div>
-                            <div className="flex justify-end items-center pt-4 border-t border-gray-700">
-                                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyan-400 transition-colors"><GitHubIcon className="w-6 h-6" /></a>
+                            <div className="flex justify-end items-center pt-4 border-t border-white/[0.04]">
+                                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/70 transition-colors duration-300"><GitHubIcon className="w-5 h-5" /></a>
                             </div>
                         </div>
                     </Card>
@@ -746,8 +763,6 @@ const AIAssistantSection = () => {
         setIsGenerating(true);
         setError('');
         setGeneratedText('');
-
-        // ENFORCED THIRD-PERSON SYSTEM PROMPT
         const systemPrompt = `You are an expert AI Recruiter Match Analysis tool. Your task is to deeply analyze Ashwin Muniappan's portfolio against a specific job description and produce a structured technical fit report.
 
 STRICT RULES:
@@ -771,9 +786,7 @@ Bullet list of required skills or qualifications the candidate currently lacks o
 
 ## 💡 Recommendation
 2-3 sentences with a final verdict: is this a strong, moderate, or weak fit? Include one actionable suggestion for the candidate to strengthen their profile for this role.`;
-        
         const userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nJob for Analysis: ${jobDesc}`;
-
         try {
             const result = await callGeminiAPI(userQuery, systemPrompt);
             setGeneratedText(result);
@@ -786,40 +799,40 @@ Bullet list of required skills or qualifications the candidate currently lacks o
     };
 
     return (
-        <Section id="assistant" title="AI Recruiter Assistant">
+        <Section id="assistant" title="AI Recruiter Assistant" subtitle="Paste a job description to get an AI-powered fit analysis">
             <AnimateOnScroll>
-                <Card className="max-w-3xl mx-auto !p-0">
-                    <div className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                             <h3 className="text-xl font-bold text-white flex items-center"><BotIcon className="w-6 h-6 mr-2 text-cyan-500" /> Technical Match Analysis</h3>
-                             <span className="text-[10px] bg-cyan-900/30 text-cyan-400 border border-cyan-500/20 px-2 py-1 rounded uppercase tracking-widest font-bold">AI Powered</span>
+                <Card className="max-w-3xl mx-auto">
+                    <div className="p-6 md:p-8">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-lg font-semibold text-white/90 flex items-center tracking-tight"><BotIcon className="w-5 h-5 mr-2.5 text-blue-400" /> Technical Match Analysis</h3>
+                            <span className="text-[9px] bg-blue-500/10 text-blue-400/80 border border-blue-500/10 px-2.5 py-1 rounded-full uppercase tracking-widest font-semibold">AI Powered</span>
                         </div>
                         <AIAssistantVisual isGenerating={isGenerating} />
-                        <p className="text-gray-400 mt-4 mb-4 text-sm italic">Paste a job description below to see an objective AI-generated analysis of Ashwin's technical fit.</p>
-                        <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="w-full h-40 p-3 rounded-md bg-gray-900/50 border border-gray-600 text-white focus:ring-2 focus:ring-cyan-500 transition text-sm" disabled={isGenerating} />
-                        <button onClick={handleGenerate} disabled={isGenerating} className="mt-4 w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 transform hover:scale-[1.02] transition shadow-lg">
-                            <SparklesIcon className={`w-5 h-5 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                        <p className="text-white/30 mt-5 mb-5 text-sm font-light">Paste a job description below for an objective analysis of Ashwin's technical fit.</p>
+                        <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="input-apple h-40 resize-none font-mono text-sm" disabled={isGenerating} />
+                        <button onClick={handleGenerate} disabled={isGenerating} className="btn-premium btn-primary w-full mt-4">
+                            <SparklesIcon className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
                             {isGenerating ? 'Analyzing Match...' : 'Generate Fit Report'}
                         </button>
-                        {error && <p className="text-red-500 text-xs mt-4 text-center px-4">{error}</p>}
+                        {error && <p className="text-red-400/80 text-xs mt-4 text-center">{error}</p>}
                     </div>
                     {generatedText && (
-                        <div className="border-t border-gray-700 p-6 bg-gray-900/90">
-                            <div className="flex items-center gap-2 mb-3">
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Candidate Fit Report</h4>
+                        <div className="border-t border-white/[0.04] p-6 md:p-8 bg-white/[0.01]">
+                            <div className="flex items-center gap-2.5 mb-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ animation: 'soft-pulse 2s ease-in-out infinite' }}></div>
+                                <h4 className="text-[10px] font-semibold text-blue-400/70 uppercase tracking-[0.15em]">Candidate Fit Report</h4>
                             </div>
-                            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 prose-invert">
-                                <div className="text-gray-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: generatedText
-                                    .replace(/^## (.+)$/gm, '<h3 class="text-base font-bold text-cyan-400 mt-4 mb-2">$1</h3>')
-                                    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>')
-                                    .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1 list-disc text-gray-300">$1</li>')
-                                    .replace(/(<li[^>]*>.*<\/li>)/gs, '<ul class="my-2">$1</ul>')
+                            <div className="glass-card p-5">
+                                <div className="text-white/60 text-sm font-light leading-relaxed" dangerouslySetInnerHTML={{ __html: generatedText
+                                    .replace(/^## (.+)$/gm, '<h3 class="text-sm font-semibold text-blue-400/80 mt-5 mb-2">$1</h3>')
+                                    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white/80 font-medium">$1</strong>')
+                                    .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1.5 list-disc text-white/50">$1</li>')
+                                    .replace(/(\<li[^>]*>.*<\/li>)/gs, '<ul class="my-2">$1</ul>')
                                     .replace(/<\/ul>\s*<ul[^>]*>/g, '')
                                     .replace(/\n(?!<)/g, '<br/>')
                                 }} />
                             </div>
-                            <p className="text-[10px] text-gray-500 mt-4 italic">This report is an automated technical evaluation based on the candidate's verified portfolio data.</p>
+                            <p className="text-[10px] text-white/20 mt-4 font-light">This report is an automated technical evaluation based on the candidate's verified portfolio data.</p>
                         </div>
                     )}
                 </Card>
@@ -830,15 +843,15 @@ Bullet list of required skills or qualifications the candidate currently lacks o
 
 // --- CERTIFICATIONS ---
 const CertificationsSection = () => (
-    <Section id="certifications" title="Certifications">
-        <div className="grid sm:grid-cols-2 gap-8">
+    <Section id="certifications" title="Certifications" subtitle="Professional credentials & continuous learning">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {portfolioData.certifications.map((cert, index) => (
-                <AnimateOnScroll key={index} delay={index * 150}>
+                <AnimateOnScroll key={index} delay={index * 80}>
                     <Card className="h-full">
-                        <div className="p-6">
-                            <h3 className="text-lg font-bold text-white">{cert.name}</h3>
-                            <p className="text-gray-400 mt-1">{cert.issuer}</p>
-                            <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-semibold text-cyan-400 hover:underline mt-4">View Credential <ExternalLinkIcon className="w-4 h-4 ml-1" /></a>
+                        <div className="p-6 md:p-8 flex flex-col h-full">
+                            <h3 className="text-base font-semibold text-white/85 tracking-tight mb-2">{cert.name}</h3>
+                            <p className="text-xs text-white/30 font-light uppercase tracking-wider mb-6">{cert.issuer}</p>
+                            <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center text-xs font-medium text-blue-400/70 hover:text-blue-400 transition-colors duration-300">View Credential <ExternalLinkIcon className="w-3 h-3 ml-1.5" /></a>
                         </div>
                     </Card>
                 </AnimateOnScroll>
@@ -869,34 +882,34 @@ const ContactSection = () => {
     };
 
     return (
-        <Section id="contact" title="Get In Touch">
+        <Section id="contact" title="Get In Touch" subtitle="Let's connect and build something great">
             <AnimateOnScroll>
-                <div className="grid md:grid-cols-2 gap-12">
-                    <div className="space-y-6">
-                        <div className="flex items-start space-x-4">
-                            <div className="bg-cyan-900/50 p-3 rounded-full"><MailIcon className="w-6 h-6 text-cyan-400" /></div>
-                            <div><h3 className="text-lg font-semibold text-white">Email</h3><p className="text-gray-400">{portfolioData.personalInfo.email}</p></div>
+                <div className="grid md:grid-cols-2 gap-16">
+                    <div className="space-y-8">
+                        <div className="flex items-start gap-5">
+                            <div className="w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center flex-shrink-0"><MailIcon className="w-4 h-4 text-white/40" /></div>
+                            <div><h3 className="text-sm font-medium text-white/70 mb-1">Email</h3><p className="text-sm text-white/35 font-light">{portfolioData.personalInfo.email}</p></div>
                         </div>
-                        <div className="flex items-start space-x-4">
-                            <div className="bg-cyan-900/50 p-3 rounded-full"><PhoneIcon className="w-6 h-6 text-cyan-400" /></div>
-                            <div><h3 className="text-lg font-semibold text-white">Phone</h3><p className="text-gray-400">{portfolioData.personalInfo.phone}</p></div>
+                        <div className="flex items-start gap-5">
+                            <div className="w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center flex-shrink-0"><PhoneIcon className="w-4 h-4 text-white/40" /></div>
+                            <div><h3 className="text-sm font-medium text-white/70 mb-1">Phone</h3><p className="text-sm text-white/35 font-light">{portfolioData.personalInfo.phone}</p></div>
                         </div>
-                        <div className="flex items-start space-x-4">
-                            <div className="bg-cyan-900/50 p-3 rounded-full"><MapPinIcon className="w-6 h-6 text-cyan-400" /></div>
-                            <div><h3 className="text-lg font-semibold text-white">Location</h3><p className="text-gray-400">{portfolioData.personalInfo.location}</p></div>
+                        <div className="flex items-start gap-5">
+                            <div className="w-10 h-10 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center flex-shrink-0"><MapPinIcon className="w-4 h-4 text-white/40" /></div>
+                            <div><h3 className="text-sm font-medium text-white/70 mb-1">Location</h3><p className="text-sm text-white/35 font-light">{portfolioData.personalInfo.location}</p></div>
                         </div>
                     </div>
-                    <Card className="!p-8">
+                    <Card className="p-8">
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <input type="text" placeholder="Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required className="w-full p-2.5 rounded bg-gray-900/50 border border-gray-600 text-white" />
-                            <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} required className="w-full p-2.5 rounded bg-gray-900/50 border border-gray-600 text-white" />
-                            <input type="text" placeholder="Subject" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} required className="w-full p-2.5 rounded bg-gray-900/50 border border-gray-600 text-white" />
-                            <textarea placeholder="Message" value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} required rows="4" className="w-full p-2.5 rounded bg-gray-900/50 border border-gray-600 text-white"></textarea>
-                            <button type="submit" disabled={isSubmitting} className="w-full p-3 rounded bg-cyan-600 text-white hover:bg-cyan-700 transition">
-                                <SendIcon className={`w-4 h-4 mr-2 inline ${isSubmitting ? 'animate-spin' : ''}`} /> {isSubmitting ? 'Sending...' : 'Send Message'}
+                            <input type="text" placeholder="Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required className="input-apple" />
+                            <input type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} required className="input-apple" />
+                            <input type="text" placeholder="Subject" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} required className="input-apple" />
+                            <textarea placeholder="Message" value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} required rows="4" className="input-apple resize-none"></textarea>
+                            <button type="submit" disabled={isSubmitting} className="btn-premium btn-primary w-full mt-2">
+                                <SendIcon className={`w-4 h-4 mr-2 ${isSubmitting ? 'animate-spin' : ''}`} /> {isSubmitting ? 'Sending...' : 'Send Message'}
                             </button>
-                            {submitStatus === 'success' && <p className="text-green-500 text-sm text-center">Sent!</p>}
-                            {submitStatus === 'error' && <p className="text-red-500 text-sm text-center">Error occurred.</p>}
+                            {submitStatus === 'success' && <p className="text-green-400/80 text-sm text-center font-light">Message sent successfully!</p>}
+                            {submitStatus === 'error' && <p className="text-red-400/80 text-sm text-center font-light">Something went wrong. Please try again.</p>}
                         </form>
                     </Card>
                 </div>
@@ -905,7 +918,21 @@ const ContactSection = () => {
     );
 };
 
-const Footer = () => (<footer className="bg-gray-900/50 py-12 text-center text-gray-400"><div className="flex justify-center space-x-6 mb-4"><a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer"><GitHubIcon className="w-6 h-6 hover:text-cyan-400" /></a><a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer"><LinkedInIcon className="w-6 h-6 hover:text-cyan-400" /></a></div><p>&copy; {new Date().getFullYear()} {portfolioData.personalInfo.name}.</p></footer>);
+// --- FOOTER ---
+const Footer = () => (
+    <footer className="py-16 px-6">
+        <div className="container mx-auto max-w-6xl">
+            <div className="section-divider mb-10"></div>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <p className="text-xs text-white/20 font-light">&copy; {new Date().getFullYear()} {portfolioData.personalInfo.name}. All rights reserved.</p>
+                <div className="flex items-center gap-5">
+                    <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white/50 transition-colors duration-300"><GitHubIcon className="w-4 h-4" /></a>
+                    <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white/50 transition-colors duration-300"><LinkedInIcon className="w-4 h-4" /></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+);
 
 // --- APP ---
 export default function App() {
@@ -920,21 +947,21 @@ export default function App() {
     }, []);
 
     return (
-        <div className="bg-gray-900 min-h-screen text-white selection:bg-cyan-500/30">
-            <style>{`
-                .section-title span { display: inline-block; transition: all 0.7s; transform: translateY(100%); opacity: 0; }
-                .opacity-100 .section-title span { transform: translateY(0); opacity: 1; }
-                .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; width: 0; height: 3px; background: #06b6d4; transition: width 0.8s 0.4s; transform: translateX(-50%); }
-                .opacity-100 .section-title::after { width: 80px; }
-            `}</style>
+        <div className="bg-black min-h-screen text-white/90 font-sans">
             <Header activeSection={activeSection} />
             <main>
                 <div id="hero" ref={sectionRefs.hero}><Hero /></div>
+                <div className="section-divider"></div>
                 <div id="roadmap" ref={sectionRefs.roadmap}><CareerRoadmapSection /></div>
+                <div className="section-divider"></div>
                 <div id="skills" ref={sectionRefs.skills}><SkillsSection /></div>
+                <div className="section-divider"></div>
                 <div id="projects" ref={sectionRefs.projects}><ProjectsSection /></div>
+                <div className="section-divider"></div>
                 <div id="assistant" ref={sectionRefs.assistant}><AIAssistantSection /></div>
+                <div className="section-divider"></div>
                 <div id="certifications" ref={sectionRefs.certifications}><CertificationsSection /></div>
+                <div className="section-divider"></div>
                 <div id="contact" ref={sectionRefs.contact}><ContactSection /></div>
             </main>
             <Footer />
