@@ -163,7 +163,7 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
         apiKey = "";
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const payload = {
         contents: [{ parts: [{ text: userQuery }] }],
@@ -748,14 +748,29 @@ const AIAssistantSection = () => {
         setGeneratedText('');
 
         // ENFORCED THIRD-PERSON SYSTEM PROMPT
-        const systemPrompt = `You are a professional AI Match Analysis tool. 
-        Your task is to analyze Ashwin Muniappan's portfolio and determine how well he fits a specific job role.
-        STRICT RULES:
-        1. NEVER use "I," "me," or "my." 
-        2. ALWAYS speak about the candidate in the third person using "Ashwin" or "the candidate."
-        3. Write exactly 3-4 professional sentences.
-        4. Focus on matching specific skills (Reinforcement Learning, Sensor Fusion, Python) to the job requirements.
-        5. Tone: Objective, professional, and analytical.`;
+        const systemPrompt = `You are an expert AI Recruiter Match Analysis tool. Your task is to deeply analyze Ashwin Muniappan's portfolio against a specific job description and produce a structured technical fit report.
+
+STRICT RULES:
+1. NEVER use "I," "me," or "my." ALWAYS refer to the candidate as "Ashwin" or "the candidate" in third person.
+2. Be specific — reference actual projects, certifications, and technologies from the portfolio.
+3. Tone: Objective, professional, and data-driven.
+
+OUTPUT FORMAT (use markdown):
+
+## Match Score: [X]%
+A single overall fit percentage based on skills, experience, and project relevance.
+
+## ✅ Matching Skills
+Bullet list of skills from the portfolio that directly match the job requirements. For each, briefly cite the relevant project or experience.
+
+## ⚠️ Skill Gaps
+Bullet list of required skills or qualifications the candidate currently lacks or has limited experience in.
+
+## 🎯 Experience Alignment
+2-3 sentences on how the candidate's work experience, education, and projects map to the role's responsibilities.
+
+## 💡 Recommendation
+2-3 sentences with a final verdict: is this a strong, moderate, or weak fit? Include one actionable suggestion for the candidate to strengthen their profile for this role.`;
         
         const userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nJob for Analysis: ${jobDesc}`;
 
@@ -794,8 +809,15 @@ const AIAssistantSection = () => {
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                                 <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Candidate Fit Report</h4>
                             </div>
-                            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{generatedText}</p>
+                            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 prose-invert">
+                                <div className="text-gray-300 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: generatedText
+                                    .replace(/^## (.+)$/gm, '<h3 class="text-base font-bold text-cyan-400 mt-4 mb-2">$1</h3>')
+                                    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>')
+                                    .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1 list-disc text-gray-300">$1</li>')
+                                    .replace(/(<li[^>]*>.*<\/li>)/gs, '<ul class="my-2">$1</ul>')
+                                    .replace(/<\/ul>\s*<ul[^>]*>/g, '')
+                                    .replace(/\n(?!<)/g, '<br/>')
+                                }} />
                             </div>
                             <p className="text-[10px] text-gray-500 mt-4 italic">This report is an automated technical evaluation based on the candidate's verified portfolio data.</p>
                         </div>
