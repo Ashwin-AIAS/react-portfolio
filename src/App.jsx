@@ -38,12 +38,53 @@ const portfolioData = {
     }
   ],
   skills: {
-    "Programming & Tools": ["Python", "SQL", "Power Automate", "Simulink", "SUMO", "Pandas", "NumPy"],
-    "AI/ML": ["PyTorch", "Keras", "TensorFlow", "OpenCV", "Reinforcement Learning", "Prompt Engineering"],
+    "Programming & Tools": ["Python", "C/C++", "SQL", "FastAPI", "Docker", "CMake", "Power Automate", "Simulink", "SUMO", "Pandas", "NumPy"],
+    "AI/ML": ["PyTorch", "Keras", "TensorFlow", "OpenCV", "YOLOv8", "MediaPipe", "GANs", "LangChain", "Gemini API", "Reinforcement Learning", "Prompt Engineering"],
+    "Web & Backend": ["React", "PostgreSQL", "pgvector", "Streamlit"],
     "Data Analysis & Visualization": ["Power BI", "Excel", "Tableau"],
-    "Collaboration": ["SharePoint", "Confluence", "Jira", "GitHub"],
+    "Collaboration": ["SharePoint", "Confluence", "Jira", "GitHub", "N8N"],
   },
   projects: [
+    {
+      title: "RAG System — Full-Stack Retrieval-Augmented Generation",
+      description: "• Built a full-stack RAG system with document ingestion, semantic & hybrid retrieval, and grounded generation.\n• Implemented cross-encoder reranking and optional Graph RAG via Neo4j.\n• Features conversation history, feedback system, and admin analytics dashboard.",
+      technologies: ["FastAPI", "React", "PostgreSQL", "pgvector", "Docker", "Gemini API", "LangChain"],
+      visualComponent: 'RAGSystem',
+      githubUrl: "https://github.com/Ashwin-AIAS/rag-foundation-pgvector",
+      liveUrl: "#"
+    },
+    {
+      title: "Mini-CNN Framework",
+      description: "• Implemented a custom LeNet-5 inference engine from scratch in C/C++.\n• Optimized with HPC techniques including Im2Col for cache locality.\n• Simulated Int8 quantization and integer arithmetic for edge hardware deployment.",
+      technologies: ["C/C++", "CMake", "LeNet-5", "Int8 Quantization", "HPC"],
+      visualComponent: 'MiniCNN',
+      githubUrl: "https://github.com/Ashwin-AIAS/Mini-CNN-Framework",
+      liveUrl: "#"
+    },
+    {
+      title: "YOLO Bat Swing Analysis",
+      description: "• Built a sports analytics tool using YOLOv8 for player & bat detection and MediaPipe for pose estimation.\n• Computes swing metrics: peak speed, angular velocity, duration, angle, and smoothness score.\n• Includes Streamlit demo, CLI interface, and unit tests.",
+      technologies: ["Python", "YOLOv8", "MediaPipe", "OpenCV", "Streamlit"],
+      visualComponent: 'BatSwing',
+      githubUrl: "https://github.com/Ashwin-AIAS/Yolo-Bat-swing-analysis-",
+      liveUrl: "#"
+    },
+    {
+      title: "Radar-AI: Object Detection with Synthetic Data",
+      description: "• Explored AI-enhanced RADAR perception for autonomous systems using GAN-generated synthetic data.\n• Built CNN-based classification models trained on combined real and synthetic RADAR data.\n• Developed an AI agent for real-time object detection and classification.",
+      technologies: ["Python", "GANs", "CNNs", "PyTorch", "RADAR Signal Processing"],
+      visualComponent: 'RadarAI',
+      githubUrl: "https://github.com/Ashwin-AIAS/Radar-AI-Enhancing-Object-Detection-with-Synthetic-Data-and-AI-driven-Classification",
+      liveUrl: "#"
+    },
+    {
+      title: "Face Detection & 3D Reconstruction",
+      description: "• Implemented face detection pipeline using deep learning and OpenCV.\n• Performed 3D face reconstruction from 2D images.\n• Combined computer vision techniques for accurate facial feature mapping.",
+      technologies: ["Python", "OpenCV", "Deep Learning", "3D Reconstruction"],
+      visualComponent: 'FaceRecon',
+      githubUrl: "https://github.com/Ashwin-AIAS/Face-Detection-and-3D-Reconstruction",
+      liveUrl: "#"
+    },
     {
       title: "Foundation Models for Computer Vision",
       description: "• Advanced camera-LiDAR fusion models.\n• Led the setup of a development environment on Jetson Nano.\n• Performed data preprocessing for large-scale Kitty and Waymo datasets.\n• Utilized Git and Jira for collaborative project management.",
@@ -75,9 +116,22 @@ const portfolioData = {
       visualComponent: 'ReinforcementLearning',
       githubUrl: "https://github.com/Ashwin-AIAS",
       liveUrl: "#"
+    },
+    {
+      title: "N8N Webhook Forwarder",
+      description: "• Built a webhook forwarding system using N8N workflow automation.\n• Configured automated data pipelines triggered by external webhook events.\n• Streamlined integration between services with event-driven architecture.",
+      technologies: ["N8N", "Webhooks", "Automation", "API Integration"],
+      visualComponent: 'Webhook',
+      githubUrl: "https://github.com/Ashwin-AIAS/N8N",
+      liveUrl: "#"
     }
   ],
   certifications: [
+    {
+      name: "Claude Code in Action",
+      issuer: "Anthropic",
+      credentialUrl: "http://verify.skilljar.com/c/633xi2hd6rm6"
+    },
     {
       name: "Building Code Agents with Hugging Face",
       issuer: "Hugging Face",
@@ -268,6 +322,183 @@ const RoundaboutVisual = () => (
     </div>
 );
 
+// --- NEW VISUAL COMPONENTS ---
+const RAGSystemVisual = () => (
+    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+        <style>{`
+            @keyframes rag-doc-flow { 0% { transform: translateX(-40px); opacity: 0; } 30% { transform: translateX(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: translateX(40px); opacity: 0; } }
+            @keyframes rag-pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.3); opacity: 1; } }
+            .rag-doc { animation: rag-doc-flow 3s ease-in-out infinite; }
+            .rag-node { animation: rag-pulse 2s ease-in-out infinite; }
+        `}</style>
+        <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-2">
+                {[0, 1, 2].map(i => (
+                    <div key={i} className="rag-doc w-10 h-8 bg-cyan-900/60 border border-cyan-500/30 rounded flex items-center justify-center" style={{ animationDelay: `${i * 0.4}s` }}>
+                        <div className="space-y-1"><div className="w-5 h-0.5 bg-cyan-400/60 rounded"></div><div className="w-3 h-0.5 bg-cyan-400/40 rounded"></div></div>
+                    </div>
+                ))}
+            </div>
+            <svg width="30" height="40" className="text-cyan-500/50"><path d="M5 20 L25 20" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2"><animate attributeName="stroke-dashoffset" from="12" to="0" dur="1s" repeatCount="indefinite"/></path><polygon points="22,15 28,20 22,25" fill="currentColor"/></svg>
+            <div className="relative w-16 h-16">
+                {[0, 1, 2, 3, 4, 5].map(i => (
+                    <div key={i} className="absolute w-2.5 h-2.5 bg-blue-400 rounded-full rag-node shadow-[0_0_6px_#60a5fa]" style={{ top: `${50 + 28 * Math.sin(i * Math.PI / 3) - 5}%`, left: `${50 + 28 * Math.cos(i * Math.PI / 3) - 5}%`, animationDelay: `${i * 0.3}s` }}></div>
+                ))}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-cyan-500 rounded-full shadow-[0_0_12px_#06b6d4]"></div>
+            </div>
+            <svg width="30" height="40" className="text-cyan-500/50"><path d="M5 20 L25 20" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2"><animate attributeName="stroke-dashoffset" from="12" to="0" dur="1s" repeatCount="indefinite"/></path><polygon points="22,15 28,20 22,25" fill="currentColor"/></svg>
+            <div className="w-14 h-10 bg-green-900/50 border border-green-500/30 rounded-lg flex items-center justify-center">
+                <div className="space-y-1"><div className="w-7 h-0.5 bg-green-400/80 rounded"></div><div className="w-5 h-0.5 bg-green-400/60 rounded"></div><div className="w-6 h-0.5 bg-green-400/40 rounded"></div></div>
+            </div>
+        </div>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">DOC → VECTORS → ANSWER</div>
+    </div>
+);
+
+const MiniCNNVisual = () => (
+    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+        <style>{`
+            @keyframes cnn-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+            @keyframes cnn-data { 0% { transform: translateX(-10px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(10px); opacity: 0; } }
+            .cnn-node { animation: cnn-pulse 2s ease-in-out infinite; }
+            .cnn-data { animation: cnn-data 1.5s ease-in-out infinite; }
+        `}</style>
+        <div className="flex items-center gap-3">
+            {[{w: 'w-8', h: 'h-24', c: 'bg-purple-500/30 border-purple-500/50', n: 4, label: 'Conv'},
+              {w: 'w-6', h: 'h-20', c: 'bg-blue-500/30 border-blue-500/50', n: 3, label: 'Pool'},
+              {w: 'w-6', h: 'h-16', c: 'bg-cyan-500/30 border-cyan-500/50', n: 3, label: 'Conv'},
+              {w: 'w-4', h: 'h-12', c: 'bg-teal-500/30 border-teal-500/50', n: 2, label: 'FC'},
+              {w: 'w-3', h: 'h-8', c: 'bg-green-500/30 border-green-500/50', n: 1, label: 'Out'}].map((layer, li) => (
+                <div key={li} className="flex flex-col items-center gap-1">
+                    <div className={`${layer.w} ${layer.h} ${layer.c} border rounded-md relative overflow-hidden`}>
+                        {[...Array(layer.n)].map((_, ni) => (
+                            <div key={ni} className="cnn-data absolute w-full h-0.5 bg-gradient-to-r from-transparent via-white/40 to-transparent" style={{ top: `${((ni + 1) / (layer.n + 1)) * 100}%`, animationDelay: `${li * 0.3 + ni * 0.2}s` }}></div>
+                        ))}
+                    </div>
+                    <span className="text-[8px] text-gray-500 font-mono">{layer.label}</span>
+                </div>
+            ))}
+        </div>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">LeNet-5 INFERENCE</div>
+    </div>
+);
+
+const BatSwingVisual = () => (
+    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+        <style>{`
+            @keyframes bat-swing { 0% { transform: rotate(-45deg); } 50% { transform: rotate(45deg); } 100% { transform: rotate(-45deg); } }
+            @keyframes swing-trail { 0% { opacity: 0; } 30% { opacity: 0.6; } 100% { opacity: 0; } }
+            .bat-arm { animation: bat-swing 2s ease-in-out infinite; transform-origin: top center; }
+        `}</style>
+        <div className="relative w-32 h-32">
+            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></div>
+            <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-1 h-8 bg-gray-400/60 rounded"></div>
+            <div className="absolute top-[35%] left-1/2 -translate-x-[3px] bat-arm">
+                <div className="w-1.5 h-14 bg-gradient-to-b from-amber-700 to-amber-500 rounded-b-full"></div>
+            </div>
+            {[-30, -15, 0, 15, 30].map((angle, i) => (
+                <div key={i} className="absolute top-[35%] left-1/2 w-12 h-0.5 bg-cyan-400/20 rounded" style={{ transform: `rotate(${angle}deg)`, transformOrigin: 'left center', animation: `swing-trail 2s ease-in-out infinite`, animationDelay: `${i * 0.1}s` }}></div>
+            ))}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {['SPD', 'ANG', 'DUR'].map((m, i) => (
+                    <div key={i} className="text-[8px] bg-gray-700/80 text-cyan-400 px-1.5 py-0.5 rounded font-mono">{m}</div>
+                ))}
+            </div>
+        </div>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">SWING ANALYSIS</div>
+    </div>
+);
+
+const FaceReconVisual = () => {
+    const [rotation, setRotation] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setRotation(r => (r + 1) % 360), 30);
+        return () => clearInterval(interval);
+    }, []);
+    const points = Array.from({ length: 20 }, (_, i) => {
+        const theta = (i / 10) * Math.PI;
+        const phi = (i % 10) * Math.PI / 5;
+        const x = 30 * Math.sin(theta) * Math.cos(phi + rotation * Math.PI / 180);
+        const y = 40 * Math.cos(theta);
+        return { x: 50 + x, y: 45 + y * 0.6, z: Math.sin(phi + rotation * Math.PI / 180) };
+    });
+    return (
+        <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+            <svg viewBox="0 0 100 100" className="w-32 h-32">
+                {points.map((p, i) => (
+                    <circle key={i} cx={p.x} cy={p.y} r={1 + p.z * 0.5} fill={p.z > 0 ? '#06b6d4' : '#164e63'} opacity={0.5 + p.z * 0.3} />
+                ))}
+                {points.slice(0, -1).map((p, i) => (
+                    <line key={`l${i}`} x1={p.x} y1={p.y} x2={points[i + 1].x} y2={points[i + 1].y} stroke="#06b6d4" strokeWidth="0.3" opacity={0.2 + p.z * 0.2} />
+                ))}
+            </svg>
+            <div className="absolute top-3 right-3 flex flex-col gap-1">
+                <div className="text-[8px] bg-green-900/50 text-green-400 px-1.5 py-0.5 rounded font-mono">DETECTED</div>
+                <div className="text-[8px] bg-cyan-900/50 text-cyan-400 px-1.5 py-0.5 rounded font-mono">3D MAP</div>
+            </div>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">3D RECONSTRUCTION</div>
+        </div>
+    );
+};
+
+const RadarAIVisual = () => (
+    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+        <style>{`
+            @keyframes radar-sweep-ai { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            @keyframes radar-blip { 0%, 80% { opacity: 0; transform: scale(0); } 90% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.5); } }
+            .radar-line { animation: radar-sweep-ai 3s linear infinite; }
+            .radar-blip { animation: radar-blip 3s ease-out infinite; }
+        `}</style>
+        <div className="relative w-40 h-40">
+            {[1, 2, 3].map(r => (
+                <div key={r} className="absolute rounded-full border border-cyan-500/20" style={{ width: `${r * 33}%`, height: `${r * 33}%`, top: `${50 - r * 16.5}%`, left: `${50 - r * 16.5}%` }}></div>
+            ))}
+            <div className="absolute w-full h-full radar-line" style={{ transformOrigin: '50% 50%' }}>
+                <div className="absolute top-0 left-1/2 w-0.5 h-1/2 bg-gradient-to-t from-cyan-500/60 to-transparent" style={{ transformOrigin: 'bottom center' }}></div>
+            </div>
+            <div className="absolute w-2 h-2 bg-cyan-400 rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_#06b6d4]"></div>
+            {[{x: 30, y: 25, label: 'CAR', d: 0}, {x: 65, y: 35, label: 'PED', d: 0.8}, {x: 45, y: 70, label: 'BIKE', d: 1.6}].map((obj, i) => (
+                <div key={i} className="absolute" style={{ left: `${obj.x}%`, top: `${obj.y}%` }}>
+                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full radar-blip shadow-[0_0_6px_#ef4444]" style={{ animationDelay: `${obj.d}s` }}></div>
+                    <div className="absolute -top-4 left-3 text-[7px] bg-gray-900/80 text-green-400 px-1 py-0.5 rounded font-mono whitespace-nowrap">{obj.label}</div>
+                </div>
+            ))}
+        </div>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">RADAR + GAN CLASSIFICATION</div>
+    </div>
+);
+
+const WebhookVisual = () => (
+    <div className="w-full h-48 bg-gray-800 relative overflow-hidden flex items-center justify-center">
+        <style>{`
+            @keyframes webhook-flow { 0% { transform: translateX(-8px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(8px); opacity: 0; } }
+            @keyframes webhook-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(234, 75, 113, 0.4); } 50% { box-shadow: 0 0 0 6px rgba(234, 75, 113, 0); } }
+            .wh-flow { animation: webhook-flow 1.5s ease-in-out infinite; }
+            .wh-pulse { animation: webhook-pulse 2s ease-in-out infinite; }
+        `}</style>
+        <div className="flex items-center gap-3">
+            {[{label: 'TRIGGER', color: 'bg-amber-900/50 border-amber-500/30 text-amber-400'},
+              {label: 'N8N', color: 'bg-pink-900/50 border-pink-500/30 text-pink-400'},
+              {label: 'ACTION', color: 'bg-green-900/50 border-green-500/30 text-green-400'}].map((block, i) => (
+                <React.Fragment key={i}>
+                    <div className={`${block.color} border rounded-lg px-3 py-2 flex flex-col items-center gap-1 ${i === 1 ? 'wh-pulse' : ''}`}>
+                        <div className={`text-[9px] font-mono font-bold ${block.color.split(' ')[2]}`}>{block.label}</div>
+                        <div className="flex gap-0.5">
+                            {[0, 1, 2].map(j => <div key={j} className="w-1 h-1 bg-current rounded-full opacity-40"></div>)}
+                        </div>
+                    </div>
+                    {i < 2 && (
+                        <div className="flex gap-0.5">
+                            {[0, 1, 2].map(j => <div key={j} className="w-1.5 h-1.5 bg-cyan-400 rounded-full wh-flow" style={{ animationDelay: `${j * 0.2}s` }}></div>)}
+                        </div>
+                    )}
+                </React.Fragment>
+            ))}
+        </div>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">WEBHOOK AUTOMATION</div>
+    </div>
+);
+
 const AIAssistantVisual = ({ isGenerating }) => (
     <div className="w-full h-24 bg-gray-900/50 rounded-t-lg p-4 relative overflow-hidden">
         <style>{`
@@ -292,7 +523,11 @@ const AIAssistantVisual = ({ isGenerating }) => (
 const SkillBadge = ({ skillName }) => {
     const badgeMap = {
         Python: 'https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54',
+        'C/C++': 'https://img.shields.io/badge/C%2FC%2B%2B-00599C?style=for-the-badge&logo=cplusplus&logoColor=white',
         SQL: 'https://img.shields.io/badge/SQL-025E8C?style=for-the-badge&logo=microsoft-sql-server&logoColor=white',
+        FastAPI: 'https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white',
+        Docker: 'https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white',
+        CMake: 'https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white',
         'Power Automate': 'https://img.shields.io/badge/Power%20Automate-0066FF?style=for-the-badge&logo=powerautomate&logoColor=white',
         Simulink: 'https://img.shields.io/badge/Simulink-D9230F?style=for-the-badge&logo=simulink&logoColor=white',
         SUMO: 'https://img.shields.io/badge/SUMO-76B900?style=for-the-badge&logo=eclipse-sumo&logoColor=white',
@@ -302,8 +537,17 @@ const SkillBadge = ({ skillName }) => {
         Keras: 'https://img.shields.io/badge/Keras-%23D00000.svg?style=for-the-badge&logo=Keras&logoColor=white',
         TensorFlow: 'https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=for-the-badge&logo=TensorFlow&logoColor=white',
         OpenCV: 'https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white',
+        YOLOv8: 'https://img.shields.io/badge/YOLOv8-00FFFF?style=for-the-badge&logo=yolo&logoColor=black',
+        MediaPipe: 'https://img.shields.io/badge/MediaPipe-0097A7?style=for-the-badge&logo=google&logoColor=white',
+        GANs: 'https://img.shields.io/badge/GANs-FF6F00?style=for-the-badge',
+        LangChain: 'https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white',
+        'Gemini API': 'https://img.shields.io/badge/Gemini%20API-8E75B2?style=for-the-badge&logo=google-gemini&logoColor=white',
         'Reinforcement Learning': 'https://img.shields.io/badge/Reinforcement%20Learning-FFC107?style=for-the-badge',
         'Prompt Engineering': 'https://img.shields.io/badge/Prompt%20Engineering-9C27B0?style=for-the-badge',
+        React: 'https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB',
+        PostgreSQL: 'https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white',
+        pgvector: 'https://img.shields.io/badge/pgvector-336791?style=for-the-badge&logo=postgresql&logoColor=white',
+        Streamlit: 'https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white',
         'Power BI': 'https://img.shields.io/badge/PowerBI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black',
         Excel: 'https://img.shields.io/badge/Microsoft_Excel-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white',
         Tableau: 'https://img.shields.io/badge/Tableau-E97627?style=for-the-badge&logo=tableau&logoColor=white',
@@ -311,6 +555,7 @@ const SkillBadge = ({ skillName }) => {
         Confluence: 'https://img.shields.io/badge/Confluence-172B4D?style=for-the-badge&logo=confluence&logoColor=white',
         Jira: 'https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=Jira&logoColor=white',
         GitHub: 'https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white',
+        N8N: 'https://img.shields.io/badge/n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white',
     };
     const url = badgeMap[skillName];
     if (!url) return null;
@@ -469,6 +714,12 @@ const ProjectsSection = () => (
                         {project.visualComponent === 'GenerativeAI' && <GenerativeAIVisual />}
                         {project.visualComponent === 'ReinforcementLearning' && <RLVisual />}
                         {project.visualComponent === 'Roundabout' && <RoundaboutVisual />}
+                        {project.visualComponent === 'RAGSystem' && <RAGSystemVisual />}
+                        {project.visualComponent === 'MiniCNN' && <MiniCNNVisual />}
+                        {project.visualComponent === 'BatSwing' && <BatSwingVisual />}
+                        {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
+                        {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
+                        {project.visualComponent === 'Webhook' && <WebhookVisual />}
                         <div className="p-6 flex flex-col flex-grow">
                             <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
                             <p className="text-gray-400 mb-4 flex-grow whitespace-pre-line">{project.description}</p>
