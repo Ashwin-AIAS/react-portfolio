@@ -94,14 +94,6 @@ const portfolioData = {
       liveUrl: "#"
     },
     {
-      title: "Generative AI for Synthetic Sensor Data",
-      description: "• Developed data generation pipelines using Generative Adversarial Networks (GANs).\n• Produced rare and complex visual scenarios to augment training data.\n• Improved dataset diversity and overall model robustness.",
-      technologies: ["Python", "GANs", "PyTorch", "Keras"],
-      visualComponent: 'GenerativeAI',
-      githubUrl: "https://github.com/Ashwin-AIAS",
-      liveUrl: "#"
-    },
-    {
       title: "Coordination of Automated Vehicles at Roundabouts",
       description: "• Conducted competitive and scenario analysis to evaluate various mobility strategies.\n• Contributed to roadmap recommendations for advanced traffic systems.\n• Utilized SUMO and Simulink for traffic flow simulation.",
       technologies: ["SUMO", "Simulink", "Python", "Scenario Analysis"],
