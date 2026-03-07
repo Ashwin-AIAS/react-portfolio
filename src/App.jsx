@@ -191,47 +191,63 @@ const portfolioData = {
   ]
 };
 
-// --- GEMINI API CALLER ---
+// --- OPENAI API CALLER ---
 const callGeminiAPI = async (userQuery, systemPrompt) => {
-    // We check for the Vercel/Vite environment variable safely to avoid build warnings
     let apiKey = "";
     try {
-        // String literal access prevents compiler from crashing if import.meta is missing
-        apiKey = import.meta.env["VITE_GEMINI_API_KEY"] || "";
+        apiKey = import.meta.env["VITE_OPENAI_API_KEY"] || "";
     } catch (e) {
         apiKey = "";
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    if (!apiKey) {
+        throw new Error("Missing API Key. Ensure VITE_OPENAI_API_KEY is set in your environment.");
+    }
+
+    const url = "https://api.openai.com/v1/chat/completions";
 
     const payload = {
-        contents: [{ parts: [{ text: userQuery }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] }
+        model: "gpt-4o-mini",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userQuery }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
     };
 
-    // Mandatory Exponential Backoff Retry Logic
+    // Exponential Backoff Retry Logic
     const maxRetries = 5;
     for (let i = 0; i < maxRetries; i++) {
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
                 const data = await response.json();
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const text = data.choices?.[0]?.message?.content;
                 if (!text) throw new Error("No analysis generated.");
                 return text;
             }
 
             if (response.status === 401 || response.status === 403) {
-                throw new Error("Missing or Invalid API Key. Ensure VITE_GEMINI_API_KEY is set in Vercel settings.");
+                throw new Error("Invalid API Key. Ensure VITE_OPENAI_API_KEY is set correctly in Vercel settings.");
             }
 
-            const delay = Math.pow(2, i) * 1000;
-            await new Promise(resolve => setTimeout(resolve, delay));
+            if (response.status === 429) {
+                const delay = Math.pow(2, i) * 1000;
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error?.message || `API error: ${response.status}`);
         } catch (error) {
             if (i === maxRetries - 1 || error.message.includes("API Key")) throw error;
             const delay = Math.pow(2, i) * 1000;
