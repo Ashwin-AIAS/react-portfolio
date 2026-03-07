@@ -221,11 +221,18 @@ const callOpenAIAPI = async (userQuery, systemPrompt) => {
             })
         });
 
-        if (response.status === 401) {
-            throw new Error("Invalid OpenAI API Key");
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error("Invalid OpenAI API Key");
+            }
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error?.message || `API Error: ${response.status}`);
         }
 
         const data = await response.json();
+        if (!data.choices || data.choices.length === 0) {
+            throw new Error("No response generated from OpenAI.");
+        }
         return data.choices[0].message.content;
     } catch (error) {
         throw error;
