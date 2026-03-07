@@ -192,7 +192,7 @@ const portfolioData = {
 };
 
 // --- OPENAI API CALLER ---
-const callGeminiAPI = async (userQuery, systemPrompt) => {
+const callOpenAIAPI = async (userQuery, systemPrompt) => {
     let apiKey = "";
     try {
         apiKey = import.meta.env["VITE_OPENAI_API_KEY"] || "";
@@ -204,57 +204,32 @@ const callGeminiAPI = async (userQuery, systemPrompt) => {
         throw new Error("Missing API Key. Ensure VITE_OPENAI_API_KEY is set in your environment.");
     }
 
-    const url = "https://api.openai.com/v1/chat/completions";
+    try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userQuery }
+                ],
+                max_tokens: 1000
+            })
+        });
 
-    const payload = {
-        model: "gpt-4o-mini",
-        messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userQuery }
-        ],
-        temperature: 0.7,
-        max_tokens: 2000
-    };
-
-    // Exponential Backoff Retry Logic
-    const maxRetries = 5;
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                const text = data.choices?.[0]?.message?.content;
-                if (!text) throw new Error("No analysis generated.");
-                return text;
-            }
-
-            if (response.status === 401 || response.status === 403) {
-                throw new Error("Invalid API Key. Ensure VITE_OPENAI_API_KEY is set correctly in Vercel settings.");
-            }
-
-            if (response.status === 429) {
-                const delay = Math.pow(2, i) * 1000;
-                await new Promise(resolve => setTimeout(resolve, delay));
-                continue;
-            }
-
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `API error: ${response.status}`);
-        } catch (error) {
-            if (i === maxRetries - 1 || error.message.includes("API Key")) throw error;
-            const delay = Math.pow(2, i) * 1000;
-            await new Promise(resolve => setTimeout(resolve, delay));
+        if (response.status === 401) {
+            throw new Error("Invalid OpenAI API Key");
         }
+
+        const data = await response.json();
+        return data.choices[0].message.content;
+    } catch (error) {
+        throw error;
     }
-    throw new Error("The AI service is currently busy. Please try again.");
 };
 
 // --- ICONS ---
@@ -1248,7 +1223,7 @@ Bullet list of required skills or qualifications the candidate currently lacks o
         }
 
         try {
-            const result = await callGeminiAPI(userQuery, systemPrompt);
+            const result = await callOpenAIAPI(userQuery, systemPrompt);
             setGeneratedText(result);
         } catch (err) {
             console.error("AI Assistant Error:", err);
