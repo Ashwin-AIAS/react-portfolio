@@ -9,7 +9,7 @@ const portfolioData = {
   personalInfo: {
     name: "Ashwin",
     title: "AI Engineer for Autonomous Systems",
-    bio: "Aspiring AI Engineer with a background in ERP analysis and a passion for autonomous systems. Experienced in developing automation scripts, managing data, and working on cutting-edge computer vision and generative AI projects. Currently pursuing a Master's in AI Engineering.",
+    bio: "Master's student in AI Engineering at THI Germany, with production experience building computer vision pipelines, full-stack RAG systems, and LLM-powered tools. Former ERP Analyst at DXC Technology. Focused on bridging AI research and real-world deployment in autonomous systems.",
     email: "mashwinvignesh@gmail.com",
     phone: "+49 15560090137",
     location: "Ingolstadt, Germany",
@@ -965,16 +965,16 @@ const Hero = () => {
                             </p>
                         </AnimateOnScroll>
                         <motion.div
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{ delay: 0.2 }}
                             className="mb-5 flex justify-center md:justify-start"
                         >
                             <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
                                 <motion.div
                                     className="w-2 h-2 rounded-full bg-green-400"
-                                    animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
-                                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                                    animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
                                 />
                                 <span className="text-xs font-medium text-green-400 tracking-wide">Open to Opportunities</span>
                             </div>
@@ -1441,6 +1441,32 @@ const Footer = () => (
     </footer>
 );
 
+// --- SCROLL TO TOP ---
+const ScrollToTop = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    useEffect(() => {
+        const onScroll = () => setIsVisible(window.scrollY > 400);
+        window.addEventListener('scroll', onScroll);
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+    return (
+        <AnimatePresence>
+            {isVisible && (
+                <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 flex items-center justify-center transition-all cursor-pointer"
+                    aria-label="Scroll to top"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" /></svg>
+                </motion.button>
+            )}
+        </AnimatePresence>
+    );
+};
+
 // --- APP ---
 export default function App() {
     const [activeSection, setActiveSection] = useState('hero');
@@ -1477,6 +1503,7 @@ export default function App() {
                     <div id="contact" ref={sectionRefs.contact}><ContactSection /></div>
                 </main>
                 <Footer />
+                <ScrollToTop />
             </div>
         </ThemeContext.Provider>
     );
