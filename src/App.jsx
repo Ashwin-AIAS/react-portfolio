@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';          
    
 // --- PERSONALIZED DATA ---       
@@ -507,6 +507,182 @@ const AIAssistantVisual = ({ isGenerating }) => (
     </div>
 );
 
+// --- TRENDY ANIMATION COMPONENTS (2026) ---
+
+// 1. Mouse-following glow spotlight
+const MouseGlow = () => {
+    const glowRef = useRef(null);
+    const handleMouseMove = useCallback((e) => {
+        if (glowRef.current) {
+            glowRef.current.style.left = `${e.clientX}px`;
+            glowRef.current.style.top = `${e.clientY + window.scrollY}px`;
+            glowRef.current.style.opacity = '1';
+        }
+    }, []);
+    const handleMouseLeave = useCallback(() => {
+        if (glowRef.current) glowRef.current.style.opacity = '0';
+    }, []);
+    useEffect(() => {
+        const section = glowRef.current?.parentElement;
+        if (!section) return;
+        section.addEventListener('mousemove', handleMouseMove);
+        section.addEventListener('mouseleave', handleMouseLeave);
+        return () => { section.removeEventListener('mousemove', handleMouseMove); section.removeEventListener('mouseleave', handleMouseLeave); };
+    }, [handleMouseMove, handleMouseLeave]);
+    return <div ref={glowRef} className="mouse-glow" style={{ opacity: 0 }} />;
+};
+
+// 2. Animated gradient mesh (morphing blobs)
+const GradientMesh = () => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
+        <div className="absolute w-[600px] h-[600px] rounded-full opacity-30 top-1/4 left-1/4"
+            style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4) 0%, transparent 70%)', animation: 'mesh-blob-1 12s ease-in-out infinite' }} />
+        <div className="absolute w-[500px] h-[500px] rounded-full opacity-25 top-1/3 right-1/4"
+            style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.35) 0%, transparent 70%)', animation: 'mesh-blob-2 15s ease-in-out infinite' }} />
+        <div className="absolute w-[400px] h-[400px] rounded-full opacity-20 bottom-1/4 left-1/3"
+            style={{ background: 'radial-gradient(circle, rgba(244,114,182,0.3) 0%, transparent 70%)', animation: 'mesh-blob-3 18s ease-in-out infinite' }} />
+    </div>
+);
+
+// 3. Typewriter text effect
+const TypewriterText = ({ text, className = '' }) => {
+    const [displayText, setDisplayText] = useState('');
+    const [showCursor, setShowCursor] = useState(true);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true });
+    useEffect(() => {
+        if (!isInView) return;
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i <= text.length) { setDisplayText(text.slice(0, i)); i++; }
+            else clearInterval(interval);
+        }, 60);
+        return () => clearInterval(interval);
+    }, [isInView, text]);
+    useEffect(() => {
+        const blink = setInterval(() => setShowCursor(c => !c), 530);
+        return () => clearInterval(blink);
+    }, []);
+    return (
+        <span ref={ref} className={className}>
+            {displayText}
+            <span style={{ opacity: showCursor ? 1 : 0, transition: 'opacity 0.1s' }} className="text-blue-400">|</span>
+        </span>
+    );
+};
+
+// 4. Staggered word reveal for section titles
+const StaggeredReveal = ({ text, className = '' }) => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: '-10% 0px' });
+    const words = text.split(' ');
+    return (
+        <span ref={ref} className={className}>
+            {words.map((word, i) => (
+                <motion.span
+                    key={i}
+                    initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+                    animate={isInView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+                    transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ display: 'inline-block', marginRight: '0.3em' }}
+                >
+                    {word}
+                </motion.span>
+            ))}
+        </span>
+    );
+};
+
+// 5. 3D tilt card wrapper
+const TiltCard = ({ children, className = '' }) => {
+    const cardRef = useRef(null);
+    const handleMouseMove = useCallback((e) => {
+        const card = cardRef.current;
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -6;
+        const rotateY = ((x - centerX) / centerX) * 6;
+        const inner = card.querySelector('.tilt-card-inner');
+        if (inner) inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        const shine = card.querySelector('.tilt-shine');
+        if (shine) { shine.style.setProperty('--shine-x', `${(x / rect.width) * 100}%`); shine.style.setProperty('--shine-y', `${(y / rect.height) * 100}%`); }
+    }, []);
+    const handleMouseLeave = useCallback(() => {
+        const card = cardRef.current;
+        if (!card) return;
+        const inner = card.querySelector('.tilt-card-inner');
+        if (inner) inner.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    }, []);
+    return (
+        <div ref={cardRef} className={`tilt-card ${className}`} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+            <div className="tilt-card-inner">
+                <div className="tilt-shine"></div>
+                {children}
+            </div>
+        </div>
+    );
+};
+
+// 6. Scroll-triggered stat counter
+const StatCounter = ({ end, suffix = '', label }) => {
+    const [count, setCount] = useState(0);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true });
+    useEffect(() => {
+        if (!isInView) return;
+        let start = 0;
+        const duration = 1500;
+        const startTime = performance.now();
+        const step = (now) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.floor(eased * end));
+            if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    }, [isInView, end]);
+    return (
+        <div ref={ref} className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-gradient" style={{ animation: isInView ? 'count-up-glow 1.5s ease-out' : 'none' }}>
+                {count}{suffix}
+            </div>
+            <div className="text-xs text-white/30 font-light mt-1 tracking-wider uppercase">{label}</div>
+        </div>
+    );
+};
+
+// 7. Floating particle constellation
+const ParticleField = () => {
+    const particles = useRef(
+        Array.from({ length: 18 }, (_, i) => ({
+            left: `${Math.random() * 100}%`,
+            delay: `${Math.random() * 15}s`,
+            duration: `${15 + Math.random() * 20}s`,
+            size: 1 + Math.random() * 2,
+        }))
+    ).current;
+    return (
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+            {particles.map((p, i) => (
+                <div
+                    key={i}
+                    className="absolute rounded-full bg-blue-400/40"
+                    style={{
+                        width: `${p.size}px`, height: `${p.size}px`,
+                        left: p.left, bottom: '-10px',
+                        animation: `particle-drift ${p.duration} linear infinite`,
+                        animationDelay: p.delay,
+                    }}
+                />
+            ))}
+        </div>
+    );
+};
+
 // --- SKILL BADGE ---
 const SkillBadge = ({ skillName }) => {
     const badgeMap = {
@@ -563,16 +739,18 @@ const AnimateOnScroll = ({ children, delay = 0, className = '' }) => {
 
 const Card = ({ children, className }) => (<div className={`glass-card overflow-hidden ${className || ''}`}>{children}</div>);
 
+
+
 const Section = ({ id, title, subtitle, children }) => (
     <section id={id} className="py-32 md:py-44 px-6">
         <div className="container mx-auto max-w-6xl">
-            <AnimateOnScroll>
-                <div className="text-center mb-20">
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">{title}</h2>
-                    {subtitle && <p className="mt-4 text-lg md:text-xl text-white/40 font-light max-w-2xl mx-auto">{subtitle}</p>}
-                    <div className="mt-6 mx-auto w-16 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
-                </div>
-            </AnimateOnScroll>
+            <div className="text-center mb-20">
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
+                    <StaggeredReveal text={title} />
+                </h2>
+                {subtitle && <p className="mt-4 text-lg md:text-xl text-white/40 font-light max-w-2xl mx-auto">{subtitle}</p>}
+                <div className="mt-6 mx-auto w-16 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+            </div>
             {children}
         </div>
     </section>
@@ -613,6 +791,10 @@ const Header = ({ activeSection }) => {
 // --- HERO ---
 const Hero = () => (
     <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
+        {/* Magnetic cursor glow */}
+        <MouseGlow />
+        {/* Animated gradient mesh */}
+        <GradientMesh />
         {/* Ambient background glow */}
         <div className="absolute inset-0 overflow-hidden">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(139,92,246,0.15) 40%, transparent 70%)' }}></div>
@@ -634,7 +816,9 @@ const Hero = () => (
                 </AnimateOnScroll>
                 <div className="text-center md:text-left order-2">
                     <AnimateOnScroll delay={100}>
-                        <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">AI Engineer for Autonomous Systems</p>
+                        <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">
+                            <TypewriterText text="AI Engineer for Autonomous Systems" />
+                        </p>
                     </AnimateOnScroll>
                     <AnimateOnScroll delay={200}>
                         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">Hi, I'm <span className="text-gradient">Ashwin</span></h1>
@@ -691,6 +875,14 @@ const CareerRoadmapSection = () => (
 // --- SKILLS ---
 const SkillsSection = () => (
     <Section id="skills" title="Skills" subtitle="Technologies & tools I work with">
+        {/* Stat counters */}
+        <AnimateOnScroll>
+            <div className="grid grid-cols-3 gap-8 mb-16 max-w-lg mx-auto">
+                <StatCounter end={9} suffix="+" label="Projects" />
+                <StatCounter end={6} suffix="+" label="Certifications" />
+                <StatCounter end={3} suffix="+" label="Years Exp" />
+            </div>
+        </AnimateOnScroll>
         <div className="space-y-10">
             {Object.entries(portfolioData.skills).map(([category, skills], index) => (
                 <AnimateOnScroll key={category} delay={index * 100}>
@@ -716,35 +908,37 @@ const ProjectsSection = () => (
         <div className="grid md:grid-cols-2 gap-8">
             {portfolioData.projects.map((project, index) => (
                 <AnimateOnScroll key={index} delay={index * 80}>
-                    <Card className="flex flex-col h-full group">
-                        <div className="relative">
-                            {project.visualComponent === 'LidarFusion' && <LidarFusionVisual />}
-                            {project.visualComponent === 'GenerativeAI' && <GenerativeAIVisual />}
-                            {project.visualComponent === 'ReinforcementLearning' && <RLVisual />}
-                            {project.visualComponent === 'Roundabout' && <RoundaboutVisual />}
-                            {project.visualComponent === 'RAGSystem' && <RAGSystemVisual />}
-                            {project.visualComponent === 'MiniCNN' && <MiniCNNVisual />}
-                            {project.visualComponent === 'BatSwing' && <BatSwingVisual />}
-                            {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
-                            {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
-                            {project.visualComponent === 'Webhook' && <WebhookVisual />}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                        </div>
-                        <div className="p-6 md:p-8 flex flex-col flex-grow">
-                            <h3 className="text-lg font-semibold text-white/90 mb-3 tracking-tight">{project.title}</h3>
-                            <p className="text-sm text-white/35 font-light mb-6 flex-grow whitespace-pre-line leading-relaxed">{project.description}</p>
-                            <div className="mb-5 mt-auto">
-                                <div className="flex flex-wrap gap-2">
-                                    {project.technologies.map(tech => (
-                                        <span key={tech} className="tech-tag">{tech}</span>
-                                    ))}
+                    <TiltCard className="flex flex-col h-full group">
+                        <Card className="flex flex-col h-full">
+                            <div className="relative">
+                                {project.visualComponent === 'LidarFusion' && <LidarFusionVisual />}
+                                {project.visualComponent === 'GenerativeAI' && <GenerativeAIVisual />}
+                                {project.visualComponent === 'ReinforcementLearning' && <RLVisual />}
+                                {project.visualComponent === 'Roundabout' && <RoundaboutVisual />}
+                                {project.visualComponent === 'RAGSystem' && <RAGSystemVisual />}
+                                {project.visualComponent === 'MiniCNN' && <MiniCNNVisual />}
+                                {project.visualComponent === 'BatSwing' && <BatSwingVisual />}
+                                {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
+                                {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
+                                {project.visualComponent === 'Webhook' && <WebhookVisual />}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                            </div>
+                            <div className="p-6 md:p-8 flex flex-col flex-grow">
+                                <h3 className="text-lg font-semibold text-white/90 mb-3 tracking-tight">{project.title}</h3>
+                                <p className="text-sm text-white/35 font-light mb-6 flex-grow whitespace-pre-line leading-relaxed">{project.description}</p>
+                                <div className="mb-5 mt-auto">
+                                    <div className="flex flex-wrap gap-2">
+                                        {project.technologies.map(tech => (
+                                            <span key={tech} className="tech-tag">{tech}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex justify-end items-center pt-4 border-t border-white/[0.04]">
+                                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/70 transition-colors duration-300"><GitHubIcon className="w-5 h-5" /></a>
                                 </div>
                             </div>
-                            <div className="flex justify-end items-center pt-4 border-t border-white/[0.04]">
-                                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/70 transition-colors duration-300"><GitHubIcon className="w-5 h-5" /></a>
-                            </div>
-                        </div>
-                    </Card>
+                        </Card>
+                    </TiltCard>
                 </AnimateOnScroll>
             ))}
         </div>
@@ -948,6 +1142,7 @@ export default function App() {
 
     return (
         <div className="bg-black min-h-screen text-white/90 font-sans">
+            <ParticleField />
             <Header activeSection={activeSection} />
             <main>
                 <div id="hero" ref={sectionRefs.hero}><Hero /></div>
