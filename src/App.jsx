@@ -1112,6 +1112,7 @@ const projectFilters = ["All", "Computer Vision", "NLP/RAG", "Autonomous Systems
 
 const ProjectsSection = () => {
     const [activeFilter, setActiveFilter] = useState("All");
+    const { isDark } = useContext(ThemeContext);
     const filteredProjects = activeFilter === "All"
         ? portfolioData.projects
         : portfolioData.projects.filter(p => p.category === activeFilter);
@@ -1124,10 +1125,10 @@ const ProjectsSection = () => {
                     <button
                         key={filter}
                         onClick={() => setActiveFilter(filter)}
-                        className={`px-4 py-2 text-xs font-medium tracking-wide rounded-full transition-all duration-300 ${
+                        className={`px-4 py-1.5 text-xs font-medium tracking-wide rounded-full transition-all duration-300 ${
                             activeFilter === filter
-                                ? 'bg-blue-500/15 border border-blue-400/40 text-white shadow-[0_0_15px_rgba(59,130,246,0.25)]'
-                                : 'glass-card text-white/40 hover:text-white/70 cursor-pointer'
+                                ? `bg-blue-500/20 border border-blue-500/40 ${isDark ? 'text-blue-300' : 'text-blue-600'} shadow-[0_0_15px_rgba(59,130,246,0.25)]`
+                                : `bg-white/[0.03] border border-white/[0.06] ${isDark ? 'text-white/40 hover:text-white/70' : 'text-gray-500 hover:text-gray-700'} cursor-pointer`
                         }`}
                     >
                         {filter}
