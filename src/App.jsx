@@ -15,7 +15,7 @@ const portfolioData = {
     location: "Ingolstadt, Germany",
     github: "https://github.com/Ashwin-AIAS",
     linkedin: "https://linkedin.com/in/ashwin-vignesh-m-902344212",
-    resumeUrl: "https://drive.google.com/file/d/19W761Zx-8MJwUifXZEgeyx-8fA_mZSgJ/view?usp=sharing"
+    resumeUrl: "https://drive.google.com/file/d/1us-aWBOkPxuXZE7wg90DN1T5JsOPpD-g/view?usp=sharing"
   },
   careerRoadmap: [
     {
