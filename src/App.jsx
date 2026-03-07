@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';          
-   
+
+// --- THEME CONTEXT ---
+const ThemeContext = createContext({ isDark: true, setIsDark: () => {} });
+
 // --- PERSONALIZED DATA ---       
 const portfolioData = {
   personalInfo: {
@@ -52,7 +55,8 @@ const portfolioData = {
       technologies: ["FastAPI", "React", "PostgreSQL", "pgvector", "Docker", "Gemini API", "LangChain"],
       visualComponent: 'RAGSystem',
       githubUrl: "https://github.com/Ashwin-AIAS/rag-foundation-pgvector",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "NLP/RAG"
     },
     {
       title: "Mini-CNN Framework",
@@ -60,7 +64,8 @@ const portfolioData = {
       technologies: ["C/C++", "CMake", "LeNet-5", "Int8 Quantization", "HPC"],
       visualComponent: 'MiniCNN',
       githubUrl: "https://github.com/Ashwin-AIAS/Mini-CNN-Framework",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Computer Vision"
     },
     {
       title: "YOLO Bat Swing Analysis",
@@ -68,7 +73,8 @@ const portfolioData = {
       technologies: ["Python", "YOLOv8", "MediaPipe", "OpenCV", "Streamlit"],
       visualComponent: 'BatSwing',
       githubUrl: "https://github.com/Ashwin-AIAS/Yolo-Bat-swing-analysis-",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Computer Vision"
     },
     {
       title: "Radar-AI: Object Detection with Synthetic Data",
@@ -76,7 +82,8 @@ const portfolioData = {
       technologies: ["Python", "GANs", "CNNs", "PyTorch", "RADAR Signal Processing"],
       visualComponent: 'RadarAI',
       githubUrl: "https://github.com/Ashwin-AIAS/Radar-AI-Enhancing-Object-Detection-with-Synthetic-Data-and-AI-driven-Classification",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Autonomous Systems"
     },
     {
       title: "Face Detection & 3D Reconstruction",
@@ -84,7 +91,8 @@ const portfolioData = {
       technologies: ["Python", "OpenCV", "Deep Learning", "3D Reconstruction"],
       visualComponent: 'FaceRecon',
       githubUrl: "https://github.com/Ashwin-AIAS/Face-Detection-and-3D-Reconstruction",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Computer Vision"
     },
     {
       title: "Foundation Models for Computer Vision",
@@ -92,7 +100,8 @@ const portfolioData = {
       technologies: ["Python", "PyTorch", "Keras", "OpenCV", "Jetson Nano", "Git", "Jira"],
       visualComponent: 'LidarFusion',
       githubUrl: "https://github.com/Ashwin-AIAS",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Autonomous Systems"
     },
     {
       title: "Coordination of Automated Vehicles at Roundabouts",
@@ -100,7 +109,8 @@ const portfolioData = {
       technologies: ["SUMO", "Simulink", "Python", "Scenario Analysis"],
       visualComponent: 'Roundabout',
       githubUrl: "https://github.com/Ashwin-AIAS",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Autonomous Systems"
     },
     {
       title: "Custom RL Environment: 'Road to Mr. Olympia 2024'",
@@ -108,7 +118,8 @@ const portfolioData = {
       technologies: ["Python", "Reinforcement Learning", "Q-Learning", "PPO"],
       visualComponent: 'ReinforcementLearning',
       githubUrl: "https://github.com/Ashwin-AIAS",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Tools"
     },
     {
       title: "N8N Webhook Forwarder",
@@ -116,7 +127,8 @@ const portfolioData = {
       technologies: ["N8N", "Webhooks", "Automation", "API Integration"],
       visualComponent: 'Webhook',
       githubUrl: "https://github.com/Ashwin-AIAS/N8N",
-      liveUrl: "#"
+      liveUrl: "#",
+      category: "Tools"
     }
   ],
   certifications: [
@@ -149,6 +161,32 @@ const portfolioData = {
       name: "Python for Beginners",
       issuer: "Udemy / Sololearn",
       credentialUrl: "https://ude.my/UC-f81110b8-48cb-49bb-8e5f-a2e9369a517f"
+    }
+  ],
+  blogPosts: [
+    {
+      title: "Building a RAG System from Scratch",
+      summary: "Lessons learned from chunking strategies, cross-encoder reranking, and pgvector — from zero to a full-stack retrieval-augmented generation system.",
+      tags: ["RAG", "LangChain", "pgvector"],
+      date: "Feb 2026",
+      readTime: "8 min read",
+      url: "https://github.com/Ashwin-AIAS/rag-foundation-pgvector"
+    },
+    {
+      title: "CNN from C++ — What I Learned",
+      summary: "Implementing LeNet-5 without frameworks forced me to understand every matrix operation. Int8 quantization taught me how edge deployment really works.",
+      tags: ["C++", "LeNet-5", "Quantization"],
+      date: "Jan 2026",
+      readTime: "6 min read",
+      url: "https://github.com/Ashwin-AIAS/Mini-CNN-Framework"
+    },
+    {
+      title: "Why Synthetic Data Works for RADAR",
+      summary: "GAN-generated synthetic RADAR signals can dramatically improve classifier performance when real-world data is scarce. Here's what our Radar-AI project revealed.",
+      tags: ["GANs", "RADAR", "Synthetic Data"],
+      date: "Dec 2025",
+      readTime: "7 min read",
+      url: "https://github.com/Ashwin-AIAS/Radar-AI-Enhancing-Object-Detection-with-Synthetic-Data-and-AI-driven-Classification"
     }
   ]
 };
@@ -838,7 +876,8 @@ const Section = ({ id, title, subtitle, children }) => (
 const Header = ({ activeSection }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const navLinks = ["roadmap", "skills", "projects", "assistant", "certifications", "contact"];
+    const { isDark, setIsDark } = useContext(ThemeContext);
+    const navLinks = ["roadmap", "skills", "projects", "assistant", "certifications", "blog", "contact"];
     useEffect(() => {
         const handleScroll = () => { setIsScrolled(window.scrollY > 10); };
         window.addEventListener('scroll', handleScroll);
@@ -850,10 +889,26 @@ const Header = ({ activeSection }) => {
                 <a href="#" className="text-sm font-semibold text-white/90 tracking-tight">{portfolioData.personalInfo.name}</a>
                 <div className="hidden md:flex items-center gap-8">
                     {navLinks.map(link => (<a key={link} href={`#${link}`} className={`relative text-xs font-medium tracking-wide capitalize transition-all duration-300 py-1 ${activeSection === link ? 'text-white' : 'text-white/50 hover:text-white/80'}`}>{link}{activeSection === link && <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400" />}</a>))}
+                    {/* Dark/Light Toggle */}
+                    <button onClick={() => setIsDark(!isDark)} className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all" aria-label="Toggle theme">
+                        <motion.span
+                            key={isDark ? 'moon' : 'sun'}
+                            initial={{ rotate: -90, opacity: 0 }}
+                            animate={{ rotate: 0, opacity: 1 }}
+                            exit={{ rotate: 90, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="text-sm"
+                        >{isDark ? '🌙' : '☀️'}</motion.span>
+                    </button>
                 </div>
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden z-50 flex-shrink-0">
-                    <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} /></svg>
-                </button>
+                <div className="flex items-center gap-3 md:hidden">
+                    <button onClick={() => setIsDark(!isDark)} className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all z-50" aria-label="Toggle theme">
+                        <motion.span animate={{ rotate: isDark ? 0 : 180 }} transition={{ duration: 0.3 }} className="text-sm">{isDark ? '🌙' : '☀️'}</motion.span>
+                    </button>
+                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="z-50 flex-shrink-0">
+                        <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} /></svg>
+                    </button>
+                </div>
             </nav>
             <AnimatePresence>{isMenuOpen && (
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="md:hidden absolute top-full left-0 right-0 bg-black/90 backdrop-blur-2xl border-b border-white/[0.04]">
@@ -867,57 +922,129 @@ const Header = ({ activeSection }) => {
 };
 
 // --- HERO ---
-const Hero = () => (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
-        {/* Magnetic cursor glow */}
-        <MouseGlow />
-        {/* Animated gradient mesh */}
-        <GradientMesh />
-        {/* Ambient background glow */}
-        <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(139,92,246,0.15) 40%, transparent 70%)' }}></div>
-            {/* Orbiting particles */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div className="w-2 h-2 bg-blue-400/60 rounded-full" style={{ animation: 'orbit-1 15s linear infinite' }}></div>
-                <div className="w-1.5 h-1.5 bg-violet-400/40 rounded-full" style={{ animation: 'orbit-2 20s linear infinite' }}></div>
-                <div className="w-1 h-1 bg-cyan-400/50 rounded-full" style={{ animation: 'orbit-3 12s linear infinite' }}></div>
-            </div>
-        </div>
-        <div className="container mx-auto max-w-6xl relative z-10">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
-                <AnimateOnScroll className="flex justify-center order-1 md:order-1">
-                    <div className="relative">
-                        {/* Animated ring */}
-                        <div className="absolute -inset-4 rounded-full" style={{ background: 'conic-gradient(from 0deg, rgba(59,130,246,0.3), rgba(139,92,246,0.2), rgba(244,114,182,0.15), rgba(59,130,246,0.3))', animation: 'ring-rotate 8s linear infinite', filter: 'blur(8px)' }}></div>
-                        <img src="/Profile pic.jpg" alt="Ashwin" className="relative w-56 h-56 md:w-72 md:h-72 rounded-full object-cover border-2 border-white/10 shadow-2xl" />
-                    </div>
-                </AnimateOnScroll>
-                <div className="text-center md:text-left order-2">
-                    <AnimateOnScroll delay={100}>
-                        <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">
-                            <TypewriterText text="AI Engineer for Autonomous Systems" />
-                        </p>
-                    </AnimateOnScroll>
-                    <AnimateOnScroll delay={200}>
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">Hi, I'm <span className="text-gradient">Ashwin</span></h1>
-                    </AnimateOnScroll>
-                    <AnimateOnScroll delay={400}>
-                        <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0 mb-10">{portfolioData.personalInfo.bio}</p>
-                    </AnimateOnScroll>
-                    <AnimateOnScroll delay={600}>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                            <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-premium btn-primary"><DownloadIcon className="w-4 h-4 mr-2" /> Download Resume</a>
-                            <div className="flex items-center gap-4 justify-center">
-                                <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
-                                <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
-                            </div>
-                        </div>
-                    </AnimateOnScroll>
+const Hero = () => {
+    const [isResumeOpen, setIsResumeOpen] = useState(false);
+    const resumePreviewUrl = portfolioData.personalInfo.resumeUrl.replace('/view', '/preview');
+
+    useEffect(() => {
+        const handleEsc = (e) => { if (e.key === 'Escape') setIsResumeOpen(false); };
+        if (isResumeOpen) window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [isResumeOpen]);
+
+    return (
+        <>
+        <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
+            {/* Magnetic cursor glow */}
+            <MouseGlow />
+            {/* Animated gradient mesh */}
+            <GradientMesh />
+            {/* Ambient background glow */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(139,92,246,0.15) 40%, transparent 70%)' }}></div>
+                {/* Orbiting particles */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-2 h-2 bg-blue-400/60 rounded-full" style={{ animation: 'orbit-1 15s linear infinite' }}></div>
+                    <div className="w-1.5 h-1.5 bg-violet-400/40 rounded-full" style={{ animation: 'orbit-2 20s linear infinite' }}></div>
+                    <div className="w-1 h-1 bg-cyan-400/50 rounded-full" style={{ animation: 'orbit-3 12s linear infinite' }}></div>
                 </div>
             </div>
-        </div>
-    </section>
-);
+            <div className="container mx-auto max-w-6xl relative z-10">
+                <div className="grid md:grid-cols-2 gap-16 items-center">
+                    <AnimateOnScroll className="flex justify-center order-1 md:order-1">
+                        <div className="relative">
+                            {/* Animated ring */}
+                            <div className="absolute -inset-4 rounded-full" style={{ background: 'conic-gradient(from 0deg, rgba(59,130,246,0.3), rgba(139,92,246,0.2), rgba(244,114,182,0.15), rgba(59,130,246,0.3))', animation: 'ring-rotate 8s linear infinite', filter: 'blur(8px)' }}></div>
+                            <img src="/Profile pic.jpg" alt="Ashwin" className="relative w-56 h-56 md:w-72 md:h-72 rounded-full object-cover border-2 border-white/10 shadow-2xl" />
+                        </div>
+                    </AnimateOnScroll>
+                    <div className="text-center md:text-left order-2">
+                        <AnimateOnScroll delay={100}>
+                            <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">
+                                <TypewriterText text="AI Engineer for Autonomous Systems" />
+                            </p>
+                        </AnimateOnScroll>
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            className="mb-5 flex justify-center md:justify-start"
+                        >
+                            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
+                                <motion.div
+                                    className="w-2 h-2 rounded-full bg-green-400"
+                                    animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                                />
+                                <span className="text-xs font-medium text-green-400 tracking-wide">Open to Opportunities</span>
+                            </div>
+                        </motion.div>
+                        <AnimateOnScroll delay={200}>
+                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">Hi, I'm <span className="text-gradient">Ashwin</span></h1>
+                        </AnimateOnScroll>
+                        <AnimateOnScroll delay={400}>
+                            <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0 mb-10">{portfolioData.personalInfo.bio}</p>
+                        </AnimateOnScroll>
+                        <AnimateOnScroll delay={600}>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                                <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> View Resume</button>
+                                <div className="flex items-center gap-4 justify-center">
+                                    <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
+                                    <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
+                                </div>
+                            </div>
+                        </AnimateOnScroll>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {/* Resume Preview Modal */}
+        <AnimatePresence>
+            {isResumeOpen && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+                    onClick={() => setIsResumeOpen(false)}
+                >
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        className="relative w-full max-w-4xl h-[85vh] bg-black/60 rounded-2xl border border-white/10 overflow-hidden flex flex-col"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close button */}
+                        <button
+                            onClick={() => setIsResumeOpen(false)}
+                            className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-all text-sm"
+                        >✕</button>
+
+                        {/* Iframe */}
+                        <iframe
+                            src={resumePreviewUrl}
+                            title="Resume Preview"
+                            className="w-full flex-grow border-0"
+                            allow="autoplay"
+                        />
+
+                        {/* Download link */}
+                        <div className="p-4 border-t border-white/[0.06] flex justify-center">
+                            <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-premium btn-primary text-sm px-6 py-2.5">
+                                <DownloadIcon className="w-4 h-4 mr-2" /> Download Resume
+                            </a>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+        </>
+    );
+};
 
 // --- ROADMAP ---
 const CareerRoadmapSection = () => (
@@ -981,47 +1108,83 @@ const SkillsSection = () => (
 );
 
 // --- PROJECTS ---
-const ProjectsSection = () => (
-    <Section id="projects" title="Projects" subtitle="Featured work & technical explorations">
-        <div className="grid md:grid-cols-2 gap-8">
-            {portfolioData.projects.map((project, index) => (
-                <AnimateOnScroll key={index} delay={index * 80}>
-                    <TiltCard className="flex flex-col h-full group">
-                        <Card className="flex flex-col h-full">
-                            <div className="relative">
-                                {project.visualComponent === 'LidarFusion' && <LidarFusionVisual />}
-                                {project.visualComponent === 'GenerativeAI' && <GenerativeAIVisual />}
-                                {project.visualComponent === 'ReinforcementLearning' && <RLVisual />}
-                                {project.visualComponent === 'Roundabout' && <RoundaboutVisual />}
-                                {project.visualComponent === 'RAGSystem' && <RAGSystemVisual />}
-                                {project.visualComponent === 'MiniCNN' && <MiniCNNVisual />}
-                                {project.visualComponent === 'BatSwing' && <BatSwingVisual />}
-                                {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
-                                {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
-                                {project.visualComponent === 'Webhook' && <WebhookVisual />}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                            </div>
-                            <div className="p-6 md:p-8 flex flex-col flex-grow">
-                                <h3 className="text-lg font-semibold text-white/90 mb-3 tracking-tight">{project.title}</h3>
-                                <p className="text-sm text-white/35 font-light mb-6 flex-grow whitespace-pre-line leading-relaxed">{project.description}</p>
-                                <div className="mb-5 mt-auto">
-                                    <div className="flex flex-wrap gap-2">
-                                        {project.technologies.map(tech => (
-                                            <span key={tech} className="tech-tag">{tech}</span>
-                                        ))}
+const projectFilters = ["All", "Computer Vision", "NLP/RAG", "Autonomous Systems", "Tools"];
+
+const ProjectsSection = () => {
+    const [activeFilter, setActiveFilter] = useState("All");
+    const filteredProjects = activeFilter === "All"
+        ? portfolioData.projects
+        : portfolioData.projects.filter(p => p.category === activeFilter);
+
+    return (
+        <Section id="projects" title="Projects" subtitle="Featured work & technical explorations">
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
+                {projectFilters.map(filter => (
+                    <button
+                        key={filter}
+                        onClick={() => setActiveFilter(filter)}
+                        className={`px-4 py-2 text-xs font-medium tracking-wide rounded-full transition-all duration-300 ${
+                            activeFilter === filter
+                                ? 'bg-blue-500/15 border border-blue-400/40 text-white shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                                : 'glass-card text-white/40 hover:text-white/70 cursor-pointer'
+                        }`}
+                    >
+                        {filter}
+                    </button>
+                ))}
+            </div>
+
+            {/* Project Grid */}
+            <motion.div layout className="grid md:grid-cols-2 gap-8">
+                <AnimatePresence mode="popLayout">
+                    {filteredProjects.map((project, index) => (
+                        <motion.div
+                            key={project.title}
+                            layout
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.35, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                            <TiltCard className="flex flex-col h-full group">
+                                <Card className="flex flex-col h-full">
+                                    <div className="relative">
+                                        {project.visualComponent === 'LidarFusion' && <LidarFusionVisual />}
+                                        {project.visualComponent === 'GenerativeAI' && <GenerativeAIVisual />}
+                                        {project.visualComponent === 'ReinforcementLearning' && <RLVisual />}
+                                        {project.visualComponent === 'Roundabout' && <RoundaboutVisual />}
+                                        {project.visualComponent === 'RAGSystem' && <RAGSystemVisual />}
+                                        {project.visualComponent === 'MiniCNN' && <MiniCNNVisual />}
+                                        {project.visualComponent === 'BatSwing' && <BatSwingVisual />}
+                                        {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
+                                        {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
+                                        {project.visualComponent === 'Webhook' && <WebhookVisual />}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                                     </div>
-                                </div>
-                                <div className="flex justify-end items-center pt-4 border-t border-white/[0.04]">
-                                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/70 transition-colors duration-300"><GitHubIcon className="w-5 h-5" /></a>
-                                </div>
-                            </div>
-                        </Card>
-                    </TiltCard>
-                </AnimateOnScroll>
-            ))}
-        </div>
-    </Section>
-);
+                                    <div className="p-6 md:p-8 flex flex-col flex-grow">
+                                        <h3 className="text-lg font-semibold text-white/90 mb-3 tracking-tight">{project.title}</h3>
+                                        <p className="text-sm text-white/35 font-light mb-6 flex-grow whitespace-pre-line leading-relaxed">{project.description}</p>
+                                        <div className="mb-5 mt-auto">
+                                            <div className="flex flex-wrap gap-2">
+                                                {project.technologies.map(tech => (
+                                                    <span key={tech} className="tech-tag">{tech}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-end items-center pt-4 border-t border-white/[0.04]">
+                                            <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white/70 transition-colors duration-300"><GitHubIcon className="w-5 h-5" /></a>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </TiltCard>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </motion.div>
+        </Section>
+    );
+};
 
 // --- AI ASSISTANT ---
 const AIAssistantSection = () => {
@@ -1029,9 +1192,10 @@ const AIAssistantSection = () => {
     const [generatedText, setGeneratedText] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
+    const [inputMode, setInputMode] = useState('jd');
 
     const handleGenerate = async () => {
-        if (!jobDesc.trim()) { setError('Please paste a job description first.'); return; }
+        if (!jobDesc.trim()) { setError(inputMode === 'jd' ? 'Please paste a job description first.' : 'Please enter a job title first.'); return; }
         setIsGenerating(true);
         setError('');
         setGeneratedText('');
@@ -1058,7 +1222,14 @@ Bullet list of required skills or qualifications the candidate currently lacks o
 
 ## 💡 Recommendation
 2-3 sentences with a final verdict: is this a strong, moderate, or weak fit? Include one actionable suggestion for the candidate to strengthen their profile for this role.`;
-        const userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nJob for Analysis: ${jobDesc}`;
+
+        let userQuery;
+        if (inputMode === 'title') {
+            userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nThe recruiter is looking for a candidate for the role: ${jobDesc}. Based on typical requirements for this role in the AI/autonomous systems industry, analyze Ashwin's fit.`;
+        } else {
+            userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nJob for Analysis: ${jobDesc}`;
+        }
+
         try {
             const result = await callGeminiAPI(userQuery, systemPrompt);
             setGeneratedText(result);
@@ -1071,7 +1242,7 @@ Bullet list of required skills or qualifications the candidate currently lacks o
     };
 
     return (
-        <Section id="assistant" title="AI Recruiter Assistant" subtitle="Paste a job description to get an AI-powered fit analysis">
+        <Section id="assistant" title="AI Recruiter Assistant" subtitle="Paste a job description or enter a job title to get an AI-powered fit analysis">
             <AnimateOnScroll>
                 <Card className="max-w-3xl mx-auto">
                     <div className="p-6 md:p-8">
@@ -1080,8 +1251,39 @@ Bullet list of required skills or qualifications the candidate currently lacks o
                             <span className="text-[9px] bg-blue-500/10 text-blue-400/80 border border-blue-500/10 px-2.5 py-1 rounded-full uppercase tracking-widest font-semibold">AI Powered</span>
                         </div>
                         <AIAssistantVisual isGenerating={isGenerating} />
-                        <p className="text-white/30 mt-5 mb-5 text-sm font-light">Paste a job description below for an objective analysis of Ashwin's technical fit.</p>
-                        <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="input-apple h-40 resize-none font-mono text-sm" disabled={isGenerating} />
+
+                        {/* Input Mode Toggle */}
+                        <div className="flex gap-2 mt-5 mb-5">
+                            <button
+                                onClick={() => { setInputMode('jd'); setJobDesc(''); setError(''); }}
+                                className={`px-4 py-2 text-xs font-medium tracking-wide rounded-full transition-all duration-300 ${
+                                    inputMode === 'jd'
+                                        ? 'bg-blue-500/15 border border-blue-400/40 text-white shadow-[0_0_12px_rgba(59,130,246,0.2)]'
+                                        : 'bg-white/[0.04] border border-white/[0.08] text-white/40 hover:text-white/70'
+                                }`}
+                            >Paste Job Description</button>
+                            <button
+                                onClick={() => { setInputMode('title'); setJobDesc(''); setError(''); }}
+                                className={`px-4 py-2 text-xs font-medium tracking-wide rounded-full transition-all duration-300 ${
+                                    inputMode === 'title'
+                                        ? 'bg-blue-500/15 border border-blue-400/40 text-white shadow-[0_0_12px_rgba(59,130,246,0.2)]'
+                                        : 'bg-white/[0.04] border border-white/[0.08] text-white/40 hover:text-white/70'
+                                }`}
+                            >Enter Job Title</button>
+                        </div>
+
+                        {inputMode === 'jd' ? (
+                            <>
+                                <p className="text-white/30 mb-4 text-sm font-light">Paste a job description below for an objective analysis of Ashwin's technical fit.</p>
+                                <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="input-apple h-40 resize-none font-mono text-sm" disabled={isGenerating} />
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-white/30 mb-4 text-sm font-light">Enter a job title and we'll analyze Ashwin's fit based on typical industry requirements.</p>
+                                <input type="text" value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="e.g. Computer Vision Engineer at BMW" className="input-apple font-mono text-sm" disabled={isGenerating} />
+                            </>
+                        )}
+
                         <button onClick={handleGenerate} disabled={isGenerating} className="btn-premium btn-primary w-full mt-4">
                             <SparklesIcon className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
                             {isGenerating ? 'Analyzing Match...' : 'Generate Fit Report'}
@@ -1099,7 +1301,7 @@ Bullet list of required skills or qualifications the candidate currently lacks o
                                     .replace(/^## (.+)$/gm, '<h3 class="text-sm font-semibold text-blue-400/80 mt-5 mb-2">$1</h3>')
                                     .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white/80 font-medium">$1</strong>')
                                     .replace(/^- (.+)$/gm, '<li class="ml-4 mb-1.5 list-disc text-white/50">$1</li>')
-                                    .replace(/(\<li[^>]*>.*<\/li>)/gs, '<ul class="my-2">$1</ul>')
+                                    .replace(/(<li[^>]*>.*<\/li>)/gs, '<ul class="my-2">$1</ul>')
                                     .replace(/<\/ul>\s*<ul[^>]*>/g, '')
                                     .replace(/\n(?!<)/g, '<br/>')
                                 }} />
@@ -1126,6 +1328,39 @@ const CertificationsSection = () => (
                             <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center text-xs font-medium text-blue-400/70 hover:text-blue-400 transition-colors duration-300">View Credential <ExternalLinkIcon className="w-3 h-3 ml-1.5" /></a>
                         </div>
                     </Card>
+                </AnimateOnScroll>
+            ))}
+        </div>
+    </Section>
+);
+
+// --- BLOG ---
+const BlogSection = () => (
+    <Section id="blog" title="Blog & Notes" subtitle="Reflections on building real-world AI systems">
+        <div className="grid md:grid-cols-3 gap-8">
+            {portfolioData.blogPosts.map((post, index) => (
+                <AnimateOnScroll key={index} delay={index * 100}>
+                    <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}>
+                        <Card className="h-full">
+                            <div className="p-6 md:p-8 flex flex-col h-full">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="text-xs text-white/30 font-light">{post.date}</span>
+                                    <span className="text-xs text-white/20">·</span>
+                                    <span className="text-xs text-white/30 font-light">{post.readTime}</span>
+                                </div>
+                                <h3 className="text-base font-semibold text-white/85 tracking-tight mb-3">{post.title}</h3>
+                                <p className="text-sm text-white/35 font-light leading-relaxed mb-5 flex-grow">{post.summary}</p>
+                                <div className="flex flex-wrap gap-2 mb-5">
+                                    {post.tags.map(tag => (
+                                        <span key={tag} className="px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase rounded-full bg-blue-500/10 border border-blue-500/15 text-blue-400/70">{tag}</span>
+                                    ))}
+                                </div>
+                                <a href={post.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-xs font-medium text-blue-400/70 hover:text-blue-400 transition-colors duration-300">
+                                    Read more <ExternalLinkIcon className="w-3 h-3 ml-1.5" />
+                                </a>
+                            </div>
+                        </Card>
+                    </motion.div>
                 </AnimateOnScroll>
             ))}
         </div>
@@ -1209,7 +1444,8 @@ const Footer = () => (
 // --- APP ---
 export default function App() {
     const [activeSection, setActiveSection] = useState('hero');
-    const sectionRefs = { hero: useRef(null), roadmap: useRef(null), skills: useRef(null), projects: useRef(null), assistant: useRef(null), certifications: useRef(null), contact: useRef(null) };
+    const [isDark, setIsDark] = useState(true);
+    const sectionRefs = { hero: useRef(null), roadmap: useRef(null), skills: useRef(null), projects: useRef(null), assistant: useRef(null), certifications: useRef(null), blog: useRef(null), contact: useRef(null) };
     useEffect(() => {
         const observer = new IntersectionObserver(entries => {
             entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id); });
@@ -1219,25 +1455,29 @@ export default function App() {
     }, []);
 
     return (
-        <div className="bg-black min-h-screen text-white/90 font-sans">
-            <ParticleField />
-            <Header activeSection={activeSection} />
-            <main>
-                <div id="hero" ref={sectionRefs.hero}><Hero /></div>
-                <div className="section-divider"></div>
-                <div id="roadmap" ref={sectionRefs.roadmap}><CareerRoadmapSection /></div>
-                <div className="section-divider"></div>
-                <div id="skills" ref={sectionRefs.skills}><SkillsSection /></div>
-                <div className="section-divider"></div>
-                <div id="projects" ref={sectionRefs.projects}><ProjectsSection /></div>
-                <div className="section-divider"></div>
-                <div id="assistant" ref={sectionRefs.assistant}><AIAssistantSection /></div>
-                <div className="section-divider"></div>
-                <div id="certifications" ref={sectionRefs.certifications}><CertificationsSection /></div>
-                <div className="section-divider"></div>
-                <div id="contact" ref={sectionRefs.contact}><ContactSection /></div>
-            </main>
-            <Footer />
-        </div>
+        <ThemeContext.Provider value={{ isDark, setIsDark }}>
+            <div className={`${isDark ? 'theme-dark' : 'theme-light'} min-h-screen font-sans transition-colors duration-500`}>
+                <ParticleField />
+                <Header activeSection={activeSection} />
+                <main>
+                    <div id="hero" ref={sectionRefs.hero}><Hero /></div>
+                    <div className="section-divider"></div>
+                    <div id="roadmap" ref={sectionRefs.roadmap}><CareerRoadmapSection /></div>
+                    <div className="section-divider"></div>
+                    <div id="skills" ref={sectionRefs.skills}><SkillsSection /></div>
+                    <div className="section-divider"></div>
+                    <div id="projects" ref={sectionRefs.projects}><ProjectsSection /></div>
+                    <div className="section-divider"></div>
+                    <div id="assistant" ref={sectionRefs.assistant}><AIAssistantSection /></div>
+                    <div className="section-divider"></div>
+                    <div id="certifications" ref={sectionRefs.certifications}><CertificationsSection /></div>
+                    <div className="section-divider"></div>
+                    <div id="blog" ref={sectionRefs.blog}><BlogSection /></div>
+                    <div className="section-divider"></div>
+                    <div id="contact" ref={sectionRefs.contact}><ContactSection /></div>
+                </main>
+                <Footer />
+            </div>
+        </ThemeContext.Provider>
     );
 }
