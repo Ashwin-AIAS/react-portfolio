@@ -1469,14 +1469,24 @@ const ScrollToTop = () => {
 
 // --- AVATAR GUIDE ---
 const tourSteps = [
-    { section: 'hero',           message: "👋 Hey! I'm Ashwin — welcome! Let me show you around.", x: '38vw', y: '-60vh' },
-    { section: 'roadmap',        message: "📚 Here's my journey — B.Tech in India to AI Engineering in Germany!", x: '10vw', y: '-45vh' },
-    { section: 'skills',         message: "⚡ My core stack — PyTorch, OpenCV, LangChain, RAG systems and more.", x: '60vw', y: '-50vh' },
-    { section: 'projects',       message: "🚀 These are my projects — from LiDAR fusion to full-stack RAG!", x: '15vw', y: '-35vh' },
-    { section: 'assistant',      message: "🤖 Try my AI assistant — paste a job description and see how I match!", x: '55vw', y: '-55vh' },
-    { section: 'certifications', message: "🎓 Certified by Anthropic, NVIDIA, Kaggle and more.", x: '25vw', y: '-40vh' },
-    { section: 'contact',        message: "📬 Like what you see? I'm open to opportunities — let's connect!", x: '42vw', y: '-30vh' },
+  { section: 'hero',           emotion: 'wave',    message: "👋 Hey! I'm Ashwin — welcome! Let me show you around." ,           x: '38vw', y: '-60vh' },
+  { section: 'roadmap',        emotion: 'nod',     message: "📚 Here's my journey — B.Tech in India to AI Engineering in Germany!", x: '10vw', y: '-45vh' },
+  { section: 'skills',         emotion: 'flex',    message: "⚡ My core stack — PyTorch, OpenCV, LangChain, RAG systems and more.",         x: '60vw', y: '-50vh' },
+  { section: 'projects',       emotion: 'excited', message: "🚀 These are my projects — from LiDAR fusion to full-stack RAG!",           x: '15vw', y: '-35vh' },
+  { section: 'assistant',      emotion: 'think',   message: "🤖 Try my AI assistant — paste a job description and see how I match!", x: '55vw', y: '-55vh' },
+  { section: 'certifications', emotion: 'proud',   message: "🎓 Certified by Anthropic, NVIDIA, Kaggle and more.",                  x: '25vw', y: '-40vh' },
+  { section: 'contact',        emotion: 'bye',     message: "📬 Like what you see? I'm open to opportunities — let's connect!",     x: '42vw', y: '-30vh' },
 ];
+
+const emotionAnimations = {
+  wave:    { rotate: [0, -25, 25, -20, 20, 0],         y: [0, -5, 0],            transition: { duration: 0.7 } },
+  nod:     { rotateX: [0, 20, -10, 15, 0],             y: [0, -8, 0],            transition: { duration: 0.6 } },
+  flex:    { scale: [1, 1.3, 1.1, 1.25, 1],            rotate: [0, -5, 5, 0],    transition: { duration: 0.6 } },
+  excited: { y: [0, -30, 0, -20, 0, -10, 0],           rotate: [0, -8, 8, 0],    transition: { duration: 0.8 } },
+  think:   { rotate: [0, -15, 0],                       x: [0, -8, 0],            transition: { duration: 0.5 } },
+  proud:   { scale: [1, 1.2, 1],                        y: [0, -15, 0],           transition: { duration: 0.5 } },
+  bye:     { rotate: [0, -20, 20, -20, 20, -20, 20, 0], y: [0, -10, 0],           transition: { duration: 1.0 } },
+};
 
 const AvatarGuide = () => {
     const [tourActive, setTourActive] = useState(() => !sessionStorage.getItem('toured'));
@@ -1536,7 +1546,7 @@ const AvatarGuide = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
-                            className="absolute bottom-full mb-3 w-64 bg-white text-gray-800 text-sm font-semibold rounded-2xl px-4 py-3 shadow-2xl after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[8px] after:border-transparent after:border-t-white"
+                            className="absolute bottom-full mb-3 w-72 bg-white text-gray-800 text-base font-semibold rounded-2xl px-4 py-3 shadow-2xl after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[8px] after:border-transparent after:border-t-white"
                         >
                             <p className="leading-relaxed mb-3">{tourSteps[currentStep].message}</p>
                             
@@ -1597,7 +1607,7 @@ const AvatarGuide = () => {
                     <motion.div
                         animate={{ y: [0, -10, 0] }}
                         transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-                        className="w-24 h-24"
+                        className="w-36 h-36"
                     >
                         <motion.div
                             initial={{ rotate: 0 }}
@@ -1607,15 +1617,13 @@ const AvatarGuide = () => {
                         >
                             <motion.div
                                 key={currentStep}
-                                initial={false}
-                                animate={hasStarted ? { y: [0, -30, 0], rotate: [0, -12, 12, 0] } : {}}
-                                transition={{ duration: 0.5 }}
-                                className="w-full h-full"
+                                animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
+                                className="w-full h-full cursor-pointer"
                             >
                                 <img 
                                     src={avatarEmoji} 
                                     alt="Ashwin" 
-                                    className="w-24 h-24 object-contain drop-shadow-xl" 
+                                    className="w-36 h-36 object-contain drop-shadow-xl" 
                                     onError={(e) => console.log('Avatar load error:', e)}
                                 />
                             </motion.div>
