@@ -925,6 +925,59 @@ const Hero = () => {
     const [isResumeOpen, setIsResumeOpen] = useState(false);
     const resumePreviewUrl = portfolioData.personalInfo.resumeUrl.replace('/view', '/preview');
 
+    // Typewriter state
+    const roles = [
+        "AI ENGINEER FOR AUTONOMOUS SYSTEMS",
+        "COMPUTER VISION ENGINEER",
+        "LLM & RAG SYSTEMS BUILDER",
+        "MASTER'S STUDENT @ THI GERMANY",
+    ];
+    const [roleIndex, setRoleIndex] = useState(0);
+    const [displayText, setDisplayText] = useState('');
+    
+    // Parallax mouse state
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+    const handleMouseMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
+        const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
+        setMousePos({ x: x * 15, y: y * 15 });
+    };
+
+    // Typewriter effect
+    useEffect(() => {
+        let currentText = '';
+        let charIndex = 0;
+        let isTyping = true;
+        let timeout;
+
+        const type = () => {
+            const currentRole = roles[roleIndex];
+            if (isTyping) {
+                if (charIndex < currentRole.length) {
+                    currentText += currentRole[charIndex];
+                    setDisplayText(currentText);
+                    charIndex++;
+                    timeout = setTimeout(type, 60);
+                } else {
+                    isTyping = false;
+                    timeout = setTimeout(type, 1500); // Wait before clearing
+                }
+            } else {
+                setDisplayText('');
+                setRoleIndex((prev) => (prev + 1) % roles.length);
+                isTyping = true;
+                charIndex = 0;
+                currentText = '';
+                timeout = setTimeout(type, 60); // Start next immediately
+            }
+        };
+
+        timeout = setTimeout(type, 60);
+        return () => clearTimeout(timeout);
+    }, [roleIndex]);
+
     useEffect(() => {
         const handleEsc = (e) => { if (e.key === 'Escape') setIsResumeOpen(false); };
         if (isResumeOpen) window.addEventListener('keydown', handleEsc);
@@ -933,7 +986,7 @@ const Hero = () => {
 
     return (
         <>
-        <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
+        <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden" onMouseMove={handleMouseMove}>
             {/* Magnetic cursor glow */}
             <MouseGlow />
             {/* Animated gradient mesh */}
@@ -952,21 +1005,52 @@ const Hero = () => {
                 <div className="grid md:grid-cols-2 gap-16 items-center">
                     <AnimateOnScroll className="flex justify-center order-1 md:order-1">
                         <div className="relative">
-                            {/* Animated ring */}
-                            <div className="absolute -inset-4 rounded-full" style={{ background: 'conic-gradient(from 0deg, rgba(59,130,246,0.3), rgba(139,92,246,0.2), rgba(244,114,182,0.15), rgba(59,130,246,0.3))', animation: 'ring-rotate 8s linear infinite', filter: 'blur(8px)' }}></div>
-                            <img src="/Profile pic.jpg" alt="Ashwin" className="relative w-56 h-56 md:w-72 md:h-72 rounded-full object-cover border-2 border-white/10 shadow-2xl" />
+                            {/* Floating particles around image */}
+                            {[...Array(12)].map((_, i) => (
+                                <motion.div
+                                    key={`orb-${i}`}
+                                    className="absolute w-2 h-2 rounded-full bg-blue-500/30"
+                                    style={{
+                                        top: `${Math.random() * 100}%`,
+                                        left: `${Math.random() * 100}%`,
+                                    }}
+                                    animate={{ y: [0, -15, 0], x: [0, 8, 0] }}
+                                    transition={{
+                                        duration: 3 + Math.random() * 3,
+                                        delay: Math.random() * 2,
+                                        repeat: Infinity,
+                                        ease: "easeInOut"
+                                    }}
+                                />
+                            ))}
+                            
+                            {/* Parallax wrapper with animated gradient ring */}
+                            <motion.div
+                                animate={{ x: mousePos.x, y: mousePos.y }} 
+                                transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+                                className="relative w-56 h-56 md:w-72 md:h-72"
+                            >
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 rounded-full"
+                                    style={{
+                                        background: 'conic-gradient(from 0deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6)',
+                                        padding: '3px',
+                                    }}
+                                >
+                                    <div className="w-full h-full bg-black rounded-full p-1 border-2 border-white/10 overflow-hidden shadow-2xl">
+                                        <img src="/Profile pic.jpg" alt="Ashwin" className="w-full h-full object-cover rounded-full" />
+                                    </div>
+                                </motion.div>
+                            </motion.div>
                         </div>
                     </AnimateOnScroll>
                     <div className="text-center md:text-left order-2">
-                        <AnimateOnScroll delay={100}>
-                            <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4">
-                                <TypewriterText text="AI Engineer for Autonomous Systems" />
-                            </p>
-                        </AnimateOnScroll>
                         <motion.div
-                            initial={{ opacity: 0, y: -10 }}
+                            initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
+                            transition={{ delay: 0.0, duration: 0.6, ease: "easeOut" }}
                             className="mb-5 flex justify-center md:justify-start"
                         >
                             <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
@@ -978,21 +1062,42 @@ const Hero = () => {
                                 <span className="text-xs font-medium text-green-400 tracking-wide">Open to Opportunities</span>
                             </div>
                         </motion.div>
-                        <AnimateOnScroll delay={200}>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
+                        >
+                            <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4 h-5 block">
+                                <span className="text-blue-400">{displayText}</span>
+                                <motion.span 
+                                    animate={{ opacity: [1, 0] }} 
+                                    transition={{ duration: 0.53, repeat: Infinity }}
+                                >|</motion.span>
+                            </p>
                             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">Hi, I'm <span className="text-gradient">Ashwin</span></h1>
-                        </AnimateOnScroll>
-                        <AnimateOnScroll delay={400}>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.30, duration: 0.6, ease: "easeOut" }}
+                        >
                             <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0 mb-10">{portfolioData.personalInfo.bio}</p>
-                        </AnimateOnScroll>
-                        <AnimateOnScroll delay={600}>
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                                <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> View Resume</button>
-                                <div className="flex items-center gap-4 justify-center">
-                                    <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
-                                    <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
-                                </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.45, duration: 0.6, ease: "easeOut" }}
+                            className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
+                        >
+                            <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> View Resume</button>
+                            <div className="flex items-center gap-4 justify-center">
+                                <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
+                                <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
                             </div>
-                        </AnimateOnScroll>
+                        </motion.div>
                     </div>
                 </div>
             </div>
@@ -1595,28 +1700,17 @@ const AvatarGuide = () => {
         const W = window.innerWidth;
         const H = window.innerHeight;
         const isMobile = W < 640;
-        const avatarH = isMobile ? 80 : 144;
-        const maxY = H - avatarH - 150; // always leave room for bubble above + avatar height
-
-        if (isMobile) {
-            return [
-                { x: W * 0.35, y: maxY * 0.55 },
-                { x: W * 0.05, y: maxY * 0.60 },
-                { x: W * 0.52, y: maxY * 0.50 },
-                { x: W * 0.05, y: maxY * 0.65 },
-                { x: W * 0.48, y: maxY * 0.45 },
-                { x: W * 0.20, y: maxY * 0.58 },
-                { x: W * 0.32, y: maxY * 0.62 },
-            ];
-        }
+        const avatarW = isMobile ? 80 : 130;
+        const bubbleH = isMobile ? 110 : 140;
+        // Edge positions only — corners and sides, never center
         return [
-            { x: W * 0.42, y: maxY * 0.40 },
-            { x: W * 0.05, y: maxY * 0.55 },
-            { x: W * 0.65, y: maxY * 0.45 },
-            { x: W * 0.08, y: maxY * 0.65 },
-            { x: W * 0.60, y: maxY * 0.35 },
-            { x: W * 0.28, y: maxY * 0.52 },
-            { x: W * 0.42, y: maxY * 0.60 },
+            { x: W - avatarW - 20,       y: H * 0.35 },          // right side mid
+            { x: 20,                      y: H * 0.40 },          // left side mid
+            { x: W - avatarW - 20,       y: H * 0.55 },          // right side lower
+            { x: 20,                      y: H * 0.55 },          // left side lower
+            { x: W - avatarW - 20,       y: H * 0.25 },          // right side upper
+            { x: 20,                      y: H * 0.30 },          // left side upper
+            { x: W * 0.5 - avatarW / 2,  y: H - avatarW - bubbleH - 20 }, // bottom center
         ];
     };
 
@@ -1652,7 +1746,7 @@ const AvatarGuide = () => {
             transition={{ type: "spring", stiffness: 80, damping: 16 }}
         >
             <div 
-                style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'auto' }}
+                style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -1665,6 +1759,7 @@ const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             style={{
+                                pointerEvents: 'auto',
                                 background: 'white',
                                 borderRadius: '16px',
                                 padding: '12px 16px',
@@ -1725,6 +1820,7 @@ const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             style={{
+                                pointerEvents: 'auto',
                                 background: 'white',
                                 borderRadius: '12px',
                                 padding: '8px 12px',
@@ -1747,6 +1843,7 @@ const AvatarGuide = () => {
                     src={avatarEmoji}
                     animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
                     style={{
+                        pointerEvents: 'auto',
                         width: screenConfig.isMobile ? '80px' : '130px',
                         height: screenConfig.isMobile ? '80px' : '130px',
                         objectFit: 'contain',
