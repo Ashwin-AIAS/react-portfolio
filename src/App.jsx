@@ -1634,48 +1634,64 @@ const AvatarGuide = () => {
             ? 'absolute bottom-full right-0 mb-2'
             : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-2';
 
+    const nextStep = (e) => {
+        e.stopPropagation();
+        const next = currentStep + 1;
+        setCurrentStep(next);
+        document.getElementById(tourSteps[next].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const handleAvatarClick = () => {
+        if (!tourActive) handleRestart();
+    };
+
     return (
         <motion.div 
-            style={{ position: 'fixed', bottom: 0, left: 0, zIndex: 50, pointerEvents: 'none' }}
+            style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
             animate={{ x: safePos.x, y: safePos.y }}
-            transition={{ type: "spring", stiffness: 80, damping: 16, mass: 1.2 }}
+            transition={{ type: "spring", stiffness: 80, damping: 16 }}
         >
-            <motion.div 
-                className="relative cursor-pointer pointer-events-auto"
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            <div 
+                style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'auto' }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onClick={() => { if (!tourActive) handleRestart(); }}
-                key={currentStep}
-                animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
             >
+                {/* BUBBLE — always directly above avatar */}
                 <AnimatePresence mode="wait">
                     {(tourActive && hasStarted) ? (
                         <motion.div
-                            key="tour-bubble"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            key={currentStep}
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
-                            className={`${bubbleClass} ${screenConfig.bubbleWidth} bg-white text-gray-800 ${screenConfig.fontSize} font-semibold rounded-2xl px-4 py-3 shadow-2xl after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[8px] after:border-transparent after:border-t-white`}
+                            style={{
+                                background: 'white',
+                                borderRadius: '16px',
+                                padding: '12px 16px',
+                                marginBottom: '8px',
+                                width: screenConfig.isMobile ? '200px' : '260px',
+                                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                                fontSize: screenConfig.isMobile ? '12px' : '13px',
+                                color: '#1f2937',
+                                fontWeight: 500,
+                            }}
                         >
-                            <p className="leading-relaxed mb-3">{tourSteps[currentStep].message}</p>
+                            <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>{tourSteps[currentStep].message}</p>
                             
-                            <div className="flex items-center justify-between mt-2">
-                                <div className="flex gap-1.5 ml-1">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', gap: '4px' }}>
                                     {tourSteps.map((_, idx) => (
-                                        <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentStep ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                                        <div key={idx} style={{
+                                            width: 6, height: 6, borderRadius: '50%',
+                                            background: idx === currentStep ? '#3b82f6' : '#cbd5e1'
+                                        }} />
                                     ))}
                                 </div>
-                                <div className="flex gap-3 text-xs items-center">
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                     {currentStep < tourSteps.length - 1 ? (
                                         <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                const next = currentStep + 1;
-                                                setCurrentStep(next);
-                                                document.getElementById(tourSteps[next].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                            }}
-                                            className={`${screenConfig.isMobile ? 'p-2 text-sm' : 'p-1 text-xs'} text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer`}
+                                            onClick={nextStep}
+                                            style={{ color: '#3b82f6', fontWeight: 600, fontSize: 13, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                         >
                                             Next →
                                         </button>
@@ -1685,7 +1701,7 @@ const AvatarGuide = () => {
                                                 e.stopPropagation();
                                                 setTourActive(false);
                                             }}
-                                            className={`${screenConfig.isMobile ? 'p-2 text-sm' : 'p-1 text-xs'} text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer`}
+                                            style={{ color: '#3b82f6', fontWeight: 600, fontSize: 13, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                         >
                                             🎉 Finish!
                                         </button>
@@ -1695,7 +1711,7 @@ const AvatarGuide = () => {
                                             e.stopPropagation();
                                             setTourActive(false);
                                         }}
-                                        className={`${screenConfig.isMobile ? 'p-2 text-sm' : 'p-1 text-xs'} text-gray-400 hover:text-gray-600 transition-colors font-bold cursor-pointer pr-1`}
+                                        style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: '0 0 0 4px', fontWeight: 'bold' }}
                                     >
                                         ✕
                                     </button>
@@ -1705,37 +1721,43 @@ const AvatarGuide = () => {
                     ) : (!tourActive && isHovered) ? (
                         <motion.div
                             key="idle-bubble"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
-                            className={`${bubbleClass} bg-white text-gray-800 ${screenConfig.fontSize} font-semibold rounded-xl px-3 py-2 shadow-lg after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-white whitespace-nowrap`}
+                            style={{
+                                background: 'white',
+                                borderRadius: '12px',
+                                padding: '8px 12px',
+                                marginBottom: '8px',
+                                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                                fontSize: '12px',
+                                color: '#1f2937',
+                                fontWeight: 600,
+                                whiteSpace: 'nowrap'
+                            }}
                         >
                             Click to restart 👆
                         </motion.div>
                     ) : null}
                 </AnimatePresence>
 
-                <motion.div
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-                    className={`${screenConfig.avatarSize}`}
-                >
-                    <motion.div
-                        initial={{ rotate: 0 }}
-                        className="w-full h-full"
-                    >
-                        <motion.img 
-                            key={currentStep}
-                            src={avatarEmoji} 
-                            className={`w-full h-full object-contain`} 
-                            initial={{ filter: "drop-shadow(0 0 0px transparent)" }}
-                            animate={{ filter: emotionFilters[tourSteps[currentStep].emotion] }}
-                            transition={{ duration: 0.4 }}
-                            onError={(e) => console.log('Avatar load error:', e)}
-                        />
-                    </motion.div>
-                </motion.div>
-            </motion.div>
+                {/* AVATAR — directly below bubble */}
+                <motion.img 
+                    key={`avatar-${currentStep}`}
+                    src={avatarEmoji}
+                    animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
+                    style={{
+                        width: screenConfig.isMobile ? '80px' : '130px',
+                        height: screenConfig.isMobile ? '80px' : '130px',
+                        objectFit: 'contain',
+                        filter: emotionFilters[tourSteps[currentStep].emotion],
+                        cursor: 'pointer',
+                        display: 'block',
+                    }}
+                    onClick={handleAvatarClick}
+                    onError={(e) => console.log('Avatar load error:', e)}
+                />
+            </div>
         </motion.div>
     );
 };
