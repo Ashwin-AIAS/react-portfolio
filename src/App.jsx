@@ -1595,41 +1595,37 @@ const AvatarGuide = () => {
         const W = window.innerWidth;
         const H = window.innerHeight;
         const isMobile = W < 640;
-        const avatarW = isMobile ? 80 : W < 1024 ? 112 : 144;
-        const bubbleH = isMobile ? 100 : 130;
-        const padX = avatarW / 2 + 10;
-        const padY = bubbleH + avatarW + 10;
-        const safeW = W - avatarW - 20;
-        const safeH = H - padY;
+        const avatarH = isMobile ? 80 : 144;
+        const maxY = H - avatarH - 150; // always leave room for bubble above + avatar height
 
         if (isMobile) {
             return [
-                { x: W * 0.35,  y: H * 0.55 },
-                { x: W * 0.05,  y: H * 0.60 },
-                { x: W * 0.55,  y: H * 0.50 },
-                { x: W * 0.05,  y: H * 0.65 },
-                { x: W * 0.50,  y: H * 0.45 },
-                { x: W * 0.20,  y: H * 0.58 },
-                { x: W * 0.35,  y: H * 0.70 },
+                { x: W * 0.35, y: maxY * 0.55 },
+                { x: W * 0.05, y: maxY * 0.60 },
+                { x: W * 0.52, y: maxY * 0.50 },
+                { x: W * 0.05, y: maxY * 0.65 },
+                { x: W * 0.48, y: maxY * 0.45 },
+                { x: W * 0.20, y: maxY * 0.58 },
+                { x: W * 0.32, y: maxY * 0.62 },
             ];
         }
         return [
-            { x: W * 0.42, y: H * 0.30 },
-            { x: W * 0.05, y: H * 0.50 },
-            { x: W * 0.65, y: H * 0.40 },
-            { x: W * 0.08, y: H * 0.60 },
-            { x: W * 0.60, y: H * 0.28 },
-            { x: W * 0.28, y: H * 0.48 },
-            { x: W * 0.42, y: H * 0.62 },
+            { x: W * 0.42, y: maxY * 0.40 },
+            { x: W * 0.05, y: maxY * 0.55 },
+            { x: W * 0.65, y: maxY * 0.45 },
+            { x: W * 0.08, y: maxY * 0.65 },
+            { x: W * 0.60, y: maxY * 0.35 },
+            { x: W * 0.28, y: maxY * 0.52 },
+            { x: W * 0.42, y: maxY * 0.60 },
         ];
     };
 
-    const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
     const avatarPx = screenConfig.isMobile ? 80 : 144;
+    const bubbleH = 140;
     const pos = getPositions()[currentStep] || getPositions()[0];
     const safePos = {
-        x: clamp(pos.x, 10, window.innerWidth - avatarPx - 10),
-        y: clamp(pos.y, 120, window.innerHeight - avatarPx - 20),
+        x: Math.min(Math.max(pos.x, 10), window.innerWidth - avatarPx - 10),
+        y: Math.min(Math.max(pos.y, bubbleH), window.innerHeight - avatarPx - bubbleH),
     };
 
     const bubbleClass = screenConfig.isMobile
