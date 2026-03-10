@@ -1532,11 +1532,30 @@ const emotionFilters = {
   bye:     "drop-shadow(0 0 12px rgba(251,146,60,0.9))",  // orange — warm goodbye
 };
 
+const getScreenConfig = () => {
+  const W = window.innerWidth;
+  const isMobile = W < 640;
+  const isTablet = W >= 640 && W < 1024;
+  return {
+    avatarSize: isMobile ? 'w-20 h-20' : isTablet ? 'w-28 h-28' : 'w-36 h-36',
+    bubbleWidth: isMobile ? 'w-52' : isTablet ? 'w-64' : 'w-72',
+    fontSize: isMobile ? 'text-xs' : 'text-sm',
+    isMobile,
+  };
+};
+
 const AvatarGuide = () => {
     const [tourActive, setTourActive] = useState(() => !sessionStorage.getItem('toured'));
     const [currentStep, setCurrentStep] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
     const [hasStarted, setHasStarted] = useState(false);
+    const [screenConfig, setScreenConfig] = useState(getScreenConfig);
+
+    useEffect(() => {
+        const handleResize = () => setScreenConfig(getScreenConfig());
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         if (!tourActive) return;
@@ -1572,14 +1591,57 @@ const AvatarGuide = () => {
         document.getElementById(tourSteps[0].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    // Keep the avatar at the current position whether active or inactive/finished
-    const activePositionX = tourSteps[currentStep].x;
-    const activePositionY = tourSteps[currentStep].y;
+    const getPositions = () => {
+        const W = window.innerWidth;
+        const H = window.innerHeight;
+        const isMobile = W < 640;
+        const avatarW = isMobile ? 80 : W < 1024 ? 112 : 144;
+        const bubbleH = isMobile ? 100 : 130;
+        const padX = avatarW / 2 + 10;
+        const padY = bubbleH + avatarW + 10;
+        const safeW = W - avatarW - 20;
+        const safeH = H - padY;
+
+        if (isMobile) {
+            return [
+                { x: W * 0.35,  y: H * 0.55 },
+                { x: W * 0.05,  y: H * 0.60 },
+                { x: W * 0.55,  y: H * 0.50 },
+                { x: W * 0.05,  y: H * 0.65 },
+                { x: W * 0.50,  y: H * 0.45 },
+                { x: W * 0.20,  y: H * 0.58 },
+                { x: W * 0.35,  y: H * 0.70 },
+            ];
+        }
+        return [
+            { x: W * 0.42, y: H * 0.30 },
+            { x: W * 0.05, y: H * 0.50 },
+            { x: W * 0.65, y: H * 0.40 },
+            { x: W * 0.08, y: H * 0.60 },
+            { x: W * 0.60, y: H * 0.28 },
+            { x: W * 0.28, y: H * 0.48 },
+            { x: W * 0.42, y: H * 0.62 },
+        ];
+    };
+
+    const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+    const avatarPx = screenConfig.isMobile ? 80 : 144;
+    const pos = getPositions()[currentStep] || getPositions()[0];
+    const safePos = {
+        x: clamp(pos.x, 10, window.innerWidth - avatarPx - 10),
+        y: clamp(pos.y, 120, window.innerHeight - avatarPx - 20),
+    };
+
+    const bubbleClass = screenConfig.isMobile
+        ? 'absolute bottom-full left-1/2 -translate-x-1/2 mb-2'
+        : safePos.x > window.innerWidth * 0.55
+            ? 'absolute bottom-full right-0 mb-2'
+            : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-2';
 
     return (
         <motion.div 
             style={{ position: 'fixed', bottom: 0, left: 0, zIndex: 50, pointerEvents: 'none' }}
-            animate={{ x: activePositionX, y: activePositionY }}
+            animate={{ x: safePos.x, y: safePos.y }}
             transition={{ type: "spring", stiffness: 80, damping: 16, mass: 1.2 }}
         >
             <motion.div 
@@ -1598,7 +1660,7 @@ const AvatarGuide = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
-                            className="absolute bottom-full mb-3 w-72 bg-white text-gray-800 text-base font-semibold rounded-2xl px-4 py-3 shadow-2xl after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[8px] after:border-transparent after:border-t-white"
+                            className={`${bubbleClass} ${screenConfig.bubbleWidth} bg-white text-gray-800 ${screenConfig.fontSize} font-semibold rounded-2xl px-4 py-3 shadow-2xl after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[8px] after:border-transparent after:border-t-white`}
                         >
                             <p className="leading-relaxed mb-3">{tourSteps[currentStep].message}</p>
                             
@@ -1608,7 +1670,7 @@ const AvatarGuide = () => {
                                         <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentStep ? 'bg-blue-500' : 'bg-gray-300'}`} />
                                     ))}
                                 </div>
-                                <div className="flex gap-3 text-xs">
+                                <div className="flex gap-3 text-xs items-center">
                                     {currentStep < tourSteps.length - 1 ? (
                                         <button 
                                             onClick={(e) => {
@@ -1617,7 +1679,7 @@ const AvatarGuide = () => {
                                                 setCurrentStep(next);
                                                 document.getElementById(tourSteps[next].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                             }}
-                                            className="text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer"
+                                            className={`${screenConfig.isMobile ? 'p-2 text-sm' : 'p-1 text-xs'} text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer`}
                                         >
                                             Next →
                                         </button>
@@ -1627,7 +1689,7 @@ const AvatarGuide = () => {
                                                 e.stopPropagation();
                                                 setTourActive(false);
                                             }}
-                                            className="text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer"
+                                            className={`${screenConfig.isMobile ? 'p-2 text-sm' : 'p-1 text-xs'} text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer`}
                                         >
                                             🎉 Finish!
                                         </button>
@@ -1637,7 +1699,7 @@ const AvatarGuide = () => {
                                             e.stopPropagation();
                                             setTourActive(false);
                                         }}
-                                        className="text-gray-400 hover:text-gray-600 transition-colors font-bold cursor-pointer pr-1"
+                                        className={`${screenConfig.isMobile ? 'p-2 text-sm' : 'p-1 text-xs'} text-gray-400 hover:text-gray-600 transition-colors font-bold cursor-pointer pr-1`}
                                     >
                                         ✕
                                     </button>
@@ -1650,7 +1712,7 @@ const AvatarGuide = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
-                            className="absolute bottom-full mb-3 bg-white text-gray-800 text-xs font-semibold rounded-xl px-3 py-2 shadow-lg after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-white whitespace-nowrap"
+                            className={`${bubbleClass} bg-white text-gray-800 ${screenConfig.fontSize} font-semibold rounded-xl px-3 py-2 shadow-lg after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-white whitespace-nowrap`}
                         >
                             Click to restart 👆
                         </motion.div>
@@ -1660,7 +1722,7 @@ const AvatarGuide = () => {
                 <motion.div
                     animate={{ y: [0, -10, 0] }}
                     transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-                    className="w-36 h-36"
+                    className={`${screenConfig.avatarSize}`}
                 >
                     <motion.div
                         initial={{ rotate: 0 }}
@@ -1669,8 +1731,7 @@ const AvatarGuide = () => {
                         <motion.img 
                             key={currentStep}
                             src={avatarEmoji} 
-                            alt="Ashwin" 
-                            className="w-36 h-36 object-contain" 
+                            className={`w-full h-full object-contain`} 
                             initial={{ filter: "drop-shadow(0 0 0px transparent)" }}
                             animate={{ filter: emotionFilters[tourSteps[currentStep].emotion] }}
                             transition={{ duration: 0.4 }}
