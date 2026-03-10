@@ -1479,13 +1479,57 @@ const tourSteps = [
 ];
 
 const emotionAnimations = {
-  wave:    { rotate: [0, -25, 25, -20, 20, 0],         y: [0, -5, 0],            transition: { duration: 0.7 } },
-  nod:     { rotateX: [0, 20, -10, 15, 0],             y: [0, -8, 0],            transition: { duration: 0.6 } },
-  flex:    { scale: [1, 1.3, 1.1, 1.25, 1],            rotate: [0, -5, 5, 0],    transition: { duration: 0.6 } },
-  excited: { y: [0, -30, 0, -20, 0, -10, 0],           rotate: [0, -8, 8, 0],    transition: { duration: 0.8 } },
-  think:   { rotate: [0, -15, 0],                       x: [0, -8, 0],            transition: { duration: 0.5 } },
-  proud:   { scale: [1, 1.2, 1],                        y: [0, -15, 0],           transition: { duration: 0.5 } },
-  bye:     { rotate: [0, -20, 20, -20, 20, -20, 20, 0], y: [0, -10, 0],           transition: { duration: 1.0 } },
+  wave: {
+    rotate: [0, -30, 25, -20, 15, 0],
+    y: [0, -20, -10, -15, 0],
+    scale: [1, 1.1, 1.05, 1.1, 1],
+    transition: { duration: 0.9, ease: "easeInOut" }
+  },
+  nod: {
+    scaleY: [1, 0.85, 1.05, 0.9, 1],
+    y: [0, 10, -5, 8, 0],
+    transition: { duration: 0.7 }
+  },
+  flex: {
+    scale: [1, 1.35, 0.95, 1.25, 1],
+    rotate: [0, -10, 10, -5, 0],
+    y: [0, -25, 0, -15, 0],
+    transition: { duration: 0.7 }
+  },
+  excited: {
+    y: [0, -40, 0, -30, 0, -20, 0],
+    rotate: [0, -12, 12, -8, 8, 0],
+    scale: [1, 1.2, 1, 1.15, 1],
+    transition: { duration: 1.0 }
+  },
+  think: {
+    rotate: [0, -20, 0, -15, 0],
+    x: [0, -15, 0, -10, 0],
+    scaleX: [1, 0.92, 1],
+    transition: { duration: 0.8 }
+  },
+  proud: {
+    scale: [1, 1.3, 1.1, 1.25, 1],
+    y: [0, -30, -10, -20, 0],
+    rotate: [0, 5, -5, 3, 0],
+    transition: { duration: 0.7 }
+  },
+  bye: {
+    rotate: [0, -25, 25, -25, 25, -25, 25, 0],
+    y: [0, -10, 0],
+    scale: [1, 1.1, 1],
+    transition: { duration: 1.2 }
+  },
+};
+
+const emotionFilters = {
+  wave:    "drop-shadow(0 0 12px rgba(59,130,246,0.9))",   // blue glow — friendly
+  nod:     "drop-shadow(0 0 10px rgba(99,102,241,0.8))",   // purple — thoughtful
+  flex:    "drop-shadow(0 0 14px rgba(234,179,8,0.9))",    // yellow — power
+  excited: "drop-shadow(0 0 16px rgba(239,68,68,0.9))",   // red — hype
+  think:   "drop-shadow(0 0 10px rgba(148,163,184,0.7))",  // gray — thinking
+  proud:   "drop-shadow(0 0 14px rgba(34,197,94,0.9))",   // green — proud
+  bye:     "drop-shadow(0 0 12px rgba(251,146,60,0.9))",  // orange — warm goodbye
 };
 
 const AvatarGuide = () => {
@@ -1534,11 +1578,19 @@ const AvatarGuide = () => {
 
     return (
         <motion.div 
-            className="fixed bottom-0 left-0 z-50 pointer-events-none"
+            style={{ position: 'fixed', bottom: 0, left: 0, zIndex: 50, pointerEvents: 'none' }}
             animate={{ x: activePositionX, y: activePositionY }}
-            transition={{ type: "spring", stiffness: 120, damping: 14 }}
+            transition={{ type: "spring", stiffness: 80, damping: 16, mass: 1.2 }}
         >
-            <div className="relative flex flex-col items-center pointer-events-auto">
+            <motion.div 
+                className="relative cursor-pointer pointer-events-auto"
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onClick={() => { if (!tourActive) handleRestart(); }}
+                key={currentStep}
+                animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
+            >
                 <AnimatePresence mode="wait">
                     {(tourActive && hasStarted) ? (
                         <motion.div
@@ -1559,7 +1611,8 @@ const AvatarGuide = () => {
                                 <div className="flex gap-3 text-xs">
                                     {currentStep < tourSteps.length - 1 ? (
                                         <button 
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                e.stopPropagation();
                                                 const next = currentStep + 1;
                                                 setCurrentStep(next);
                                                 document.getElementById(tourSteps[next].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1570,14 +1623,20 @@ const AvatarGuide = () => {
                                         </button>
                                     ) : (
                                         <button 
-                                            onClick={() => setTourActive(false)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setTourActive(false);
+                                            }}
                                             className="text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer"
                                         >
                                             🎉 Finish!
                                         </button>
                                     )}
                                     <button 
-                                        onClick={() => setTourActive(false)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setTourActive(false);
+                                        }}
                                         className="text-gray-400 hover:text-gray-600 transition-colors font-bold cursor-pointer pr-1"
                                     >
                                         ✕
@@ -1598,39 +1657,28 @@ const AvatarGuide = () => {
                     ) : null}
                 </AnimatePresence>
 
-                <div 
-                    className="relative cursor-pointer mt-3"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                    onClick={() => { if (!tourActive) handleRestart(); }}
+                <motion.div
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                    className="w-36 h-36"
                 >
                     <motion.div
-                        animate={{ y: [0, -10, 0] }}
-                        transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-                        className="w-36 h-36"
+                        initial={{ rotate: 0 }}
+                        className="w-full h-full"
                     >
-                        <motion.div
-                            initial={{ rotate: 0 }}
-                            animate={{ rotate: [0, -20, 20, -15, 15, 0] }}
-                            transition={{ duration: 0.8 }}
-                            className="w-full h-full"
-                        >
-                            <motion.div
-                                key={currentStep}
-                                animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
-                                className="w-full h-full cursor-pointer"
-                            >
-                                <img 
-                                    src={avatarEmoji} 
-                                    alt="Ashwin" 
-                                    className="w-36 h-36 object-contain drop-shadow-xl" 
-                                    onError={(e) => console.log('Avatar load error:', e)}
-                                />
-                            </motion.div>
-                        </motion.div>
+                        <motion.img 
+                            key={currentStep}
+                            src={avatarEmoji} 
+                            alt="Ashwin" 
+                            className="w-36 h-36 object-contain" 
+                            initial={{ filter: "drop-shadow(0 0 0px transparent)" }}
+                            animate={{ filter: emotionFilters[tourSteps[currentStep].emotion] }}
+                            transition={{ duration: 0.4 }}
+                            onError={(e) => console.log('Avatar load error:', e)}
+                        />
                     </motion.div>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </motion.div>
     );
 };
