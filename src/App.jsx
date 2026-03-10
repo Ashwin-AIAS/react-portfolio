@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';          
+import avatarEmoji from '/avatar-emoji.png';
 
 // --- THEME CONTEXT ---
 const ThemeContext = createContext({ isDark: true, setIsDark: () => {} });
@@ -1612,9 +1613,10 @@ const AvatarGuide = () => {
                                 className="w-full h-full"
                             >
                                 <img 
-                                    src="/avatar-emoji.png" 
+                                    src={avatarEmoji} 
                                     alt="Ashwin" 
-                                    className="w-full h-full object-contain drop-shadow-lg" 
+                                    className="w-24 h-24 object-contain drop-shadow-xl" 
+                                    onError={(e) => console.log('Avatar load error:', e)}
                                 />
                             </motion.div>
                         </motion.div>
