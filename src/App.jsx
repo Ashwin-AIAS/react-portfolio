@@ -1468,13 +1468,13 @@ const ScrollToTop = () => {
 
 // --- AVATAR GUIDE ---
 const tourSteps = [
-    { section: 'hero',          message: "👋 Hey! I'm Ashwin — welcome to my portfolio! Let me show you around." },
-    { section: 'roadmap',       message: "📚 Here's my journey — from B.Tech in India to AI Engineering in Germany!" },
-    { section: 'skills',        message: "⚡ These are my core skills — PyTorch, OpenCV, RAG systems and more." },
-    { section: 'projects',      message: "🚀 Check out my projects — from LiDAR fusion to a full-stack RAG system!" },
-    { section: 'assistant',     message: "🤖 Try my AI assistant — paste any job description and see how I match!" },
-    { section: 'certifications',message: "🎓 And here are my certifications from Anthropic, NVIDIA, Kaggle and more." },
-    { section: 'contact',       message: "📬 Like what you see? Let's connect — I'm open to opportunities!" },
+    { section: 'hero',           message: "👋 Hey! I'm Ashwin — welcome! Let me show you around.", x: '38vw', y: '-60vh' },
+    { section: 'roadmap',        message: "📚 Here's my journey — B.Tech in India to AI Engineering in Germany!", x: '10vw', y: '-45vh' },
+    { section: 'skills',         message: "⚡ My core stack — PyTorch, OpenCV, LangChain, RAG systems and more.", x: '60vw', y: '-50vh' },
+    { section: 'projects',       message: "🚀 These are my projects — from LiDAR fusion to full-stack RAG!", x: '15vw', y: '-35vh' },
+    { section: 'assistant',      message: "🤖 Try my AI assistant — paste a job description and see how I match!", x: '55vw', y: '-55vh' },
+    { section: 'certifications', message: "🎓 Certified by Anthropic, NVIDIA, Kaggle and more.", x: '25vw', y: '-40vh' },
+    { section: 'contact',        message: "📬 Like what you see? I'm open to opportunities — let's connect!", x: '42vw', y: '-30vh' },
 ];
 
 const AvatarGuide = () => {
@@ -1510,12 +1510,6 @@ const AvatarGuide = () => {
         return () => clearInterval(interval);
     }, [tourActive, hasStarted, currentStep]);
 
-    const handleStepChange = (newStep) => {
-        if (newStep < 0 || newStep >= tourSteps.length) return;
-        setCurrentStep(newStep);
-        document.getElementById(tourSteps[newStep].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
     const handleRestart = () => {
         setCurrentStep(0);
         setHasStarted(true);
@@ -1523,96 +1517,111 @@ const AvatarGuide = () => {
         document.getElementById(tourSteps[0].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    return (
-        <div className="fixed bottom-6 left-6 z-50 flex items-end">
-            {/* Avatar */}
-            <div 
-                className="relative cursor-pointer"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                onClick={() => { if (!tourActive) handleRestart(); }}
-            >
-                <motion.div
-                    animate={{ boxShadow: ['0 0 0 0 rgba(59,130,246,0.4)', '0 0 0 12px rgba(59,130,246,0)'] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className="w-16 h-16 rounded-full bg-black/20"
-                >
-                    <motion.div
-                        key={currentStep}
-                        animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
-                        transition={{ duration: 0.6 }}
-                        className="w-full h-full"
-                    >
-                        <img 
-                            src="/Profile pic.jpg" 
-                            alt="Ashwin" 
-                            className="w-16 h-16 rounded-full object-cover border-2 border-blue-400" 
-                        />
-                    </motion.div>
-                </motion.div>
-            </div>
+    // Keep the avatar at the current position whether active or inactive/finished
+    const activePositionX = tourSteps[currentStep].x;
+    const activePositionY = tourSteps[currentStep].y;
 
-            {/* Speech Bubble */}
-            <AnimatePresence mode="wait">
-                {(tourActive && hasStarted) ? (
-                    <motion.div
-                        key="tour-bubble"
-                        initial={{ opacity: 0, x: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, x: -10, scale: 0.95 }}
-                        className="mb-4 ml-4 relative bg-white text-gray-800 text-sm font-medium rounded-2xl rounded-bl-none px-4 py-3 shadow-xl max-w-xs"
-                    >
-                        <div className="absolute -left-[8px] bottom-0 w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-0"></div>
-                        
-                        <p className="leading-relaxed">{tourSteps[currentStep].message}</p>
-                        
-                        <div className="mt-3 flex items-center justify-between text-xs text-blue-500 font-medium whitespace-nowrap">
-                            <div className="flex gap-3">
-                                <button 
-                                    onClick={() => handleStepChange(currentStep - 1)}
-                                    disabled={currentStep === 0}
-                                    className={`transition-colors ${currentStep === 0 ? 'opacity-50 cursor-default' : 'hover:text-blue-600 cursor-pointer'}`}
-                                >
-                                    ← Prev
-                                </button>
-                                {currentStep < tourSteps.length - 1 ? (
-                                    <button 
-                                        onClick={() => handleStepChange(currentStep + 1)}
-                                        className="hover:text-blue-600 transition-colors cursor-pointer"
-                                    >
-                                        Next →
-                                    </button>
-                                ) : (
+    return (
+        <motion.div 
+            className="fixed bottom-0 left-0 z-50 pointer-events-none"
+            animate={{ x: activePositionX, y: activePositionY }}
+            transition={{ type: "spring", stiffness: 120, damping: 14 }}
+        >
+            <div className="relative flex flex-col items-center pointer-events-auto">
+                <AnimatePresence mode="wait">
+                    {(tourActive && hasStarted) ? (
+                        <motion.div
+                            key="tour-bubble"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute bottom-full mb-3 w-64 bg-white text-gray-800 text-sm font-semibold rounded-2xl px-4 py-3 shadow-2xl after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-[8px] after:border-transparent after:border-t-white"
+                        >
+                            <p className="leading-relaxed mb-3">{tourSteps[currentStep].message}</p>
+                            
+                            <div className="flex items-center justify-between mt-2">
+                                <div className="flex gap-1.5 ml-1">
+                                    {tourSteps.map((_, idx) => (
+                                        <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentStep ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                                    ))}
+                                </div>
+                                <div className="flex gap-3 text-xs">
+                                    {currentStep < tourSteps.length - 1 ? (
+                                        <button 
+                                            onClick={() => {
+                                                const next = currentStep + 1;
+                                                setCurrentStep(next);
+                                                document.getElementById(tourSteps[next].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            }}
+                                            className="text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer"
+                                        >
+                                            Next →
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            onClick={() => setTourActive(false)}
+                                            className="text-blue-500 hover:text-blue-700 font-bold transition-colors cursor-pointer"
+                                        >
+                                            🎉 Finish!
+                                        </button>
+                                    )}
                                     <button 
                                         onClick={() => setTourActive(false)}
-                                        className="hover:text-blue-600 transition-colors cursor-pointer"
+                                        className="text-gray-400 hover:text-gray-600 transition-colors font-bold cursor-pointer pr-1"
                                     >
-                                        🎉 Done!
+                                        ✕
                                     </button>
-                                )}
+                                </div>
                             </div>
-                            <button 
-                                onClick={() => setTourActive(false)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer pl-4"
-                            >
-                                ✕ Skip tour
-                            </button>
-                        </div>
-                    </motion.div>
-                ) : (!tourActive && isHovered) ? (
+                        </motion.div>
+                    ) : (!tourActive && isHovered) ? (
+                        <motion.div
+                            key="idle-bubble"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute bottom-full mb-3 bg-white text-gray-800 text-xs font-semibold rounded-xl px-3 py-2 shadow-lg after:content-[''] after:absolute after:top-full after:left-1/2 after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-white whitespace-nowrap"
+                        >
+                            Click to restart 👆
+                        </motion.div>
+                    ) : null}
+                </AnimatePresence>
+
+                <div 
+                    className="relative cursor-pointer mt-3"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={() => { if (!tourActive) handleRestart(); }}
+                >
                     <motion.div
-                        key="idle-bubble"
-                        initial={{ opacity: 0, x: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, x: -10, scale: 0.95 }}
-                        className="mb-4 ml-4 relative bg-white text-gray-800 text-sm font-medium rounded-2xl rounded-bl-none px-4 py-3 shadow-xl max-w-xs whitespace-nowrap"
+                        animate={{ y: [0, -10, 0] }}
+                        transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                        className="w-24 h-24"
                     >
-                        <div className="absolute -left-[8px] bottom-0 w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-0"></div>
-                        <p>👋 Click to restart tour!</p>
+                        <motion.div
+                            initial={{ rotate: 0 }}
+                            animate={{ rotate: [0, -20, 20, -15, 15, 0] }}
+                            transition={{ duration: 0.8 }}
+                            className="w-full h-full"
+                        >
+                            <motion.div
+                                key={currentStep}
+                                initial={false}
+                                animate={hasStarted ? { y: [0, -30, 0], rotate: [0, -12, 12, 0] } : {}}
+                                transition={{ duration: 0.5 }}
+                                className="w-full h-full"
+                            >
+                                <img 
+                                    src="/avatar-emoji.png" 
+                                    alt="Ashwin" 
+                                    className="w-full h-full object-contain drop-shadow-lg" 
+                                />
+                            </motion.div>
+                        </motion.div>
                     </motion.div>
-                ) : null}
-            </AnimatePresence>
-        </div>
+                </div>
+            </div>
+        </motion.div>
     );
 };
 
