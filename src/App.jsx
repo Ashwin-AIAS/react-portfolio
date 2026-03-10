@@ -942,7 +942,7 @@ const Hero = () => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
         const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
-        setMousePos({ x: x * 15, y: y * 15 });
+        setMousePos({ x: x * 12, y: y * 12 }); // no rotate
     };
 
     // Typewriter effect
@@ -1701,16 +1701,19 @@ const AvatarGuide = () => {
         const H = window.innerHeight;
         const isMobile = W < 640;
         const avatarW = isMobile ? 80 : 130;
-        const bubbleH = isMobile ? 110 : 140;
-        // Edge positions only — corners and sides, never center
+        const bubbleW = isMobile ? 200 : 260;
+        const rightEdge = W - avatarW - 16;   // fully inside right edge
+        const leftEdge  = 16;                  // fully inside left edge
+        const rightBubbleEdge = W - bubbleW - 16; // when bubble opens left
+
         return [
-            { x: W - avatarW - 20,       y: H * 0.35 },          // right side mid
-            { x: 20,                      y: H * 0.40 },          // left side mid
-            { x: W - avatarW - 20,       y: H * 0.55 },          // right side lower
-            { x: 20,                      y: H * 0.55 },          // left side lower
-            { x: W - avatarW - 20,       y: H * 0.25 },          // right side upper
-            { x: 20,                      y: H * 0.30 },          // left side upper
-            { x: W * 0.5 - avatarW / 2,  y: H - avatarW - bubbleH - 20 }, // bottom center
+            { x: rightEdge,      y: H * 0.30 },   // hero — right
+            { x: leftEdge,       y: H * 0.38 },   // roadmap — left
+            { x: rightEdge,      y: H * 0.45 },   // skills — right
+            { x: leftEdge,       y: H * 0.50 },   // projects — left
+            { x: rightEdge,      y: H * 0.28 },   // assistant — right top
+            { x: leftEdge,       y: H * 0.35 },   // certifications — left
+            { x: rightEdge,      y: H * 0.55 },   // contact — right
         ];
     };
 
@@ -1736,8 +1739,14 @@ const AvatarGuide = () => {
     };
 
     const handleAvatarClick = () => {
-        if (!tourActive) handleRestart();
+        if (!tourActive) {
+            setCurrentStep(0);
+            setTourActive(true);
+            document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+        }
     };
+
+    const isRightSide = safePos.x > window.innerWidth / 2;
 
     return (
         <motion.div 
@@ -1761,6 +1770,9 @@ const AvatarGuide = () => {
                             style={{
                                 pointerEvents: 'auto',
                                 background: 'white',
+                                position: 'absolute',
+                                bottom: '100%',
+                                ...(isRightSide ? { right: 0 } : { left: 0 }),
                                 borderRadius: '16px',
                                 padding: '12px 16px',
                                 marginBottom: '8px',
@@ -1842,16 +1854,16 @@ const AvatarGuide = () => {
                     key={`avatar-${currentStep}`}
                     src={avatarEmoji}
                     animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
+                    onClick={handleAvatarClick}
                     style={{
                         pointerEvents: 'auto',
+                        cursor: tourActive ? 'default' : 'pointer',
                         width: screenConfig.isMobile ? '80px' : '130px',
                         height: screenConfig.isMobile ? '80px' : '130px',
                         objectFit: 'contain',
                         filter: emotionFilters[tourSteps[currentStep].emotion],
-                        cursor: 'pointer',
                         display: 'block',
                     }}
-                    onClick={handleAvatarClick}
                     onError={(e) => console.log('Avatar load error:', e)}
                 />
             </div>
