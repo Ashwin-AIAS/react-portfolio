@@ -1466,6 +1466,156 @@ const ScrollToTop = () => {
     );
 };
 
+// --- AVATAR GUIDE ---
+const tourSteps = [
+    { section: 'hero',          message: "👋 Hey! I'm Ashwin — welcome to my portfolio! Let me show you around." },
+    { section: 'roadmap',       message: "📚 Here's my journey — from B.Tech in India to AI Engineering in Germany!" },
+    { section: 'skills',        message: "⚡ These are my core skills — PyTorch, OpenCV, RAG systems and more." },
+    { section: 'projects',      message: "🚀 Check out my projects — from LiDAR fusion to a full-stack RAG system!" },
+    { section: 'assistant',     message: "🤖 Try my AI assistant — paste any job description and see how I match!" },
+    { section: 'certifications',message: "🎓 And here are my certifications from Anthropic, NVIDIA, Kaggle and more." },
+    { section: 'contact',       message: "📬 Like what you see? Let's connect — I'm open to opportunities!" },
+];
+
+const AvatarGuide = () => {
+    const [tourActive, setTourActive] = useState(() => !sessionStorage.getItem('toured'));
+    const [currentStep, setCurrentStep] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
+    const [hasStarted, setHasStarted] = useState(false);
+
+    useEffect(() => {
+        if (!tourActive) return;
+
+        if (!hasStarted) {
+            const timer = setTimeout(() => {
+                setHasStarted(true);
+                sessionStorage.setItem('toured', 'true');
+                document.getElementById(tourSteps[0].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+
+        const interval = setInterval(() => {
+            setCurrentStep(prev => {
+                if (prev >= tourSteps.length - 1) {
+                    setTourActive(false);
+                    return prev;
+                }
+                const nextStep = prev + 1;
+                document.getElementById(tourSteps[nextStep].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return nextStep;
+            });
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, [tourActive, hasStarted, currentStep]);
+
+    const handleStepChange = (newStep) => {
+        if (newStep < 0 || newStep >= tourSteps.length) return;
+        setCurrentStep(newStep);
+        document.getElementById(tourSteps[newStep].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const handleRestart = () => {
+        setCurrentStep(0);
+        setHasStarted(true);
+        setTourActive(true);
+        document.getElementById(tourSteps[0].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    return (
+        <div className="fixed bottom-6 left-6 z-50 flex items-end">
+            {/* Avatar */}
+            <div 
+                className="relative cursor-pointer"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onClick={() => { if (!tourActive) handleRestart(); }}
+            >
+                <motion.div
+                    animate={{ boxShadow: ['0 0 0 0 rgba(59,130,246,0.4)', '0 0 0 12px rgba(59,130,246,0)'] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="w-16 h-16 rounded-full bg-black/20"
+                >
+                    <motion.div
+                        key={currentStep}
+                        animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
+                        transition={{ duration: 0.6 }}
+                        className="w-full h-full"
+                    >
+                        <img 
+                            src="/Profile pic.jpg" 
+                            alt="Ashwin" 
+                            className="w-16 h-16 rounded-full object-cover border-2 border-blue-400" 
+                        />
+                    </motion.div>
+                </motion.div>
+            </div>
+
+            {/* Speech Bubble */}
+            <AnimatePresence mode="wait">
+                {(tourActive && hasStarted) ? (
+                    <motion.div
+                        key="tour-bubble"
+                        initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                        className="mb-4 ml-4 relative bg-white text-gray-800 text-sm font-medium rounded-2xl rounded-bl-none px-4 py-3 shadow-xl max-w-xs"
+                    >
+                        <div className="absolute -left-[8px] bottom-0 w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-0"></div>
+                        
+                        <p className="leading-relaxed">{tourSteps[currentStep].message}</p>
+                        
+                        <div className="mt-3 flex items-center justify-between text-xs text-blue-500 font-medium whitespace-nowrap">
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={() => handleStepChange(currentStep - 1)}
+                                    disabled={currentStep === 0}
+                                    className={`transition-colors ${currentStep === 0 ? 'opacity-50 cursor-default' : 'hover:text-blue-600 cursor-pointer'}`}
+                                >
+                                    ← Prev
+                                </button>
+                                {currentStep < tourSteps.length - 1 ? (
+                                    <button 
+                                        onClick={() => handleStepChange(currentStep + 1)}
+                                        className="hover:text-blue-600 transition-colors cursor-pointer"
+                                    >
+                                        Next →
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={() => setTourActive(false)}
+                                        className="hover:text-blue-600 transition-colors cursor-pointer"
+                                    >
+                                        🎉 Done!
+                                    </button>
+                                )}
+                            </div>
+                            <button 
+                                onClick={() => setTourActive(false)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer pl-4"
+                            >
+                                ✕ Skip tour
+                            </button>
+                        </div>
+                    </motion.div>
+                ) : (!tourActive && isHovered) ? (
+                    <motion.div
+                        key="idle-bubble"
+                        initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                        className="mb-4 ml-4 relative bg-white text-gray-800 text-sm font-medium rounded-2xl rounded-bl-none px-4 py-3 shadow-xl max-w-xs whitespace-nowrap"
+                    >
+                        <div className="absolute -left-[8px] bottom-0 w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-0"></div>
+                        <p>👋 Click to restart tour!</p>
+                    </motion.div>
+                ) : null}
+            </AnimatePresence>
+        </div>
+    );
+};
+
 // --- APP ---
 export default function App() {
     const [activeSection, setActiveSection] = useState('hero');
@@ -1503,7 +1653,9 @@ export default function App() {
                 </main>
                 <Footer />
                 <ScrollToTop />
+                <AvatarGuide />
             </div>
         </ThemeContext.Provider>
     );
 }
+
