@@ -935,15 +935,7 @@ const Hero = () => {
     const [roleIndex, setRoleIndex] = useState(0);
     const [displayText, setDisplayText] = useState('');
     
-    // Parallax mouse state
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-    const handleMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
-        const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
-        setMousePos({ x: x * 12, y: y * 12 }); // no rotate
-    };
 
     // Typewriter effect
     useEffect(() => {
@@ -986,7 +978,7 @@ const Hero = () => {
 
     return (
         <>
-        <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden" onMouseMove={handleMouseMove}>
+        <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
             {/* Magnetic cursor glow */}
             <MouseGlow />
             {/* Animated gradient mesh */}
@@ -1024,26 +1016,19 @@ const Hero = () => {
                                 />
                             ))}
                             
-                            {/* Parallax wrapper with animated gradient ring */}
-                            <motion.div
-                                animate={{ x: mousePos.x, y: mousePos.y }} 
-                                transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-                                className="relative w-56 h-56 md:w-72 md:h-72"
-                            >
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                                    className="absolute inset-0 rounded-full"
-                                    style={{
-                                        background: 'conic-gradient(from 0deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6)',
-                                        padding: '3px',
-                                    }}
-                                >
-                                    <div className="w-full h-full bg-black rounded-full p-1 border-2 border-white/10 overflow-hidden shadow-2xl">
-                                        <img src="/Profile pic.jpg" alt="Ashwin" className="w-full h-full object-cover rounded-full" />
-                                    </div>
-                                </motion.div>
-                            </motion.div>
+                            {/* Static glowing profile wrapper */}
+                            <div className="relative w-56 h-56 md:w-72 md:h-72">
+                                <div style={{
+                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4)',
+                                    borderRadius: '50%',
+                                    padding: '3px',
+                                    boxShadow: '0 0 30px rgba(59,130,246,0.4), 0 0 60px rgba(139,92,246,0.2)',
+                                    width: '100%',
+                                    height: '100%',
+                                }}>
+                                    <img src="/Profile pic.jpg" alt="Ashwin" className="rounded-full w-full h-full object-cover block" />
+                                </div>
+                            </div>
                         </div>
                     </AnimateOnScroll>
                     <div className="text-center md:text-left order-2">
@@ -1666,28 +1651,39 @@ const AvatarGuide = () => {
         if (!tourActive) return;
 
         if (!hasStarted) {
-            const timer = setTimeout(() => {
+            setTimeout(() => {
                 setHasStarted(true);
                 sessionStorage.setItem('toured', 'true');
-                document.getElementById(tourSteps[0].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 1000);
-            return () => clearTimeout(timer);
         }
 
-        const interval = setInterval(() => {
-            setCurrentStep(prev => {
-                if (prev >= tourSteps.length - 1) {
-                    setTourActive(false);
-                    return prev;
-                }
-                const nextStep = prev + 1;
-                document.getElementById(tourSteps[nextStep].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                return nextStep;
-            });
-        }, 4000);
+        const sectionIds = tourSteps.map(s => s.section);
+        const observers = [];
 
-        return () => clearInterval(interval);
-    }, [tourActive, hasStarted, currentStep]);
+        sectionIds.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setCurrentStep(index);
+                        }
+                    });
+                },
+                {
+                    threshold: 0.3,
+                    rootMargin: '-10% 0px -10% 0px'
+                }
+            );
+
+            observer.observe(el);
+            observers.push(observer);
+        });
+
+        return () => observers.forEach(o => o.disconnect());
+    }, [tourActive, hasStarted]);
 
     const handleRestart = () => {
         setCurrentStep(0);
@@ -1731,12 +1727,7 @@ const AvatarGuide = () => {
             ? 'absolute bottom-full right-0 mb-2'
             : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-2';
 
-    const nextStep = (e) => {
-        e.stopPropagation();
-        const next = currentStep + 1;
-        setCurrentStep(next);
-        document.getElementById(tourSteps[next].section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
+    
 
     const handleAvatarClick = () => {
         if (!tourActive) {
@@ -1785,45 +1776,29 @@ const AvatarGuide = () => {
                         >
                             <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>{tourSteps[currentStep].message}</p>
                             
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                                 <div style={{ display: 'flex', gap: '4px' }}>
-                                    {tourSteps.map((_, idx) => (
-                                        <div key={idx} style={{
+                                    {tourSteps.map((_, i) => (
+                                        <div key={i} style={{
                                             width: 6, height: 6, borderRadius: '50%',
-                                            background: idx === currentStep ? '#3b82f6' : '#cbd5e1'
+                                            background: i === currentStep ? '#2563eb' : '#cbd5e1',
+                                            transition: 'background 0.3s'
                                         }} />
                                     ))}
                                 </div>
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    {currentStep < tourSteps.length - 1 ? (
-                                        <button 
-                                            onClick={nextStep}
-                                            style={{ color: '#3b82f6', fontWeight: 600, fontSize: 13, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                        >
-                                            Next →
-                                        </button>
-                                    ) : (
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setTourActive(false);
-                                            }}
-                                            style={{ color: '#3b82f6', fontWeight: 600, fontSize: 13, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                        >
-                                            🎉 Finish!
-                                        </button>
-                                    )}
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setTourActive(false);
-                                        }}
-                                        style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: '0 0 0 4px', fontWeight: 'bold' }}
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setTourActive(false);
+                                    }}
+                                    style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0, fontWeight: 'bold' }}
+                                >
+                                    ✕
+                                </button>
                             </div>
+                            <p style={{ fontSize: '11px', color: '#94a3b8', textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>
+                                scroll to explore ↓
+                            </p>
                         </motion.div>
                     ) : (!tourActive && isHovered) ? (
                         <motion.div
