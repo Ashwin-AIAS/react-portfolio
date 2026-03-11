@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';          
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { embedJobDescription, embedMultimodal, cosineSimilarity, generateFitReport } from './geminiEmbed';
 import avatarEmoji from '/avatar-emoji.png';
 
 // --- THEME CONTEXT ---
@@ -130,6 +131,15 @@ const portfolioData = {
       githubUrl: "https://github.com/Ashwin-AIAS/N8N",
       liveUrl: "#",
       category: "Tools"
+    },
+    {
+      title: "Interactive Portfolio with AI Assistant",
+      description: "• Built a React-based interactive portfolio utilizing Framer Motion for advanced animations.\n• Upgraded AI recruiter assistant with Gemini Embedding 2 multimodal embeddings for semantic cross-modal match scoring.\n• Implemented an animated avatar tour guide and scroll-based interactions.",
+      technologies: ["React", "Framer Motion", "Gemini API", "Tailwind CSS"],
+      visualComponent: 'AIAssistant',
+      githubUrl: "https://github.com/Ashwin-AIAS/portfolio",
+      liveUrl: "#",
+      category: "Web & Backend"
     }
   ],
   certifications: [
@@ -192,53 +202,7 @@ const portfolioData = {
   ]
 };
 
-// --- OPENAI API CALLER ---
-const callOpenAIAPI = async (userQuery, systemPrompt) => {
-    let apiKey = "";
-    try {
-        apiKey = import.meta.env["VITE_OPENAI_API_KEY"] || "";
-    } catch (e) {
-        apiKey = "";
-    }
 
-    if (!apiKey) {
-        throw new Error("Missing API Key. Ensure VITE_OPENAI_API_KEY is set in your environment.");
-    }
-
-    try {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: "gpt-4o-mini",
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userQuery }
-                ],
-                max_tokens: 1000
-            })
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error("Invalid OpenAI API Key");
-            }
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || `API Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (!data.choices || data.choices.length === 0) {
-            throw new Error("No response generated from OpenAI.");
-        }
-        return data.choices[0].message.content;
-    } catch (error) {
-        throw error;
-    }
-};
 
 // --- ICONS ---
 const GitHubIcon = (props) => (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>);
@@ -1279,49 +1243,99 @@ const ProjectsSection = () => {
 // --- AI ASSISTANT ---
 const AIAssistantSection = () => {
     const [jobDesc, setJobDesc] = useState('');
+    const [jobFile, setJobFile] = useState(null);
     const [generatedText, setGeneratedText] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
     const [inputMode, setInputMode] = useState('jd');
+    const [matchScore, setMatchScore] = useState(null);
 
     const handleGenerate = async () => {
-        if (!jobDesc.trim()) { setError(inputMode === 'jd' ? 'Please paste a job description first.' : 'Please enter a job title first.'); return; }
+        if (!jobDesc.trim() && !jobFile) { setError(inputMode === 'jd' ? 'Please paste a job description or upload a file first.' : 'Please enter a job title first.'); return; }
         setIsGenerating(true);
         setError('');
         setGeneratedText('');
-        const systemPrompt = `You are an expert AI Recruiter Match Analysis tool. Your task is to deeply analyze Ashwin Muniappan's portfolio against a specific job description and produce a structured technical fit report.
+        setMatchScore(null);
 
-STRICT RULES:
-1. NEVER use "I," "me," or "my." ALWAYS refer to the candidate as "Ashwin" or "the candidate" in third person.
-2. Be specific — reference actual projects, certifications, and technologies from the portfolio.
-3. Tone: Objective, professional, and data-driven.
+        let finalJobDescription = jobDesc;
+        const portfolioContext = JSON.stringify(portfolioData);
+        let calculatedScore = null;
 
-OUTPUT FORMAT (use markdown):
+        try {
+            let jobEmbedding;
+            let resumeEmbedding = await embedJobDescription(portfolioContext);
 
-## Match Score: [X]%
-A single overall fit percentage based on skills, experience, and project relevance.
+            if (jobFile) {
+                const arrayBuffer = await jobFile.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const bytes = Array.from(uint8Array);
+                
+                // Extract text from typed or pasted description as base context
+                const baseTextContext = jobDesc ? `Job Notes: ${jobDesc}` : "Job Description PDF attachment.";
+                
+                try {
+                    const multiResult = await embedMultimodal(baseTextContext, bytes);
+                    jobEmbedding = multiResult;
+                } catch (e) {
+                   console.warn("Multimodal embedding failed, falling back to text only if available.", e);
+                   if (jobDesc) {
+                       const textResult = await embedJobDescription(jobDesc);
+                       jobEmbedding = textResult;
+                   } else {
+                       throw new Error("Could not process PDF and no text description was provided.");
+                   }
+                }
+                finalJobDescription = jobDesc ? `[PDF Attached] ${jobDesc}` : "[PDF Attached]";
+            } else {
+                if (inputMode === 'title') {
+                     finalJobDescription = `The recruiter is looking for a candidate for the role: ${jobDesc}. Based on typical requirements for this role in the AI/autonomous systems industry, analyze Ashwin's fit.`;
+                }
+                const textResult = await embedJobDescription(finalJobDescription);
+                jobEmbedding = textResult;
+            }
+            
+            if (jobEmbedding && jobEmbedding.values && resumeEmbedding && resumeEmbedding.values) {
+                 calculatedScore = (cosineSimilarity(jobEmbedding.values, resumeEmbedding.values) * 100).toFixed(1);
+                 setMatchScore(calculatedScore);
+            }
 
-## ✅ Matching Skills
-Bullet list of skills from the portfolio that directly match the job requirements. For each, briefly cite the relevant project or experience.
-
-## ⚠️ Skill Gaps
-Bullet list of required skills or qualifications the candidate currently lacks or has limited experience in.
-
-## 🎯 Experience Alignment
-2-3 sentences on how the candidate's work experience, education, and projects map to the role's responsibilities.
-
-## 💡 Recommendation
-2-3 sentences with a final verdict: is this a strong, moderate, or weak fit? Include one actionable suggestion for the candidate to strengthen their profile for this role.`;
-
-        let userQuery;
-        if (inputMode === 'title') {
-            userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nThe recruiter is looking for a candidate for the role: ${jobDesc}. Based on typical requirements for this role in the AI/autonomous systems industry, analyze Ashwin's fit.`;
-        } else {
-            userQuery = `Candidate Portfolio: ${JSON.stringify(portfolioData)}\n\nJob for Analysis: ${jobDesc}`;
+        } catch (e) {
+            console.log('Embedding skipped or failed:', e);
+            // Don't fail the whole process if embedding fails, just skip the match score
         }
 
         try {
-            const result = await callOpenAIAPI(userQuery, systemPrompt);
+            const prompt = `
+            ${calculatedScore ? `Semantic Match Score: ${calculatedScore}% (calculated via Gemini Embedding 2)\n` : ''}
+            You are an expert AI Recruiter Match Analysis tool. Your task is to deeply analyze Ashwin Muniappan's portfolio against a specific job description and produce a structured technical fit report.
+            
+            STRICT RULES:
+            1. NEVER use "I," "me," or "my." ALWAYS refer to the candidate as "Ashwin" or "the candidate" in third person.
+            2. Be specific — reference actual projects, certifications, and technologies from the portfolio.
+            3. Tone: Objective, professional, and data-driven.
+            
+            OUTPUT FORMAT (use markdown):
+            
+            ## Match Score: [X]%
+            A single overall fit percentage based on skills, experience, and project relevance. (If provided in the prompt above, use that semantic match score).
+            
+            ## ✅ Matching Skills
+            Bullet list of skills from the portfolio that directly match the job requirements. For each, briefly cite the relevant project or experience.
+            
+            ## ⚠️ Skill Gaps
+            Bullet list of required skills or qualifications the candidate currently lacks or has limited experience in.
+            
+            ## 🎯 Experience Alignment
+            2-3 sentences on how the candidate's work experience, education, and projects map to the role's responsibilities.
+            
+            ## 💡 Recommendation
+            2-3 sentences with a final verdict: is this a strong, moderate, or weak fit? Include one actionable suggestion for the candidate to strengthen their profile for this role.
+
+            Job for Analysis: ${finalJobDescription}
+            Candidate Portfolio: ${portfolioContext}
+            `;
+
+            const result = await generateFitReport(prompt);
             setGeneratedText(result);
         } catch (err) {
             console.error("AI Assistant Error:", err);
@@ -1365,12 +1379,22 @@ Bullet list of required skills or qualifications the candidate currently lacks o
                         {inputMode === 'jd' ? (
                             <>
                                 <p className="text-white/30 mb-4 text-sm font-light">Paste a job description below for an objective analysis of Ashwin's technical fit.</p>
-                                <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="input-apple h-40 resize-none font-mono text-sm" disabled={isGenerating} />
+                                <textarea value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="Paste job description here..." className="input-apple h-40 resize-none font-mono text-sm mb-2" disabled={isGenerating} />
+                                <div className="flex flex-col mb-4">
+                                  <label className="text-xs text-white/50 mb-1">Optional: Upload Job Description PDF</label>
+                                  <input
+                                    type="file"
+                                    accept=".pdf,.txt"
+                                    onChange={(e) => setJobFile(e.target.files[0])}
+                                    className="text-xs text-gray-400"
+                                    disabled={isGenerating}
+                                  />
+                                </div>
                             </>
                         ) : (
                             <>
                                 <p className="text-white/30 mb-4 text-sm font-light">Enter a job title and we'll analyze Ashwin's fit based on typical industry requirements.</p>
-                                <input type="text" value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="e.g. Computer Vision Engineer at BMW" className="input-apple font-mono text-sm" disabled={isGenerating} />
+                                <input type="text" value={jobDesc} onChange={(e) => setJobDesc(e.target.value)} placeholder="e.g. Computer Vision Engineer at BMW" className="input-apple font-mono text-sm mb-4" disabled={isGenerating} />
                             </>
                         )}
 
@@ -1382,6 +1406,15 @@ Bullet list of required skills or qualifications the candidate currently lacks o
                     </div>
                     {generatedText && (
                         <div className="border-t border-white/[0.04] p-6 md:p-8 bg-white/[0.01]">
+                            {matchScore && (
+                              <div className="flex items-center gap-4 mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-[0_4px_16px_rgba(59,130,246,0.1)]">
+                                <div className="text-3xl font-bold text-blue-400 glow-text">{matchScore}%</div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm text-white/80 font-medium">Semantic Match</span>
+                                    <span className="text-[10px] text-blue-400/60 font-mono tracking-wider">Powered by Gemini Embedding 2</span>
+                                </div>
+                              </div>
+                            )}
                             <div className="flex items-center gap-2.5 mb-4">
                                 <div className="w-1.5 h-1.5 rounded-full bg-green-400" style={{ animation: 'soft-pulse 2s ease-in-out infinite' }}></div>
                                 <h4 className="text-[10px] font-semibold text-blue-400/70 uppercase tracking-[0.15em]">Candidate Fit Report</h4>
