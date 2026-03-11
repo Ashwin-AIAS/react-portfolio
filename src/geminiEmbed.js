@@ -44,10 +44,10 @@ export function cosineSimilarity(a, b) {
   return dot / (magA * magB);
 }
 
-// Generate the text report using Gemini 1.5 Flash
+// Generate the text report using Gemini 2.0 Flash Lite
 export async function generateFitReport(prompt) {
   const result = await client.models.generateContent({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.0-flash-lite',
     contents: prompt,
     config: {
       maxOutputTokens: 1000,
