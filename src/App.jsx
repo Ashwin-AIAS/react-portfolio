@@ -1668,13 +1668,14 @@ const AvatarGuide = () => {
                 (entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
+                            console.log('Section visible:', id, 'index:', index);
                             setCurrentStep(index);
                         }
                     });
                 },
                 {
-                    threshold: 0.3,
-                    rootMargin: '-10% 0px -10% 0px'
+                    threshold: 0.05,
+                    rootMargin: '0px 0px -20% 0px'
                 }
             );
 
@@ -1682,8 +1683,31 @@ const AvatarGuide = () => {
             observers.push(observer);
         });
 
-        return () => observers.forEach(o => o.disconnect());
+        return () => {
+            observers.forEach(o => o.disconnect());
+        };
     }, [tourActive, hasStarted]);
+
+    // Fallback scroll listener for tall sections
+    useEffect(() => {
+        if (!tourActive) return;
+
+        const handleScroll = () => {
+            const scrollY = window.scrollY + window.innerHeight * 0.4;
+            tourSteps.forEach((step, index) => {
+                const el = document.getElementById(step.section);
+                if (!el) return;
+                const top = el.offsetTop;
+                const bottom = top + el.offsetHeight;
+                if (scrollY >= top && scrollY < bottom) {
+                    setCurrentStep(index);
+                }
+            });
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [tourActive]);
 
     const handleRestart = () => {
         setCurrentStep(0);
