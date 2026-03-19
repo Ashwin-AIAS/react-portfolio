@@ -136,7 +136,7 @@ const portfolioData = {
       title: "Interactive Portfolio with AI Assistant",
       description: "• Built a React-based interactive portfolio utilizing Framer Motion for advanced animations.\n• Upgraded AI recruiter assistant with Gemini Embedding 2 multimodal embeddings for semantic cross-modal match scoring.\n• Implemented an animated avatar tour guide and scroll-based interactions.",
       technologies: ["React", "Framer Motion", "Gemini API", "Tailwind CSS"],
-      visualComponent: 'AIAssistant',
+      visualComponent: 'PortfolioAI',
       githubUrl: "https://github.com/Ashwin-AIAS/portfolio",
       liveUrl: "#",
       category: "Web & Backend"
@@ -490,6 +490,49 @@ const WebhookVisual = () => (
             ))}
         </div>
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">WEBHOOK AUTOMATION</div>
+    </div>
+);
+
+const PortfolioAIVisual = () => (
+    <div className="w-full h-48 bg-black/50 relative overflow-hidden flex items-center justify-center">
+        <style>{`
+            @keyframes msg-appear { 0% { transform: translateY(10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+            @keyframes typing-dot { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
+            @keyframes score-fill { 0% { width: 0%; } 100% { width: 82%; } }
+            .msg-in { animation: msg-appear 0.4s ease-out forwards; opacity: 0; }
+            .typing-dot { animation: typing-dot 1.2s ease-in-out infinite; }
+        `}</style>
+        <div className="w-64 rounded-xl border border-white/10 bg-gray-900/80 overflow-hidden">
+            {/* Browser bar */}
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-black/40 border-b border-white/5">
+                <div className="w-2 h-2 rounded-full bg-red-500/60"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500/60"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500/60"></div>
+                <div className="flex-1 mx-2 h-3 bg-white/5 rounded-full text-[7px] text-white/20 flex items-center px-2">ashwin.dev</div>
+            </div>
+            {/* Chat messages */}
+            <div className="p-3 space-y-2">
+                <div className="msg-in flex justify-end" style={{ animationDelay: '0.2s' }}>
+                    <div className="bg-blue-600/80 text-white text-[9px] px-2.5 py-1.5 rounded-xl rounded-tr-sm max-w-[80%]">Analyze this job description...</div>
+                </div>
+                <div className="msg-in flex justify-start" style={{ animationDelay: '0.8s' }}>
+                    <div className="bg-white/5 border border-white/10 text-white/70 text-[9px] px-2.5 py-1.5 rounded-xl rounded-tl-sm max-w-[80%]">
+                        <div className="text-green-400 font-mono font-bold mb-1">Match Score: 82%</div>
+                        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-blue-500 to-green-400 rounded-full" style={{ animation: 'score-fill 1.5s ease-out 1s forwards', width: 0 }}></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="msg-in flex justify-start" style={{ animationDelay: '1.4s' }}>
+                    <div className="bg-white/5 border border-white/10 px-2.5 py-1.5 rounded-xl rounded-tl-sm flex gap-1 items-center">
+                        {[0, 0.15, 0.3].map((d, i) => (
+                            <div key={i} className="w-1 h-1 rounded-full bg-blue-400 typing-dot" style={{ animationDelay: `${d}s` }}></div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-widest font-mono">AI RECRUITER ASSISTANT</div>
     </div>
 );
 
@@ -1214,6 +1257,7 @@ const ProjectsSection = () => {
                                         {project.visualComponent === 'FaceRecon' && <FaceReconVisual />}
                                         {project.visualComponent === 'RadarAI' && <RadarAIVisual />}
                                         {project.visualComponent === 'Webhook' && <WebhookVisual />}
+                                        {project.visualComponent === 'PortfolioAI' && <PortfolioAIVisual />}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                                     </div>
                                     <div className="p-6 md:p-8 flex flex-col flex-grow">
