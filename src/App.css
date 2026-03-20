@@ -208,3 +208,17 @@
   .tilt-shine { transition: none !important; }
   * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* Chat & Progress Animations */
+@keyframes msg-appear {
+  0% { transform: translateY(10px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes score-fill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+@keyframes typing-dot {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}
