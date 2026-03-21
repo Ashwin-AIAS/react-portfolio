@@ -6,9 +6,7 @@ const BatSwingVisual = () => (
         <div className="relative w-32 h-32">
             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></div>
             <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-1 h-8 bg-gray-400/60 rounded"></div>
-            <div className="absolute top-[35%] left-1/2 -translate-x-[3px] bat-arm">
-                <div className="w-1.5 h-14 bg-gradient-to-b from-amber-700 to-amber-500 rounded-b-full"></div>
-            </div>
+            <div className="bat-arm absolute top-[35%] left-1/2 -translate-x-[3px] w-1.5 h-14 bg-gradient-to-b from-amber-700 to-amber-500 rounded-b-full"></div>
             {[-30, -15, 0, 15, 30].map((angle, i) => (
                 <div key={i} className="absolute top-[35%] left-1/2 w-12 h-0.5 bg-cyan-400/20 rounded swing-trail" style={{ transform: `rotate(${angle}deg)`, transformOrigin: 'left center', animationDelay: `${i * 0.1}s` }}></div>
             ))}
