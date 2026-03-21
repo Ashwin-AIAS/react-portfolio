@@ -288,7 +288,9 @@
   background-color: #22d3ee;
   border-radius: 50%;
   animation: lidar-scan 1.5s ease-out infinite;
+  animation-play-state: paused;
 }
+.group:hover .lidar-point { animation-play-state: running; }
 
 .radar-sweep::after {
   content: '';
@@ -298,24 +300,63 @@
   width: 50%;
   height: 100%;
   background: linear-gradient(to right, transparent, rgba(96, 165, 250, 0.15));
+  animation: radar-sweep 2s linear infinite;
+  animation-play-state: paused;
 }
+.group:hover .radar-sweep::after { animation-play-state: running; }
 
-.synthetic-dot { animation: dot-fade-in 0.5s ease-out; }
-.rag-doc { animation: rag-doc-flow 3s ease-in-out infinite; }
-.rag-node { animation: rag-pulse 2s ease-in-out infinite; }
-.cnn-node { animation: cnn-pulse 2s ease-in-out infinite; }
-.cnn-data { animation: cnn-data 1.5s ease-in-out infinite; }
-.bat-arm { animation: bat-swing 2s ease-in-out infinite; transform-origin: top center; }
-.rl-agent { animation: agent-move 5s ease-in-out infinite; }
-.car { animation-timing-function: linear; animation-iteration-count: infinite; }
+.synthetic-dot { animation: dot-fade-in 0.5s ease-out; animation-play-state: paused; }
+.group:hover .synthetic-dot { animation-play-state: running; }
+
+.rag-doc { animation: rag-doc-flow 3s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .rag-doc { animation-play-state: running; }
+
+.rag-node { animation: rag-pulse 2s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .rag-node { animation-play-state: running; }
+
+.cnn-node { animation: cnn-pulse 2s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .cnn-node { animation-play-state: running; }
+
+.cnn-data { animation: cnn-data 1.5s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .cnn-data { animation-play-state: running; }
+
+.bat-arm { animation: bat-swing 2s ease-in-out infinite; transform-origin: top center; animation-play-state: paused; }
+.group:hover .bat-arm { animation-play-state: running; }
+
+.swing-trail { animation: swing-trail 2s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .swing-trail { animation-play-state: running; }
+
+.rl-agent { animation: agent-move 5s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .rl-agent { animation-play-state: running; }
+
+.car { animation-timing-function: linear; animation-iteration-count: infinite; animation-play-state: paused; }
+.group:hover .car { animation-play-state: running; }
+
 .car-1 { animation-name: drive-around-1; animation-duration: 8s; }
 .car-2 { animation-name: drive-around-2; animation-duration: 8s; }
 .car-3 { animation-name: drive-around-3; animation-duration: 8s; }
-.wifi-pulse { animation: pulse 2s infinite; }
-.radar-line { animation: radar-sweep-ai 3s linear infinite; }
-.radar-blip { animation: radar-blip 3s ease-out infinite; }
-.wh-flow { animation: webhook-flow 1.5s ease-in-out infinite; }
-.wh-pulse { animation: webhook-pulse 2s ease-in-out infinite; }
+
+.wifi-pulse { animation: pulse 2s infinite; animation-play-state: paused; }
+.group:hover .wifi-pulse { animation-play-state: running; }
+
+.radar-line { animation: radar-sweep-ai 3s linear infinite; animation-play-state: paused; }
+.group:hover .radar-line { animation-play-state: running; }
+
+.radar-blip { animation: radar-blip 3s ease-out infinite; animation-play-state: paused; }
+.group:hover .radar-blip { animation-play-state: running; }
+
+.wh-flow { animation: webhook-flow 1.5s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .wh-flow { animation-play-state: running; }
+
+.wh-pulse { animation: webhook-pulse 2s ease-in-out infinite; animation-play-state: paused; }
+.group:hover .wh-pulse { animation-play-state: running; }
+
+@keyframes dash-flow { to { stroke-dashoffset: 0; } }
+.svg-dash-flow {
+  animation: dash-flow 1s linear infinite;
+  animation-play-state: paused;
+}
+.group:hover .svg-dash-flow { animation-play-state: running; }
 
 /* ===== TRENDY ANIMATIONS 2026 ===== */
 

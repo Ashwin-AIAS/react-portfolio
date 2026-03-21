@@ -10,7 +10,7 @@ const BatSwingVisual = () => (
                 <div className="w-1.5 h-14 bg-gradient-to-b from-amber-700 to-amber-500 rounded-b-full"></div>
             </div>
             {[-30, -15, 0, 15, 30].map((angle, i) => (
-                <div key={i} className="absolute top-[35%] left-1/2 w-12 h-0.5 bg-cyan-400/20 rounded swing-trail" style={{ transform: `rotate(${angle}deg)`, transformOrigin: 'left center', animationDelay: `${i * 0.1}s`, animationName: 'swing-trail', animationDuration: '2s', animationTimingFunction: 'ease-in-out', animationIterationCount: 'infinite' }}></div>
+                <div key={i} className="absolute top-[35%] left-1/2 w-12 h-0.5 bg-cyan-400/20 rounded swing-trail" style={{ transform: `rotate(${angle}deg)`, transformOrigin: 'left center', animationDelay: `${i * 0.1}s` }}></div>
             ))}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 {['SPD', 'ANG', 'DUR'].map((m, i) => (
