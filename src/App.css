@@ -215,10 +215,215 @@
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 @keyframes score-fill {
+  0% { transform: rotate(120deg) translateX(180px) rotate(-120deg); opacity: 0.4; }
+  50% { opacity: 0.15; }
+  100% { transform: rotate(480deg) translateX(180px) rotate(-480deg); opacity: 0.4; }
+}
+
+@keyframes orbit-3 {
+  0% { transform: rotate(240deg) translateX(100px) rotate(-240deg); opacity: 0.5; }
+  50% { opacity: 0.2; }
+  100% { transform: rotate(600deg) translateX(100px) rotate(-600deg); opacity: 0.5; }
+}
+
+/* Gradient border animation */
+@keyframes border-gradient {
+  0%, 100% { border-color: rgba(59, 130, 246, 0.2); }
+  33% { border-color: rgba(139, 92, 246, 0.2); }
+  66% { border-color: rgba(34, 211, 238, 0.2); }
+}
+
+/* Pulse for status dots */
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Loading bar */
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* Visual component animations — kept from original */
+@keyframes lidar-scan {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+}
+
+@keyframes radar-sweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+@keyframes dot-fade-in { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
+
+@keyframes rag-doc-flow { 0% { transform: translateX(-40px); opacity: 0; } 30% { transform: translateX(0); opacity: 1; } 70% { opacity: 1; } 100% { transform: translateX(40px); opacity: 0; } }
+@keyframes rag-pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.3); opacity: 1; } }
+
+@keyframes cnn-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+@keyframes cnn-data { 0% { transform: translateX(-10px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(10px); opacity: 0; } }
+
+@keyframes bat-swing { 0% { transform: rotate(-45deg); } 50% { transform: rotate(45deg); } 100% { transform: rotate(-45deg); } }
+@keyframes swing-trail { 0% { opacity: 0; } 30% { opacity: 0.6; } 100% { opacity: 0; } }
+
+@keyframes agent-move { 0%, 20% { top: 12.5%; left: 12.5%; } 35% { top: 12.5%; left: 37.5%; } 50% { top: 37.5%; left: 37.5%; } 65% { top: 37.5%; left: 62.5%; } 80%, 100% { top: 62.5%; left: 62.5%; } }
+
+@keyframes drive-around-1 { 0% { transform: rotate(0deg) translateX(55px) rotate(-0deg); } 100% { transform: rotate(360deg) translateX(55px) rotate(-360deg); } }
+@keyframes drive-around-2 { 0% { transform: rotate(120deg) translateX(55px) rotate(-120deg); } 100% { transform: rotate(480deg) translateX(55px) rotate(-480deg); } }
+@keyframes drive-around-3 { 0% { transform: rotate(240deg) translateX(55px) rotate(-240deg); } 100% { transform: rotate(600deg) translateX(55px) rotate(-600deg); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); } 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); } }
+
+@keyframes radar-sweep-ai { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes radar-blip { 0%, 80% { opacity: 0; transform: scale(0); } 90% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.5); } }
+
+@keyframes webhook-flow { 0% { transform: translateX(-8px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(8px); opacity: 0; } }
+@keyframes webhook-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(234, 75, 113, 0.4); } 50% { box-shadow: 0 0 0 6px rgba(234, 75, 113, 0); } }
+
+@keyframes scan-glow { 0% { box-shadow: 0 0 5px 2px rgba(59, 130, 246, 0.5); } 50% { box-shadow: 0 0 15px 5px rgba(59, 130, 246, 0.8); } 100% { box-shadow: 0 0 5px 2px rgba(59, 130, 246, 0.5); } }
+@keyframes scanner-move { 0% { top: -10px; } 100% { top: 100%; } }
+
+/* Visual component classes */
+.lidar-point {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: #22d3ee;
+  border-radius: 50%;
+  animation: lidar-scan 1.5s ease-out infinite;
+}
+
+.radar-sweep::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(96, 165, 250, 0.15));
+}
+
+.synthetic-dot { animation: dot-fade-in 0.5s ease-out; }
+.rag-doc { animation: rag-doc-flow 3s ease-in-out infinite; }
+.rag-node { animation: rag-pulse 2s ease-in-out infinite; }
+.cnn-node { animation: cnn-pulse 2s ease-in-out infinite; }
+.cnn-data { animation: cnn-data 1.5s ease-in-out infinite; }
+.bat-arm { animation: bat-swing 2s ease-in-out infinite; transform-origin: top center; }
+.rl-agent { animation: agent-move 5s ease-in-out infinite; }
+.car { animation-timing-function: linear; animation-iteration-count: infinite; }
+.car-1 { animation-name: drive-around-1; animation-duration: 8s; }
+.car-2 { animation-name: drive-around-2; animation-duration: 8s; }
+.car-3 { animation-name: drive-around-3; animation-duration: 8s; }
+.wifi-pulse { animation: pulse 2s infinite; }
+.radar-line { animation: radar-sweep-ai 3s linear infinite; }
+.radar-blip { animation: radar-blip 3s ease-out infinite; }
+.wh-flow { animation: webhook-flow 1.5s ease-in-out infinite; }
+.wh-pulse { animation: webhook-pulse 2s ease-in-out infinite; }
+
+/* ===== TRENDY ANIMATIONS 2026 ===== */
+
+/* Gradient Mesh — morphing blobs */
+@keyframes mesh-blob-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(80px, -60px) scale(1.15); }
+  50% { transform: translate(-40px, 40px) scale(0.9); }
+  75% { transform: translate(60px, 80px) scale(1.1); }
+}
+@keyframes mesh-blob-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-70px, 50px) scale(1.2); }
+  50% { transform: translate(60px, -30px) scale(0.85); }
+  75% { transform: translate(-50px, -70px) scale(1.05); }
+}
+@keyframes mesh-blob-3 {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  33% { transform: translate(50px, 70px) scale(0.9); }
+  66% { transform: translate(-80px, -20px) scale(1.15); }
+}
+
+/* Typewriter cursor blink */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Particle drift */
+@keyframes particle-drift {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-100vh) translateX(30px); opacity: 0; }
+}
+
+/* Tilt card highlight */
+.tilt-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+.tilt-card-inner {
+  transition: transform 0.25s ease-out;
+  transform-style: preserve-3d;
+}
+.tilt-card .tilt-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 10;
+  background: radial-gradient(circle at var(--shine-x, 50%) var(--shine-y, 50%), rgba(255,255,255,0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.tilt-card:hover .tilt-shine {
+  opacity: 1;
+}
+
+/* Stat counter number animation */
+@keyframes count-up-glow {
+  0% { text-shadow: 0 0 0 rgba(59, 130, 246, 0); }
+  50% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+  100% { text-shadow: 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+/* Mouse glow */
+.mouse-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(139,92,246,0.06) 30%, transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  filter: blur(40px);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .mouse-glow,
+  .tilt-card-inner,
+  .tilt-shine { transition: none !important; }
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* Chat & Progress Animations */
+@keyframes msg-appear {
+  0% { transform: translateY(10px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes score-fill {
   0% { width: 0%; }
   100% { width: 100%; }
 }
 @keyframes typing-dot {
   0%, 100% { transform: translateY(0); opacity: 0.4; }
   50% { transform: translateY(-3px); opacity: 1; }
+}
+
+@keyframes mic-pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.mic-pulse {
+  animation: mic-pulse-ring 1.2s ease-in-out infinite;
 }

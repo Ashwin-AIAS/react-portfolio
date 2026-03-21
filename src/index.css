@@ -9,10 +9,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    overflow-anchor: none;
   }
 
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;

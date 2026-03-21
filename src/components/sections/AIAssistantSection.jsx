@@ -3,9 +3,9 @@ import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
-import AIAssistantVisual from '../visuals/AIAssistantVisual';
-import { SendIcon, SparklesIcon, BotIcon } from '../../icons/Icons';
+import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon } from '../../icons/Icons';
 import { streamGeminiResponse, getApiKey } from '../../geminiEmbed';
+import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SYSTEM_PROMPT = `
@@ -103,7 +103,30 @@ export const AIAssistantSection = ({ t }) => {
     ]);
     const [input, setInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [voiceError, setVoiceError] = useState('');
     const messagesEndRef = useRef(null);
+
+    const { isListening, startListening, stopListening } = useSpeechInput({
+        onResult: (transcript, isFinal) => {
+            setInput(transcript);
+            if (isFinal) {
+                setTimeout(() => {
+                    if (transcript.trim()) handleSend(null, transcript);
+                }, 400);
+            }
+        },
+        onError: (msg) => {
+            setVoiceError(msg);
+            setTimeout(() => setVoiceError(''), 4000);
+        }
+    });
+
+    useEffect(() => {
+        const supported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+        if (!supported) {
+            setVoiceError('Voice input works best in Chrome or Edge.');
+        }
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -113,11 +136,12 @@ export const AIAssistantSection = ({ t }) => {
         scrollToBottom();
     }, [messages, isGenerating]);
 
-    const handleSend = async (e) => {
-        e.preventDefault();
-        if (!input.trim() || isGenerating) return;
+    const handleSend = async (e, overrideText) => {
+        if (e) e.preventDefault();
+        const messageText = overrideText || input;
+        if (!messageText.trim() || isGenerating) return;
 
-        const userMsg = input.trim();
+        const userMsg = messageText.trim();
         setInput('');
         
         // Push user message, and a placeholder for the model response
@@ -229,28 +253,52 @@ export const AIAssistantSection = ({ t }) => {
                         </div>
 
                         <div className="p-4 bg-white/[0.02] border-t border-white/[0.06]">
-                            <form onSubmit={handleSend} className="relative flex items-center">
-                                <textarea
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder={t.assistant.placeholder}
-                                    className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
-                                    rows="1"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
-                                            e.preventDefault();
-                                            handleSend(e);
-                                        }
-                                    }}
-                                />
+                            <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
                                 <button
-                                    type="submit"
-                                    disabled={!input.trim() || isGenerating}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    type="button"
+                                    onClick={isListening ? stopListening : startListening}
+                                    disabled={isGenerating}
+                                    title={isListening ? "Stop listening" : "Speak your message"}
+                                    className={`
+                                        flex-shrink-0 w-10 h-10 rounded-full border transition-all duration-300
+                                        flex items-center justify-center
+                                        ${isListening 
+                                        ? 'bg-red-500/20 border-red-500/50 text-red-400 mic-pulse' 
+                                        : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white/70 hover:bg-white/[0.08]'
+                                        }
+                                        ${isGenerating ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
+                                    `}
                                 >
-                                    <SendIcon className="w-4 h-4" />
+                                    {isListening ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />}
                                 </button>
+                                <div className="relative flex-1">
+                                    <textarea
+                                        value={input}
+                                        onChange={(e) => setInput(e.target.value)}
+                                        placeholder={t.assistant.placeholder}
+                                        className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
+                                        rows="1"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSend(e);
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={!input.trim() || isGenerating}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <SendIcon className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </form>
+                            {voiceError && (
+                                <p className="text-amber-400/70 text-xs mt-2 text-center">
+                                    {voiceError}
+                                </p>
+                            )}
                             <div className="text-[10px] text-center text-white/30 mt-3 font-medium uppercase tracking-widest">
                                 Press Enter to send, Shift+Enter for new line
                             </div>

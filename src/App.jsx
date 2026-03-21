@@ -29,6 +29,10 @@ export default function App() {
     const { lang, t, toggleLang } = useLang();
 
     useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, []);
+
+    useEffect(() => {
         document.documentElement.lang = lang;
     }, [lang]);
 

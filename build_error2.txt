@@ -1,0 +1,182 @@
+
+> my-portfolio@0.0.0 build
+> vite build
+
+[36mvite v5.4.20 [32mbuilding for production...[36m[39m
+transforming...
+node.exe : [baseline-b
+rowser-mapping] The 
+data in this module 
+is over two months 
+old.  To ensure 
+accurate Baseline 
+data, please update: 
+`npm i baseline-browse
+r-mapping@latest -D`
+At line:1 char:1
++ & "C:\Program Files\
+nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ([baseline-   
+ brows...ping@late    
+st -D`:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+Browserslist: 
+browsers data 
+(caniuse-lite) is 6 
+months old. Please 
+run:
+  npx update-browsersl
+ist-db@latest
+  Why you should do 
+it regularly: https://
+github.com/browserslis
+t/update-db#readme
+[32m???[39m 18 modules transformed.
+[31mx[39m Build 
+failed in 851ms
+[31merror during 
+build:
+[31m[vite:esbuild] 
+Transform failed with 
+2 errors:
+C:/Users/mashw/OneDriv
+e/Desktop/CollegeMater
+ials/protfolio/react-p
+ortfolio/src/component
+s/sections/AIAssistant
+Section.jsx:9:9: 
+ERROR: The symbol "str
+eamGeminiResponse" 
+has already been 
+declared
+C:/Users/mashw/OneDriv
+e/Desktop/CollegeMater
+ials/protfolio/react-p
+ortfolio/src/component
+s/sections/AIAssistant
+Section.jsx:9:31: 
+ERROR: The symbol 
+"getApiKey" has 
+already been 
+declared[31m
+file: [36mC:/Users/ma
+shw/OneDrive/Desktop/C
+ollegeMaterials/protfo
+lio/react-portfolio/sr
+c/components/sections/
+AIAssistantSection.jsx
+:9:9[31m
+[33m
+[33mThe symbol "strea
+mGeminiResponse" has 
+already been 
+declared[33m
+7  |  import { 
+streamGeminiResponse, 
+getApiKey } from 
+'../../geminiEmbed';
+8  |  import { 
+useSpeechInput } from 
+'../../hooks/useSpeech
+Input';
+9  |  import { 
+streamGeminiResponse, 
+getApiKey } from 
+'../../geminiEmbed';
+   |           ^
+10 |  import { 
+motion, 
+AnimatePresence } 
+from 'framer-motion';
+11 |  
+
+[33mThe symbol 
+"getApiKey" has 
+already been 
+declared[33m
+7  |  import { 
+streamGeminiResponse, 
+getApiKey } from 
+'../../geminiEmbed';
+8  |  import { 
+useSpeechInput } from 
+'../../hooks/useSpeech
+Input';
+9  |  import { 
+streamGeminiResponse, 
+getApiKey } from 
+'../../geminiEmbed';
+   |                  
+               ^
+10 |  import { 
+motion, 
+AnimatePresence } 
+from 'framer-motion';
+11 |  
+[31m
+    at 
+failureErrorWithLog (C
+:\Users\mashw\OneDrive
+\Desktop\CollegeMateri
+als\protfolio\react-po
+rtfolio\node_modules\e
+sbuild\lib\main.js:147
+2:15)
+    at C:\Users\mashw\
+OneDrive\Desktop\Colle
+geMaterials\protfolio\
+react-portfolio\node_m
+odules\esbuild\lib\mai
+n.js:755:50
+    at responseCallbac
+ks.<computed> (C:\User
+s\mashw\OneDrive\Deskt
+op\CollegeMaterials\pr
+otfolio\react-portfoli
+o\node_modules\esbuild
+\lib\main.js:622:9)
+    at 
+handleIncomingPacket (
+C:\Users\mashw\OneDriv
+e\Desktop\CollegeMater
+ials\protfolio\react-p
+ortfolio\node_modules\
+esbuild\lib\main.js:67
+7:12)
+    at 
+Socket.readFromStdout 
+(C:\Users\mashw\OneDri
+ve\Desktop\CollegeMate
+rials\protfolio\react-
+portfolio\node_modules
+\esbuild\lib\main.js:6
+00:7)
+    at Socket.emit 
+(node:events:519:28)
+    at addChunk (node:
+internal/streams/reada
+ble:561:12)
+    at readableAddChun
+kPushByteMode (node:in
+ternal/streams/readabl
+e:512:3)
+    at Readable.push (
+node:internal/streams/
+readable:392:5)
+    at 
+Pipe.onStreamRead (nod
+e:internal/stream_base
+_commons:189:23)[39m
