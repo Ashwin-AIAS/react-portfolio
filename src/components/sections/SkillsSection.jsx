@@ -4,8 +4,8 @@ import { Section } from '../ui/Section';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import { SkillBadge } from '../ui/SkillBadge';
 
-export const SkillsSection = () => (
-    <Section id="skills" title="Technical Arsenal" subtitle="Tools and technologies I use to build robust AI and software solutions">
+export const SkillsSection = ({ t }) => (
+    <Section id="skills" title={t.skills.title} subtitle={t.skills.subtitle}>
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {Object.entries(portfolioData.skills).map(([category, skills], index) => (
                 <AnimateOnScroll key={index} delay={index * 150} className={`glass-card p-8 bg-gradient-to-br from-white/[0.03] to-transparent ${index === 0 ? 'md:col-span-2' : ''}`}>

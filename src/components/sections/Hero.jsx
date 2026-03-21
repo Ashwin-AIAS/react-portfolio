@@ -6,12 +6,12 @@ import { GradientMesh } from '../ui/GradientMesh';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import { DownloadIcon, GitHubIcon, LinkedInIcon } from '../../icons/Icons';
 
-export const Hero = () => {
+export const Hero = ({ t }) => {
     const [isResumeOpen, setIsResumeOpen] = useState(false);
     const resumePreviewUrl = portfolioData.personalInfo.resumeUrl.replace('/view', '/preview');
 
     const roles = [
-        "AI ENGINEER FOR AUTONOMOUS SYSTEMS",
+        t.hero.badge.toUpperCase(),
         "COMPUTER VISION ENGINEER",
         "LLM & RAG SYSTEMS BUILDER",
         "MASTER'S STUDENT @ THI GERMANY",
@@ -134,7 +134,7 @@ export const Hero = () => {
                                     transition={{ duration: 0.53, repeat: Infinity }}
                                 >|</motion.span>
                             </p>
-                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">Hi, I'm <span className="text-gradient">Ashwin</span></h1>
+                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">{t.hero.greeting} <span className="text-gradient">Ashwin</span></h1>
                         </motion.div>
 
                         <motion.div
@@ -142,7 +142,7 @@ export const Hero = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.30, duration: 0.6, ease: "easeOut" }}
                         >
-                            <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0 mb-10">{portfolioData.personalInfo.bio}</p>
+                            <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0 mb-10">{t.hero.bio}</p>
                         </motion.div>
 
                         <motion.div
@@ -151,7 +151,7 @@ export const Hero = () => {
                             transition={{ delay: 0.45, duration: 0.6, ease: "easeOut" }}
                             className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
                         >
-                            <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> View Resume</button>
+                            <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> {t.hero.downloadCv}</button>
                             <div className="flex items-center gap-4 justify-center">
                                 <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
                                 <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
@@ -192,7 +192,7 @@ export const Hero = () => {
                         />
                         <div className="p-4 border-t border-white/[0.06] flex justify-center">
                             <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-premium btn-primary text-sm px-6 py-2.5">
-                                <DownloadIcon className="w-4 h-4 mr-2" /> Download Resume
+                                <DownloadIcon className="w-4 h-4 mr-2" /> {t.hero.downloadCv}
                             </a>
                         </div>
                     </motion.div>

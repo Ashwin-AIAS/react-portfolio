@@ -54,13 +54,13 @@ const ScoreDial = ({ score }) => {
     );
 };
 
-const FitReportCard = ({ data }) => {
+const FitReportCard = ({ data, t }) => {
     return (
         <div className="bg-black/40 border border-white/10 rounded-xl p-5 mt-2 flex flex-col gap-6 w-full shadow-lg">
             <div className="flex items-center gap-6 pb-6 border-b border-white/[0.06]">
                 <ScoreDial score={data.score || 0} />
                 <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-white/90 mb-2">Automated Fit Analysis</h4>
+                    <h4 className="text-lg font-semibold text-white/90 mb-2">{t.cardTitle}</h4>
                     <p className="text-sm text-white/60 leading-relaxed">{data.alignment}</p>
                 </div>
             </div>
@@ -97,9 +97,9 @@ const FitReportCard = ({ data }) => {
     );
 };
 
-export const AIAssistantSection = () => {
+export const AIAssistantSection = ({ t }) => {
     const [messages, setMessages] = useState([
-        { role: 'model', content: "Hi! I'm Ashwin's AI agent. Ask me anything about his experience, or paste a job description and I'll generate a Fit Report of how well he matches!" }
+        { role: 'model', content: t.assistant.initialMessage }
     ]);
     const [input, setInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
@@ -176,7 +176,7 @@ export const AIAssistantSection = () => {
             if (possibleJson && possibleJson.includes('"type": "fit_report"')) {
                 const data = JSON.parse(possibleJson);
                 if (data.type === 'fit_report') {
-                    return <FitReportCard data={data} />;
+                    return <FitReportCard data={data} t={t.assistant} />;
                 }
             }
         } catch (e) {
@@ -185,22 +185,22 @@ export const AIAssistantSection = () => {
 
         return (
             <div className="bg-white/5 border border-white/10 text-white/80 text-sm px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-md max-w-[85%] leading-relaxed whitespace-pre-wrap">
-                {msg.content || (isGenerating && <span className="animate-pulse">...</span>)}
+                {msg.content || (isGenerating && <span className="animate-pulse">{t.assistant.generating}</span>)}
             </div>
         );
     };
 
     return (
-        <Section id="assistant" title="AI Recruiter Assistant" subtitle="Chat with my AI agent or evaluate my profile against a job description">
+        <Section id="assistant" title={t.assistant.title} subtitle={t.assistant.subtitle}>
             <div className="grid md:grid-cols-5 gap-8 lg:gap-12">
                 <AnimateOnScroll className="md:col-span-2">
                     <Card className="h-full bg-gradient-to-b from-blue-900/10 to-transparent p-6 md:p-8 flex flex-col justify-center items-center text-center border border-blue-500/20">
                         <AIAssistantVisual isGenerating={isGenerating} />
                         <h3 className="text-xl font-semibold text-white mb-4 mt-8 flex items-center justify-center gap-2">
-                            <SparklesIcon className="w-5 h-5 text-blue-400" /> Powered by Gemini
+                            <SparklesIcon className="w-5 h-5 text-blue-400" /> {t.assistant.badge}
                         </h3>
                         <p className="text-sm text-white/50 font-light leading-relaxed">
-                            I loaded my resume, project experience, and skill vectors into a context window. Paste any Job Description here, and it will compute an instant Match Score and alignment report. Or just ask questions naturally!
+                            {t.assistant.disclaimer}
                         </p>
                     </Card>
                 </AnimateOnScroll>
@@ -233,7 +233,7 @@ export const AIAssistantSection = () => {
                                 <textarea
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Paste job description or ask a question..."
+                                    placeholder={t.assistant.placeholder}
                                     className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
                                     rows="1"
                                     onKeyDown={(e) => {

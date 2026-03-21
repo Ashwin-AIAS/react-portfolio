@@ -5,8 +5,8 @@ import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import { ExternalLinkIcon, GraduationCapIcon } from '../../icons/Icons';
 
-export const CertificationsSection = () => (
-    <Section id="certifications" title="Certifications" subtitle="Continuous learning and verified expertise">
+export const CertificationsSection = ({ t }) => (
+    <Section id="certifications" title={t.certifications.title} subtitle={t.certifications.subtitle}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {portfolioData.certifications.map((cert, index) => (
                 <AnimateOnScroll key={index} delay={index * 100}>
@@ -19,7 +19,7 @@ export const CertificationsSection = () => (
                             <p className="text-sm text-white/40 mb-6 font-light">{cert.issuer}</p>
                             <div className="mt-auto">
                                 <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider">
-                                    View Credential <ExternalLinkIcon className="w-3 h-3 ml-2" />
+                                    {t.certifications.viewCredential} <ExternalLinkIcon className="w-3 h-3 ml-2" />
                                 </a>
                             </div>
                         </div>

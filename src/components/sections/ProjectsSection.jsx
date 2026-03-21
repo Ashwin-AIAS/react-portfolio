@@ -71,9 +71,9 @@ const ProjectCardWrapper = ({ project, index }) => {
     );
 };
 
-export const ProjectsSection = () => {
+export const ProjectsSection = ({ t }) => {
     return (
-        <Section id="projects" title="Featured Work" subtitle="A selection of my recent AI engineering and full-stack projects">
+        <Section id="projects" title={t.projects.title} subtitle={t.projects.subtitle}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {portfolioData.projects.map((project, index) => (
                     <ProjectCardWrapper key={index} project={project} index={index} />
