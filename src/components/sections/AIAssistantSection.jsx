@@ -3,6 +3,7 @@ import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
+import AIAssistantVisual from '../visuals/AIAssistantVisual';
 import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon } from '../../icons/Icons';
 import { streamGeminiResponse, getApiKey } from '../../geminiEmbed';
 import { useSpeechInput } from '../../hooks/useSpeechInput';
