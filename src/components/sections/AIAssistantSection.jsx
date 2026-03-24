@@ -111,6 +111,63 @@ function detectSuggestionSet(assistantReply, userMessage) {
   return 'generic';
 }
 
+const CONVERSATION_STARTERS = [
+  {
+    icon: "📋",
+    title: "Analyze a Job Description",
+    subtitle: "Paste a JD for an instant fit report",
+    message: "I have a job description I'd like you to analyze for Ashwin's fit."
+  },
+  {
+    icon: "🤖",
+    title: "AI & ML Projects",
+    subtitle: "RAG, YOLO, GANs, computer vision",
+    message: "Tell me about Ashwin's most impressive AI and machine learning projects."
+  },
+  {
+    icon: "🚗",
+    title: "Autonomous Systems",
+    subtitle: "Radar, LiDAR, roundabout coordination",
+    message: "What autonomous systems experience does Ashwin have?"
+  },
+  {
+    icon: "💼",
+    title: "Work Experience",
+    subtitle: "DXC Technology, THI Germany",
+    message: "Walk me through Ashwin's professional background and education."
+  }
+];
+
+const TYPING_STATUSES = {
+  fitReport: [
+    "Reading job description...",
+    "Matching against Ashwin's skills...",
+    "Analyzing project relevance...",
+    "Calculating fit score...",
+    "Crafting your report..."
+  ],
+  project: [
+    "Searching Ashwin's project portfolio...",
+    "Pulling technical details...",
+    "Composing the answer..."
+  ],
+  general: [
+    "Thinking...",
+    "Searching Ashwin's background...",
+    "Composing the answer...",
+    "Almost ready..."
+  ]
+};
+
+const CopyIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+  </svg>
+);
+
 const ScoreDial = ({ score }) => {
     const circumference = 2 * Math.PI * 40;
     const offset = circumference - (score / 100) * circumference;
@@ -188,8 +245,35 @@ export const AIAssistantSection = ({ t }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [suggestions, setSuggestions] = useState(SUGGESTIONS.initial);
     const [showSuggestions, setShowSuggestions] = useState(true);
+    const [typingStatus, setTypingStatus] = useState('');
+    const typingIntervalRef = useRef(null);
+    const [copiedId, setCopiedId] = useState(null);
     const [voiceError, setVoiceError] = useState('');
     const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        return () => clearInterval(typingIntervalRef.current);
+    }, []);
+
+    function startTypingStatus(userMessage) {
+        const isJD = userMessage.length > 200 || 
+            ['requirement', 'qualification', 'responsibility', 'we are looking'].some(k => userMessage.toLowerCase().includes(k));
+        const isProject = ['project', 'rag', 'yolo', 'radar', 'cnn', 'built', 'github'].some(k => userMessage.toLowerCase().includes(k));
+        const set = isJD ? TYPING_STATUSES.fitReport : isProject ? TYPING_STATUSES.project : TYPING_STATUSES.general;
+
+        let index = 0;
+        setTypingStatus(set[0]);
+
+        typingIntervalRef.current = setInterval(() => {
+            index = (index + 1) % set.length;
+            setTypingStatus(set[index]);
+        }, 1500);
+    }
+
+    function stopTypingStatus() {
+        clearInterval(typingIntervalRef.current);
+        setTypingStatus('');
+    }
 
     const { isListening, startListening, stopListening } = useSpeechInput({
         onResult: (transcript, isFinal) => {
@@ -232,6 +316,8 @@ export const AIAssistantSection = ({ t }) => {
         const userMsg = messageText.trim();
         setInput('');
         
+        startTypingStatus(userMsg);
+
         // Push user message, and a placeholder for the model response
         const newMessages = [...messages, { role: 'user', content: userMsg }, { role: 'model', content: '' }];
         setMessages(newMessages);
@@ -260,6 +346,7 @@ export const AIAssistantSection = ({ t }) => {
                         return updated;
                     });
                     setIsGenerating(false);
+                    stopTypingStatus();
                     
                     const lastUserMsg = newMessages.findLast(m => m.role === 'user');
                     const set = detectSuggestionSet(finalText, lastUserMsg?.content || '');
@@ -274,17 +361,49 @@ export const AIAssistantSection = ({ t }) => {
                         return updated;
                     });
                     setIsGenerating(false);
+                    stopTypingStatus();
                 }
             );
         } catch (error) {
             console.error(error);
             setIsGenerating(false);
+            stopTypingStatus();
         }
     };
 
     const handleSuggestionClick = (suggestion) => {
         setShowSuggestions(false);
         handleSend(null, suggestion);
+    };
+
+    const handleCopy = (text, id) => {
+        let copyText = text;
+        try {
+            const parsed = JSON.parse(text);
+            if (parsed.type === 'fit_report') {
+                copyText = `Match Score: ${parsed.score}%\n\n` +
+                    `Matching Skills:\n${parsed.matching_skills.map(s => `• ${s}`).join('\n')}\n\n` +
+                    `Gaps:\n${parsed.missing_skills?.map(g => `• ${g}`).join('\n') || 'None'}\n\n` +
+                    `Alignment: ${parsed.alignment}\n\n` +
+                    `Recommendation: ${parsed.recommendation}`;
+            }
+        } catch {}
+        
+        navigator.clipboard.writeText(copyText).then(() => {
+            setCopiedId(id);
+            setTimeout(() => setCopiedId(null), 2000);
+        });
+    };
+
+    const handleRegenerate = () => {
+        const lastUserIndex = [...messages].reverse().findIndex(m => m.role === 'user');
+        if (lastUserIndex === -1) return;
+        
+        const actualIndex = messages.length - 1 - lastUserIndex;
+        const lastUserMessage = messages[actualIndex].content;
+
+        setMessages(prev => prev.slice(0, actualIndex + 1));
+        setTimeout(() => handleSend(null, lastUserMessage), 100);
     };
 
     const renderMessageContent = (msg) => {
@@ -306,8 +425,8 @@ export const AIAssistantSection = ({ t }) => {
         }
 
         return (
-            <div className="bg-white/5 border border-white/10 text-white/80 text-sm px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-md max-w-[85%] leading-relaxed whitespace-pre-wrap">
-                {msg.content || (isGenerating && <span className="animate-pulse">{t.assistant.generating}</span>)}
+            <div className="bg-white/5 border border-white/10 text-white/80 text-sm px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-md leading-relaxed whitespace-pre-wrap">
+                {msg.content}
             </div>
         );
     };
@@ -332,21 +451,95 @@ export const AIAssistantSection = ({ t }) => {
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 opacity-50"></div>
                         
                         <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-                            {messages.map((msg, i) => (
-                                <motion.div 
-                                    key={i} 
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                                >
-                                    {msg.role === 'model' && (
-                                        <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-blue-400">
-                                            <BotIcon className="w-4 h-4" />
-                                        </div>
-                                    )}
-                                    {renderMessageContent(msg)}
-                                </motion.div>
-                            ))}
+                            <AnimatePresence>
+                                {messages.length === 1 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10, scale: 0.97 }}
+                                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-4"
+                                    >
+                                        {CONVERSATION_STARTERS.map((starter, i) => (
+                                            <motion.button
+                                                key={starter.title}
+                                                initial={{ opacity: 0, y: 15 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: i * 0.08, duration: 0.35 }}
+                                                onClick={() => handleSuggestionClick(starter.message)}
+                                                disabled={isGenerating}
+                                                className="
+                                                    group text-left p-4 rounded-2xl
+                                                    bg-white/[0.03] border border-white/[0.06]
+                                                    hover:bg-white/[0.06] hover:border-white/[0.12]
+                                                    transition-all duration-300 cursor-pointer
+                                                    disabled:opacity-30 disabled:cursor-not-allowed
+                                                "
+                                            >
+                                                <div className="text-2xl mb-2">{starter.icon}</div>
+                                                <div className="text-sm font-medium text-white/80 mb-1 leading-snug group-hover:text-white transition-colors">
+                                                    {starter.title}
+                                                </div>
+                                                <div className="text-xs text-white/30 leading-snug group-hover:text-white/50 transition-colors">
+                                                    {starter.subtitle}
+                                                </div>
+                                            </motion.button>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {messages.map((msg, i) => {
+                                if (msg.role === 'model' && !msg.content) return null;
+
+                                return (
+                                    <motion.div 
+                                        key={i} 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        {msg.role === 'model' && (
+                                            <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-blue-400">
+                                                <BotIcon className="w-4 h-4" />
+                                            </div>
+                                        )}
+                                        {msg.role === 'model' ? (
+                                            <div className="group relative max-w-[85%]">
+                                                {renderMessageContent(msg)}
+                                                <button
+                                                    onClick={() => handleCopy(msg.content, i)}
+                                                    className="
+                                                        absolute top-2 right-2
+                                                        opacity-0 group-hover:opacity-100
+                                                        transition-all duration-200
+                                                        w-7 h-7 rounded-lg
+                                                        bg-white/[0.06] border border-white/[0.08]
+                                                        hover:bg-white/[0.12] hover:border-white/[0.15]
+                                                        flex items-center justify-center
+                                                        text-white/40 hover:text-white/70
+                                                    "
+                                                    title="Copy message"
+                                                >
+                                                    {copiedId === i ? (
+                                                        <motion.span
+                                                            initial={{ scale: 0.8 }}
+                                                            animate={{ scale: 1 }}
+                                                            className="text-green-400 text-[10px] font-medium"
+                                                        >
+                                                            ✓
+                                                        </motion.span>
+                                                    ) : (
+                                                        <CopyIcon className="w-3 h-3" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            renderMessageContent(msg)
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
                             
                             <AnimatePresence>
                                 {showSuggestions && suggestions.length > 0 && (
@@ -387,6 +580,75 @@ export const AIAssistantSection = ({ t }) => {
                                     </motion.div>
                                 )}
                             </AnimatePresence>
+
+                            {!isGenerating && 
+                             !showSuggestions && 
+                             messages.length > 1 && 
+                             messages[messages.length - 1].role === 'model' && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.5 }}
+                                    className="flex justify-start px-4 pb-2"
+                                >
+                                    <button
+                                        onClick={handleRegenerate}
+                                        className="
+                                            flex items-center gap-1.5
+                                            text-[11px] text-white/25 
+                                            hover:text-white/50
+                                            transition-colors duration-200
+                                            group
+                                        "
+                                    >
+                                        <svg 
+                                            className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" 
+                                            viewBox="0 0 24 24" fill="none" 
+                                            stroke="currentColor" strokeWidth="2"
+                                        >
+                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                            <path d="M3 3v5h5"/>
+                                        </svg>
+                                        Regenerate response
+                                    </button>
+                                </motion.div>
+                            )}
+
+                            {isGenerating && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="flex items-center gap-3 px-4 py-2"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-blue-400">
+                                        <BotIcon className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex gap-1">
+                                            {[0, 1, 2].map(i => (
+                                                <div
+                                                    key={i}
+                                                    className="w-1.5 h-1.5 bg-blue-400/60 rounded-full"
+                                                    style={{ animation: `typing-dot 1.2s ease-in-out infinite`, animationDelay: `${i * 0.2}s` }}
+                                                />
+                                            ))}
+                                        </div>
+                                        <AnimatePresence mode="wait">
+                                            <motion.span
+                                                key={typingStatus}
+                                                initial={{ opacity: 0, x: 6 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -6 }}
+                                                transition={{ duration: 0.25 }}
+                                                className="text-xs text-white/30 font-light italic"
+                                            >
+                                                {typingStatus}
+                                            </motion.span>
+                                        </AnimatePresence>
+                                    </div>
+                                </motion.div>
+                            )}
 
                             <div ref={messagesEndRef} />
                         </div>

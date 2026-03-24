@@ -286,8 +286,8 @@
   100% { width: 100%; }
 }
 @keyframes typing-dot {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(-3px); opacity: 1; }
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
 }
 
 @keyframes mic-pulse-ring {
