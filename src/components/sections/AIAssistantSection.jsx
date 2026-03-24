@@ -250,6 +250,7 @@ export const AIAssistantSection = ({ t }) => {
     const [copiedId, setCopiedId] = useState(null);
     const [voiceError, setVoiceError] = useState('');
     const messagesEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
 
     useEffect(() => {
         return () => clearInterval(typingIntervalRef.current);
@@ -297,13 +298,18 @@ export const AIAssistantSection = ({ t }) => {
         }
     }, []);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToBottom = (smooth = true) => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
+                behavior: smooth ? 'smooth' : 'auto'
+            });
+        }
     };
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages, isGenerating]);
+        scrollToBottom(true);
+    }, [messages]);
 
     const handleSend = async (e, overrideText) => {
         if (e) e.preventDefault();
@@ -338,6 +344,11 @@ export const AIAssistantSection = ({ t }) => {
                         updated[updated.length - 1].content = chunk;
                         return updated;
                     });
+                    setTimeout(() => {
+                        if (chatContainerRef.current) {
+                            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                        }
+                    }, 0);
                 },
                 (finalText) => {
                     setMessages(prev => {
@@ -347,6 +358,13 @@ export const AIAssistantSection = ({ t }) => {
                     });
                     setIsGenerating(false);
                     stopTypingStatus();
+                    
+                    if (chatContainerRef.current) {
+                        chatContainerRef.current.scrollTo({
+                            top: chatContainerRef.current.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }
                     
                     const lastUserMsg = newMessages.findLast(m => m.role === 'user');
                     const set = detectSuggestionSet(finalText, lastUserMsg?.content || '');
@@ -450,7 +468,11 @@ export const AIAssistantSection = ({ t }) => {
                     <Card className="h-[500px] flex flex-col bg-black/40 border border-white/[0.08] relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 opacity-50"></div>
                         
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                        <div 
+                            ref={chatContainerRef}
+                            onWheel={(e) => e.stopPropagation()}
+                            className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar scroll-smooth min-h-0"
+                        >
                             <AnimatePresence>
                                 {messages.length === 1 && (
                                     <motion.div
@@ -653,7 +675,7 @@ export const AIAssistantSection = ({ t }) => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <div className="p-4 bg-white/[0.02] border-t border-white/[0.06]">
+                        <div className="flex-shrink-0 p-4 bg-white/[0.02] border-t border-white/[0.06]">
                             <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
                                 <button
                                     type="button"
