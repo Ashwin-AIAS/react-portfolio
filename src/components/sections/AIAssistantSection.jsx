@@ -29,6 +29,88 @@ IF you detect that the user has pasted a JOB DESCRIPTION or is asking about Ashw
 Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the raw JSON object.
 `;
 
+const SUGGESTIONS = {
+  initial: [
+    "What are Ashwin's strongest technical skills?",
+    "Tell me about his RAG project",
+    "Is he open to relocation in Germany?",
+    "Paste a job description for a fit analysis"
+  ],
+  afterFitReport: [
+    "Tell me more about his most relevant project",
+    "What's his experience with autonomous systems?",
+    "Does he have team collaboration experience?",
+    "How quickly could he start a new role?"
+  ],
+  afterProject: [
+    "What other projects has he built?",
+    "What tech stack does he prefer?",
+    "Does he have any live demos?",
+    "What's his GitHub activity like?"
+  ],
+  afterBackground: [
+    "What certifications does he hold?",
+    "Tell me about his work experience",
+    "What autonomous systems projects has he done?",
+    "Can I see his resume?"
+  ],
+  afterExperience: [
+    "What was his role at DXC Technology?",
+    "What is he studying at THI Ingolstadt?",
+    "Does he have publications or research?",
+    "What programming languages does he know?"
+  ],
+  generic: [
+    "What makes Ashwin stand out?",
+    "Does he have experience with deep learning?",
+    "What's his availability for interviews?",
+    "How can I contact him directly?"
+  ]
+};
+
+function detectSuggestionSet(assistantReply, userMessage) {
+  const reply = assistantReply.toLowerCase();
+  const query = userMessage.toLowerCase();
+
+  if (
+    reply.includes('match score') || 
+    reply.includes('matchscore') ||
+    reply.includes('matching skills') ||
+    reply.includes('skill gap') ||
+    query.length > 200
+  ) return 'afterFitReport';
+
+  if (
+    reply.includes('github') ||
+    reply.includes('built') ||
+    reply.includes('implemented') ||
+    reply.includes('framework') ||
+    reply.includes('rag') ||
+    reply.includes('yolo') ||
+    reply.includes('radar') ||
+    reply.includes('cnn')
+  ) return 'afterProject';
+
+  if (
+    reply.includes('dxc') ||
+    reply.includes('analyst') ||
+    reply.includes('thi') ||
+    reply.includes('ingolstadt') ||
+    reply.includes('master') ||
+    reply.includes('degree')
+  ) return 'afterExperience';
+
+  if (
+    reply.includes('python') ||
+    reply.includes('pytorch') ||
+    reply.includes('skill') ||
+    reply.includes('experience') ||
+    reply.includes('certification')
+  ) return 'afterBackground';
+
+  return 'generic';
+}
+
 const ScoreDial = ({ score }) => {
     const circumference = 2 * Math.PI * 40;
     const offset = circumference - (score / 100) * circumference;
@@ -104,6 +186,8 @@ export const AIAssistantSection = ({ t }) => {
     ]);
     const [input, setInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [suggestions, setSuggestions] = useState(SUGGESTIONS.initial);
+    const [showSuggestions, setShowSuggestions] = useState(true);
     const [voiceError, setVoiceError] = useState('');
     const messagesEndRef = useRef(null);
 
@@ -142,6 +226,9 @@ export const AIAssistantSection = ({ t }) => {
         const messageText = overrideText || input;
         if (!messageText.trim() || isGenerating) return;
 
+        setShowSuggestions(false);
+        setSuggestions([]);
+
         const userMsg = messageText.trim();
         setInput('');
         
@@ -173,6 +260,11 @@ export const AIAssistantSection = ({ t }) => {
                         return updated;
                     });
                     setIsGenerating(false);
+                    
+                    const lastUserMsg = newMessages.findLast(m => m.role === 'user');
+                    const set = detectSuggestionSet(finalText, lastUserMsg?.content || '');
+                    setSuggestions(SUGGESTIONS[set]);
+                    setShowSuggestions(true);
                 },
                 (err) => {
                     console.error("Gemini Error:", err);
@@ -188,6 +280,11 @@ export const AIAssistantSection = ({ t }) => {
             console.error(error);
             setIsGenerating(false);
         }
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        setShowSuggestions(false);
+        handleSend(null, suggestion);
     };
 
     const renderMessageContent = (msg) => {
@@ -250,6 +347,47 @@ export const AIAssistantSection = ({ t }) => {
                                     {renderMessageContent(msg)}
                                 </motion.div>
                             ))}
+                            
+                            <AnimatePresence>
+                                {showSuggestions && suggestions.length > 0 && (
+                                    <motion.div
+                                        key="suggestions"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                                        className="flex flex-col gap-1 pb-4"
+                                    >
+                                        <p className="text-[9px] text-white/20 uppercase tracking-widest px-4 pt-2 pb-1 font-medium">
+                                            Suggested
+                                        </p>
+                                        <div className="px-4 flex flex-wrap gap-2">
+                                            {suggestions.map((suggestion, i) => (
+                                                <motion.button
+                                                    key={suggestion}
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ delay: i * 0.06, duration: 0.25 }}
+                                                    onClick={() => handleSuggestionClick(suggestion)}
+                                                    disabled={isGenerating}
+                                                    className="
+                                                        suggestion-chip text-xs px-3 py-1.5 rounded-full
+                                                        bg-white/[0.04] border border-white/[0.08]
+                                                        text-white/50 hover:text-white/80
+                                                        hover:bg-white/[0.08] hover:border-white/[0.15]
+                                                        transition-all duration-200 cursor-pointer
+                                                        disabled:opacity-30 disabled:cursor-not-allowed
+                                                        text-left leading-snug
+                                                    "
+                                                >
+                                                    {suggestion}
+                                                </motion.button>
+                                            ))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             <div ref={messagesEndRef} />
                         </div>
 
@@ -275,7 +413,13 @@ export const AIAssistantSection = ({ t }) => {
                                 <div className="relative flex-1">
                                     <textarea
                                         value={input}
-                                        onChange={(e) => setInput(e.target.value)}
+                                        onChange={(e) => {
+                                            setInput(e.target.value);
+                                            setShowSuggestions(false);
+                                        }}
+                                        onBlur={() => {
+                                            if (!input.trim()) setShowSuggestions(true);
+                                        }}
                                         placeholder={t.assistant.placeholder}
                                         className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
                                         rows="1"

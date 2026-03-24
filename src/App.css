@@ -238,6 +238,22 @@
   100% { text-shadow: 0 0 0 rgba(59, 130, 246, 0); }
 }
 
+/* Suggestion chip hover arrow indicator */
+.suggestion-chip::after {
+  content: ' →';
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.suggestion-chip:hover::after {
+  opacity: 0.5;
+}
+
+/* Stagger fade-in for chip group */
+@keyframes chip-appear {
+  0% { opacity: 0; transform: translateY(6px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* Mouse glow */
 .mouse-glow {
   position: absolute;
@@ -283,7 +299,7 @@
 .mic-pulse {
   animation: mic-pulse-ring 1.2s ease-in-out infinite;
 }
-\n/* Visual component animations — kept from original */
+/* Visual component animations — kept from original */
 /* ── LidarFusionVisual ── */
 @keyframes lidar-scan {
   0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
