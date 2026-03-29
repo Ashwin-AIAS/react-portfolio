@@ -4,10 +4,12 @@ import { portfolioData } from '../../data/portfolioData';
 import { MouseGlow } from '../ui/MouseGlow';
 import { GradientMesh } from '../ui/GradientMesh';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
-import { DownloadIcon, GitHubIcon, LinkedInIcon } from '../../icons/Icons';
+import { DownloadIcon, GitHubIcon, LinkedInIcon, MicIcon } from '../../icons/Icons';
+import { GeminiVoiceAgent } from '../ui/GeminiVoiceAgent';
 
 export const Hero = ({ t }) => {
     const [isResumeOpen, setIsResumeOpen] = useState(false);
+    const [isVoiceAgentOpen, setIsVoiceAgentOpen] = useState(false);
     const resumePreviewUrl = portfolioData.personalInfo.resumeUrl.replace('/view', '/preview');
 
     const roles = [
@@ -152,6 +154,10 @@ export const Hero = ({ t }) => {
                             className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
                         >
                             <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> {t.hero.downloadCv}</button>
+                            <button onClick={() => setIsVoiceAgentOpen(true)} className="btn-voice-ai">
+                                <span className="btn-voice-ai-icon"><MicIcon className="w-3 h-3" /></span>
+                                Talk to My AI
+                            </button>
                             <div className="flex items-center gap-4 justify-center">
                                 <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
                                 <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
@@ -199,6 +205,11 @@ export const Hero = ({ t }) => {
                 </motion.div>
             )}
         </AnimatePresence>
+
+        <GeminiVoiceAgent
+            isOpen={isVoiceAgentOpen}
+            onClose={() => setIsVoiceAgentOpen(false)}
+        />
         </>
     );
 };
