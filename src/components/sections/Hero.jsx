@@ -3,13 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
 import { MouseGlow } from '../ui/MouseGlow';
 import { GradientMesh } from '../ui/GradientMesh';
-import { AnimateOnScroll } from '../ui/AnimateOnScroll';
-import { DownloadIcon, GitHubIcon, LinkedInIcon, MicIcon } from '../../icons/Icons';
+import { DownloadIcon, GitHubIcon, LinkedInIcon } from '../../icons/Icons';
 import { GeminiVoiceAgent } from '../ui/GeminiVoiceAgent';
 
 export const Hero = ({ t }) => {
     const [isResumeOpen, setIsResumeOpen] = useState(false);
-    const [isVoiceAgentOpen, setIsVoiceAgentOpen] = useState(false);
+    const [isVoiceActive, setIsVoiceActive] = useState(false);
     const resumePreviewUrl = portfolioData.personalInfo.resumeUrl.replace('/view', '/preview');
 
     const roles = [
@@ -73,41 +72,9 @@ export const Hero = ({ t }) => {
                 </div>
             </div>
             <div className="container mx-auto max-w-6xl relative z-10">
-                <div className="grid md:grid-cols-2 gap-16 items-center">
-                    <AnimateOnScroll className="flex justify-center order-1 md:order-1">
-                        <div className="relative">
-                            {[...Array(12)].map((_, i) => (
-                                <motion.div
-                                    key={`orb-${i}`}
-                                    className="absolute w-2 h-2 rounded-full bg-blue-500/30"
-                                    style={{
-                                        top: `${Math.random() * 100}%`,
-                                        left: `${Math.random() * 100}%`,
-                                    }}
-                                    animate={{ y: [0, -15, 0], x: [0, 8, 0] }}
-                                    transition={{
-                                        duration: 3 + Math.random() * 3,
-                                        delay: Math.random() * 2,
-                                        repeat: Infinity,
-                                        ease: "easeInOut"
-                                    }}
-                                />
-                            ))}
-                            <div className="relative w-56 h-56 md:w-72 md:h-72">
-                                <div style={{
-                                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4)',
-                                    borderRadius: '50%',
-                                    padding: '3px',
-                                    boxShadow: '0 0 30px rgba(59,130,246,0.4), 0 0 60px rgba(139,92,246,0.2)',
-                                    width: '100%',
-                                    height: '100%',
-                                }}>
-                                    <img src="/Profile pic.jpg" alt="Ashwin" className="rounded-full w-full h-full object-cover block" />
-                                </div>
-                            </div>
-                        </div>
-                    </AnimateOnScroll>
-                    <div className="text-center md:text-left order-2">
+                <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    {/* LEFT COLUMN — Text content */}
+                    <div className="text-center md:text-left order-2 md:order-1">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -151,19 +118,30 @@ export const Hero = ({ t }) => {
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.45, duration: 0.6, ease: "easeOut" }}
-                            className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
+                            className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center"
                         >
                             <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> {t.hero.downloadCv}</button>
-                            <button onClick={() => setIsVoiceAgentOpen(true)} className="btn-voice-ai">
-                                <span className="btn-voice-ai-icon"><MicIcon className="w-3 h-3" /></span>
-                                Talk to My AI
-                            </button>
                             <div className="flex items-center gap-4 justify-center">
                                 <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
                                 <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
                             </div>
                         </motion.div>
                     </div>
+
+                    {/* RIGHT COLUMN — Inline Voice Agent */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
+                        className="order-1 md:order-2 flex justify-center"
+                    >
+                        <div className="hero-voice-column">
+                            <GeminiVoiceAgent
+                                isActive={isVoiceActive}
+                                onActivate={() => setIsVoiceActive(true)}
+                            />
+                        </div>
+                    </motion.div>
                 </div>
             </div>
         </section>
@@ -205,11 +183,6 @@ export const Hero = ({ t }) => {
                 </motion.div>
             )}
         </AnimatePresence>
-
-        <GeminiVoiceAgent
-            isOpen={isVoiceAgentOpen}
-            onClose={() => setIsVoiceAgentOpen(false)}
-        />
         </>
     );
 };
