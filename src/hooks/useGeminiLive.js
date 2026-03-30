@@ -289,20 +289,21 @@ export function useGeminiLive() {
     // Clean up any existing connection
     disconnectCleanup();
 
-    modeRef.current = mode;
     setIsConnecting(true);
     setError('');
     setTranscript('');
-    setCodeOutput('');
+    setStructuredOutput(null);
 
     try {
       const model = 'gemini-2.0-flash-live-preview';
       const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
 
+      console.log('[WS] connecting to:', wsUrl);
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
+        console.log('[WS] connected, state:', ws.readyState);
         // Use snake_case for the Gemini Live API
         const setupMsg = {
           setup: {
@@ -311,7 +312,9 @@ export function useGeminiLive() {
               response_modalities: responseModalities,
               speech_config: {
                 voice_config: {
-                  voice_name: voiceName
+                  prebuilt_voice_config: {
+                    voice_name: voiceName
+                  }
                 }
               }
             },
@@ -321,6 +324,7 @@ export function useGeminiLive() {
           }
         };
 
+        console.log('[WS] sending setup:', JSON.stringify(setupMsg, null, 2));
         ws.send(JSON.stringify(setupMsg));
       };
 
@@ -328,14 +332,17 @@ export function useGeminiLive() {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          // console.log('[WS] message received:', data);
 
           // Setup complete
           if (data.setupComplete) {
+            console.log('[WS] setup complete');
             setIsConnected(true);
             setIsConnecting(false);
-            // Start mic after setup is complete
-            startMicCapture(ws).catch(() => {
-              disconnectCleanup();
+            // Start mic after setup is complete if requested
+            startMicCapture(ws).catch((err) => {
+              console.error('[WS] mic capture failed:', err);
+              // disconnectCleanup();
             });
             return;
           }
@@ -376,48 +383,55 @@ export function useGeminiLive() {
           }
 
         } catch (e) {
-          console.error('WS message parse error:', e);
+          console.error('[WS] message parse error:', e);
         }
       };
 
-      ws.onerror = () => {
-        console.error('WebSocket error');
+      ws.onerror = (err) => {
+        console.error('[WS] error:', err);
         setError('Connection error. Please try again.');
         setIsConnecting(false);
         setIsConnected(false);
       };
 
       ws.onclose = (event) => {
-        console.log('WebSocket closed:', event.code, event.reason);
+        console.log('[WS] closed:', event.code, event.reason);
         setIsConnected(false);
         setIsConnecting(false);
         stopMicCapture();
       };
 
     } catch (err) {
-      console.error('Connection error:', err);
+      console.error('[WS] connection critical error:', err);
       setError('Failed to connect. Please try again.');
       setIsConnecting(false);
     }
-  }, [disconnectCleanup, startMicCapture, stopMicCapture, playAudioChunk]);
+  }, [startMicCapture, stopMicCapture, playAudioChunk, disconnectCleanup]);
 
   const disconnect = useCallback(() => {
     disconnectCleanup();
   }, [disconnectCleanup]);
 
-  const sendText = useCallback((text) => {
+  const sendMessage = useCallback((obj) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        client_content: {
-          turns: [{
-            role: 'user',
-            parts: [{ text }]
-          }],
-          turn_complete: true
-        }
-      }));
+      console.log('[WS] sending message:', JSON.stringify(obj, null, 2));
+      wsRef.current.send(JSON.stringify(obj));
+    } else {
+      console.error('[WS] sendMessage called but WebSocket is not open, state:', wsRef.current?.readyState);
     }
   }, []);
+
+  const sendText = useCallback((text) => {
+    sendMessage({
+      client_content: {
+        turns: [{
+          role: 'user',
+          parts: [{ text }]
+        }],
+        turn_complete: true
+      }
+    });
+  }, [sendMessage]);
 
   const clearCode = useCallback(() => {
     setCodeOutput('');
@@ -427,6 +441,7 @@ export function useGeminiLive() {
     connect,
     disconnect,
     sendText,
+    sendMessage,
     clearCode,
     isConnected,
     isConnecting,

@@ -274,19 +274,21 @@ export const AIAssistantSection = ({ t }) => {
         isConnectedRef.current = geminiLive.isConnected;
     }, [geminiLive.isConnected]);
 
-    const LIVECODE_SYSTEM_PROMPT = `
-You are an expert coding assistant specialized in AI engineering.
-When asked to write code, generate clean, well-commented, production-ready code. 
-Ashwin is an AI Engineer skilled in Python, C++, React, FastAPI, LangChain, pgvector, PyTorch, OpenCV, and ROS2.
+    const LIVECODE_SYSTEM_PROMPT = `You are an expert coding assistant 
+specialized in AI engineering. When asked to write code, generate 
+clean, well-commented, production-ready code.
 
-For each coding request:
-1. Briefly describe what you are building (1 sentence, spoken)
-2. Generate the complete code
-3. Explain key design decisions (2-3 sentences, spoken)
+For every coding request you MUST:
+1. Say one sentence describing what you are building
+2. Output the complete code wrapped EXACTLY like this with no spaces:
+[CODE_START:language]
+your complete code here
+[CODE_END]
+3. After the code block, say 2-3 sentences explaining key decisions
 
-When generating code, output it between [CODE_START] and [CODE_END] markers so it can be extracted and displayed in the code panel. 
-Always specify the language after CODE_START, e.g. [CODE_START:python]
-`;
+Replace 'language' with: python, cpp, javascript, typescript, or jsx
+Do not put anything inside the brackets except the language name.
+Always complete the full code, never truncate it.`;
 
     const RECRUITER_VOICE_PROMPT = `
 You are Ashwin's AI Recruiter assistant. You are helping evaluate Ashwin Kumar for technical roles.
@@ -371,45 +373,53 @@ Wait for the user to finish speaking before responding.
         }
     };
 
-    const waitForConnection = () => new Promise((resolve, reject) => {
-        const maxWait = 5000;
-        const interval = 100;
-        let elapsed = 0;
-        const check = setInterval(() => {
-            if (isConnectedRef.current) {
-                clearInterval(check);
-                resolve();
-            }
-            elapsed += interval;
-            if (elapsed >= maxWait) {
-                clearInterval(check);
-                reject(new Error('Connection timeout'));
-            }
-        }, interval);
-    });
+    const waitForConnection = (timeoutMs = 8000) => {
+        return new Promise((resolve, reject) => {
+            if (isConnectedRef.current) { resolve(); return; }
+            console.log('[CHIP] waiting for connection...');
+            const start = Date.now();
+            const interval = setInterval(() => {
+                if (isConnectedRef.current) {
+                    clearInterval(interval);
+                    resolve();
+                } else if (Date.now() - start > timeoutMs) {
+                    clearInterval(interval);
+                    reject(new Error('WebSocket connection timed out after ' + timeoutMs + 'ms'));
+                }
+            }, 100);
+        });
+    };
 
     const handleChipClick = async (chipText) => {
+        console.log('[CHIP] clicked:', chipText);
         if (isGenerating || activeChip) return;
         
-        setActiveChip(chipText);
-        const prompt = activeMode === 'livecode' ? LIVECODE_SYSTEM_PROMPT : RECRUITER_VOICE_PROMPT;
-
         try {
-            if (!geminiLive.isConnected) {
+            setActiveChip(chipText);
+            const prompt = activeMode === 'livecode' ? LIVECODE_SYSTEM_PROMPT : RECRUITER_VOICE_PROMPT;
+
+            if (!isConnectedRef.current) {
+                console.log('[CHIP] not connected, calling connect()...');
                 await geminiLive.connect(prompt, { responseModalities: ['AUDIO', 'TEXT'] });
+                console.log('[CHIP] connect() called, waiting for WebSocket open...');
                 await waitForConnection();
+                console.log('[CHIP] WebSocket is now open');
             }
 
-            if (geminiLive.isConnected) {
-                geminiLive.sendText(chipText);
-                if (activeMode === 'interview') {
-                    setMessages(prev => [...prev, { role: 'user', content: chipText }]);
-                } else if (activeMode === 'livecode') {
+            if (isConnectedRef.current) {
+                console.log('[CHIP] sending message to WebSocket');
+                if (activeMode === 'livecode') {
                     setCodeOutput('');
+                    setDetectedLanguage('');
+                } else {
+                    setMessages(prev => [...prev, { role: 'user', content: chipText }]);
                 }
+
+                geminiLive.sendText(chipText);
+                console.log('[CHIP] message sent successfully');
             }
         } catch (err) {
-            console.error("Chip click error:", err);
+            console.error("[CHIP] error:", err);
             setVoiceError("Failed to connect for voice. Please try again.");
         } finally {
             setTimeout(() => setActiveChip(null), 1000);
@@ -720,6 +730,7 @@ Wait for the user to finish speaking before responding.
                                             <div className="grid grid-cols-1 gap-2">
                                                 {LIVECODE_SUGGESTIONS.map((suggestion, i) => (
                                                     <button
+                                                        type="button"
                                                         key={suggestion}
                                                         onClick={() => handleChipClick(suggestion)}
                                                         disabled={geminiLive.isConnecting || activeChip}
@@ -850,6 +861,7 @@ Wait for the user to finish speaking before responding.
                                             <div className="px-4 flex flex-wrap gap-2">
                                                 {(activeMode === 'livecode' ? LIVECODE_SUGGESTIONS : suggestions).map((suggestion, i) => (
                                                     <motion.button
+                                                        type="button"
                                                         key={suggestion}
                                                         initial={{ opacity: 0, scale: 0.9 }}
                                                         animate={{ opacity: 1, scale: 1 }}
