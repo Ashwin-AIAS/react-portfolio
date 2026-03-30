@@ -10,16 +10,9 @@ import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const LIVECODE_SUGGESTIONS = [
-  "Write a RAG retrieval pipeline in Python",
-  "CNN inference function in C++",
-  "React hook for WebSocket streaming",
-  "FastAPI endpoint with embeddings"
-];
-
-
 const SYSTEM_PROMPT = `
-You are Ashwin's AI Recruiter Assistant. You represent Ashwin, an AI Engineer.
+You are Ashwin's AI Recruiter Assistant.
+ You represent Ashwin, an AI Engineer.
 Ashwin's Resume Data:
 ${JSON.stringify(portfolioData)}
 
@@ -259,10 +252,7 @@ export const AIAssistantSection = ({ t }) => {
     const [copiedId, setCopiedId] = useState(null);
     const [voiceError, setVoiceError] = useState('');
     const [isVoiceMode, setIsVoiceMode] = useState(false);
-    const [activeMode, setActiveMode] = useState('interview'); // 'interview' | 'livecode'
     const [activeChip, setActiveChip] = useState(null);
-    const [codeOutput, setCodeOutput] = useState('');
-    const [detectedLanguage, setDetectedLanguage] = useState('python');
     const isConnectedRef = useRef(false);
     const messagesEndRef = useRef(null);
 
@@ -273,22 +263,6 @@ export const AIAssistantSection = ({ t }) => {
     useEffect(() => {
         isConnectedRef.current = geminiLive.isConnected;
     }, [geminiLive.isConnected]);
-
-    const LIVECODE_SYSTEM_PROMPT = `You are an expert coding assistant 
-specialized in AI engineering. When asked to write code, generate 
-clean, well-commented, production-ready code.
-
-For every coding request you MUST:
-1. Say one sentence describing what you are building
-2. Output the complete code wrapped EXACTLY like this with no spaces:
-[CODE_START:language]
-your complete code here
-[CODE_END]
-3. After the code block, say 2-3 sentences explaining key decisions
-
-Replace 'language' with: python, cpp, javascript, typescript, or jsx
-Do not put anything inside the brackets except the language name.
-Always complete the full code, never truncate it.`;
 
     const RECRUITER_VOICE_PROMPT = `
 You are Ashwin's AI Recruiter assistant. You are helping evaluate Ashwin Kumar for technical roles.
@@ -313,23 +287,7 @@ Wait for the user to finish speaking before responding.
     // Handle voice transcript streaming into chat
     useEffect(() => {
         if (geminiLive.transcript && geminiLive.isConnected) {
-            if (activeMode === 'livecode') {
-                // Parse code markers for livecode mode
-                const codeRegex = /\[CODE_START:(\w+)\]([\s\S]*?)\[CODE_END\]/g;
-                const matches = [...geminiLive.transcript.matchAll(codeRegex)];
-                if (matches.length > 0) {
-                    const lastMatch = matches[matches.length - 1];
-                    setDetectedLanguage(lastMatch[1]);
-                    setCodeOutput(lastMatch[2].trim());
-                } else {
-                    // Check for partial start
-                    const partialMatch = geminiLive.transcript.match(/\[CODE_START:(\w+)\]([\s\S]*)$/);
-                    if (partialMatch) {
-                        setDetectedLanguage(partialMatch[1]);
-                        setCodeOutput(partialMatch[2].trim());
-                    }
-                }
-            } else if (isVoiceMode) {
+            if (isVoiceMode) {
                 setMessages(prev => {
                     const last = prev[prev.length - 1];
                     if (last && last.role === 'model' && last.isVoice) {
@@ -342,7 +300,7 @@ Wait for the user to finish speaking before responding.
                 });
             }
         }
-    }, [geminiLive.transcript, isVoiceMode, geminiLive.isConnected, activeMode]);
+    }, [geminiLive.transcript, isVoiceMode, geminiLive.isConnected]);
 
     // Handle structured output from voice
     useEffect(() => {
@@ -361,17 +319,6 @@ Wait for the user to finish speaking before responding.
         }
     };
 
-    const switchMode = (mode) => {
-        if (mode === activeMode) return;
-        if (geminiLive.isConnected) geminiLive.disconnect();
-        setActiveMode(mode);
-        setCodeOutput('');
-        if (mode === 'livecode') {
-            setIsVoiceMode(true);
-        } else {
-            setIsVoiceMode(false);
-        }
-    };
 
     const waitForConnection = (timeoutMs = 8000) => {
         return new Promise((resolve, reject) => {
@@ -396,7 +343,7 @@ Wait for the user to finish speaking before responding.
         
         try {
             setActiveChip(chipText);
-            const prompt = activeMode === 'livecode' ? LIVECODE_SYSTEM_PROMPT : RECRUITER_VOICE_PROMPT;
+            const prompt = RECRUITER_VOICE_PROMPT;
 
             if (!isConnectedRef.current) {
                 console.log('[CHIP] not connected, calling connect()...');
@@ -408,21 +355,16 @@ Wait for the user to finish speaking before responding.
 
             if (isConnectedRef.current) {
                 console.log('[CHIP] sending message to WebSocket');
-                if (activeMode === 'livecode') {
-                    setCodeOutput('');
-                    setDetectedLanguage('');
-                } else {
-                    setMessages(prev => [...prev, { role: 'user', content: chipText }]);
-                }
+                setMessages(prev => [...prev, { role: 'user', content: chipText }]);
 
                 geminiLive.sendText(chipText);
                 console.log('[CHIP] message sent successfully');
             }
         } catch (err) {
             console.error("[CHIP] error:", err);
-            setVoiceError("Failed to connect for voice. Please try again.");
+            setVoiceError("Connection lost. Please try again.");
         } finally {
-            setTimeout(() => setActiveChip(null), 1000);
+            setActiveChip(null);
         }
     };
 
@@ -628,129 +570,23 @@ Wait for the user to finish speaking before responding.
         <Section id="assistant" title={t.assistant.title} subtitle={t.assistant.subtitle}>
             <div className="grid md:grid-cols-5 gap-8 lg:gap-12">
                 <AnimateOnScroll className="md:col-span-2">
-                    {activeMode === 'livecode' ? (
-                        <Card className="h-full flex flex-col bg-slate-950/90 border border-white/10 overflow-hidden relative group">
-                            <div className="flex items-center justify-between p-4 border-b border-white/[0.06] bg-white/[0.02]">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-                                    <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">{detectedLanguage || 'Code'} Output</span>
-                                </div>
-                                {codeOutput && (
-                                    <button 
-                                        onClick={() => {
-                                            navigator.clipboard.writeText(codeOutput);
-                                            setCopiedId('livecode');
-                                            setTimeout(() => setCopiedId(null), 2000);
-                                        }}
-                                        className="text-[10px] text-white/40 hover:text-white flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded transition-colors"
-                                    >
-                                        {copiedId === 'livecode' ? '✓ Copied!' : <><CopyIcon className="w-3 h-3" /> Copy</>}
-                                    </button>
-                                )}
-                            </div>
-                            <div className="flex-1 p-5 font-mono text-xs overflow-y-auto custom-scrollbar">
-                                {codeOutput ? (
-                                    <pre className="text-blue-100/90 leading-6 whitespace-pre-wrap">
-                                        <code>{codeOutput}</code>
-                                    </pre>
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-center opacity-20 pointer-events-none">
-                                        <BotIcon className="w-12 h-12 mb-4" />
-                                        <p className="text-sm">Ask me to write code and it will appear here in real-time</p>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
-                        </Card>
-                    ) : (
-                        <Card className="h-full bg-gradient-to-b from-blue-900/10 to-transparent p-6 md:p-8 flex flex-col justify-center items-center text-center border border-blue-500/20">
-                            <AIAssistantVisual isGenerating={isGenerating} />
-                            <h3 className="text-xl font-semibold text-white mb-4 mt-8 flex items-center justify-center gap-2">
-                                <SparklesIcon className="w-5 h-5 text-blue-400" /> {t.assistant.badge}
-                            </h3>
-                            <p className="text-sm text-white/50 font-light leading-relaxed">
-                                {t.assistant.disclaimer}
-                            </p>
-                        </Card>
-                    )}
+                    <Card className="h-full bg-gradient-to-b from-blue-900/10 to-transparent p-6 md:p-8 flex flex-col justify-center items-center text-center border border-blue-500/20">
+                        <AIAssistantVisual isGenerating={isGenerating} />
+                        <h3 className="text-xl font-semibold text-white mb-4 mt-8 flex items-center justify-center gap-2">
+                            <SparklesIcon className="w-5 h-5 text-blue-400" /> {t.assistant.badge}
+                        </h3>
+                        <p className="text-sm text-white/50 font-light leading-relaxed">
+                            {t.assistant.disclaimer}
+                        </p>
+                    </Card>
                 </AnimateOnScroll>
                 
                 <AnimateOnScroll delay={200} className="md:col-span-3">
                     <Card className="h-[550px] flex flex-col bg-black/40 border border-white/[0.08] relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 opacity-50"></div>
                         
-                        {/* Tab Switcher */}
-                        <div className="flex items-center gap-1 p-2 bg-white/[0.02] border-b border-white/[0.06]">
-                            <button 
-                                onClick={() => switchMode('interview')}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all ${activeMode === 'interview' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-white/40 hover:text-white/60 hover:bg-white/5'}`}
-                            >
-                                <MicIcon className="w-3.5 h-3.5" /> Interview Me
-                            </button>
-                            <button 
-                                onClick={() => switchMode('livecode')}
-                                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all ${activeMode === 'livecode' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-white/40 hover:text-white/60 hover:bg-white/5'}`}
-                            >
-                                <BotIcon className="w-3.5 h-3.5" /> Live Code
-                            </button>
-                        </div>
 
-                        {activeMode === 'livecode' ? (
-                            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-transparent to-blue-900/5">
-                                <div className="text-[10px] text-white/20 uppercase tracking-widest mb-8 font-bold flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></div>
-                                    Tap Mic or a sample to start
-                                </div>
-                                
-                                <div className="relative mb-12">
-                                    <button
-                                        onClick={() => {
-                                            if (geminiLive.isConnected) {
-                                                geminiLive.disconnect();
-                                            } else {
-                                                handleChipClick("Hello! Let's write some code.");
-                                            }
-                                        }}
-                                        className={`w-24 h-24 rounded-full border-2 flex items-center justify-center transition-all duration-500 group ${geminiLive.isConnected ? 'bg-red-500/20 border-red-500/50 text-red-500 shadow-[0_0_40px_rgba(239,68,68,0.3)]' : 'bg-white/5 border-white/10 text-white/40 hover:border-blue-500/50 hover:text-blue-400'}`}
-                                    >
-                                        <div className={`absolute inset-0 rounded-full border border-current opacity-20 scale-100 ${geminiLive.isConnected ? 'animate-ping' : 'group-hover:scale-110'}`}></div>
-                                        {geminiLive.isConnected ? <MicOffIcon className="w-8 h-8" /> : <MicIcon className="w-8 h-8" />}
-                                    </button>
-                                </div>
-
-                                <div className="w-full max-w-sm space-y-3">
-                                    <AnimatePresence mode="wait">
-                                        <motion.div
-                                            key="livecode-suggestions-panel"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            className="flex flex-col gap-2"
-                                        >
-                                            <p className="text-[9px] text-white/20 uppercase tracking-widest font-medium text-center mb-1">Interactive Samples</p>
-                                            <div className="grid grid-cols-1 gap-2">
-                                                {LIVECODE_SUGGESTIONS.map((suggestion, i) => (
-                                                    <button
-                                                        type="button"
-                                                        key={suggestion}
-                                                        onClick={() => handleChipClick(suggestion)}
-                                                        disabled={geminiLive.isConnecting || activeChip}
-                                                        className={`text-xs p-3 rounded-xl border text-left transition-all ${activeChip === suggestion ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-white/[0.02] border-white/5 text-white/40 hover:bg-white/5 hover:border-white/10'}`}
-                                                    >
-                                                        {suggestion}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </div>
-                                <div className="mt-auto pt-8 flex items-center gap-2 text-[9px] text-white/10 uppercase tracking-[0.2em] font-bold">
-                                    <span>Powered by Gemini Live</span>
-                                    <div className="w-1 h-1 rounded-full bg-white/10"></div>
-                                    <span>Real-Time Voice AI</span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div 
+                        <div 
                                 ref={chatContainerRef}
                                 onWheel={(e) => e.stopPropagation()}
                                 className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar scroll-smooth min-h-0"
@@ -846,7 +682,7 @@ Wait for the user to finish speaking before responding.
                                 })}
                                 
                                 <AnimatePresence>
-                                    {showSuggestions && (suggestions.length > 0 || activeMode === 'livecode') && (
+                                    {showSuggestions && suggestions.length > 0 && (
                                         <motion.div
                                             key="suggestions"
                                             initial={{ opacity: 0, y: 10 }}
@@ -856,10 +692,10 @@ Wait for the user to finish speaking before responding.
                                             className="flex flex-col gap-1 pb-4"
                                         >
                                             <p className="text-[9px] text-white/20 uppercase tracking-widest px-4 pt-2 pb-1 font-medium">
-                                                {activeMode === 'livecode' ? 'Code Samples' : 'Suggested Questions'}
+                                                Suggested Questions
                                             </p>
                                             <div className="px-4 flex flex-wrap gap-2">
-                                                {(activeMode === 'livecode' ? LIVECODE_SUGGESTIONS : suggestions).map((suggestion, i) => (
+                                                {suggestions.map((suggestion, i) => (
                                                     <motion.button
                                                         type="button"
                                                         key={suggestion}
@@ -966,7 +802,6 @@ Wait for the user to finish speaking before responding.
 
                                 <div ref={messagesEndRef} />
                             </div>
-                        )}
 
                         <div className="flex-shrink-0 p-4 bg-white/[0.02] border-t border-white/[0.06]">
                             <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
@@ -974,13 +809,7 @@ Wait for the user to finish speaking before responding.
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            if (activeMode === 'livecode') {
-                                                if (geminiLive.isConnected) {
-                                                    geminiLive.disconnect();
-                                                } else {
-                                                    handleChipClick("Write some code for me.");
-                                                }
-                                            } else if (isVoiceMode) {
+                                            if (isVoiceMode) {
                                                 if (geminiLive.isConnected) {
                                                     geminiLive.disconnect();
                                                 } else {
@@ -1012,21 +841,19 @@ Wait for the user to finish speaking before responding.
                                                 ))}
                                             </div>
                                         )}
-                                        {(isVoiceMode || activeMode === 'livecode')
+                                        {isVoiceMode
                                             ? (geminiLive.isConnected ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />)
                                             : (isListening ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />)
                                         }
                                     </button>
                                     
-                                    {activeMode === 'interview' && (
-                                        <button
-                                            type="button"
-                                            onClick={toggleVoiceMode}
-                                            className={`text-[10px] px-2 py-1 rounded border transition-colors ${isVoiceMode ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-white/5 border-white/10 text-white/30'}`}
-                                        >
-                                            {isVoiceMode ? 'LIVE VOICE' : 'TEXT MODE'}
-                                        </button>
-                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={toggleVoiceMode}
+                                        className={`text-[10px] px-2 py-1 rounded border transition-colors ${isVoiceMode ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-white/5 border-white/10 text-white/30'}`}
+                                    >
+                                        {isVoiceMode ? 'LIVE VOICE' : 'TEXT MODE'}
+                                    </button>
                                 </div>
 
                                 <div className="relative flex-1">
@@ -1039,8 +866,8 @@ Wait for the user to finish speaking before responding.
                                         onBlur={() => {
                                             if (!input.trim()) setShowSuggestions(true);
                                         }}
-                                        disabled={(isVoiceMode && geminiLive.isConnected) || activeMode === 'livecode'}
-                                        placeholder={activeMode === 'livecode' ? "Use voice for Live Code..." : (isVoiceMode && geminiLive.isConnected ? "Listening for your voice..." : t.assistant.placeholder)}
+                                        disabled={isVoiceMode && geminiLive.isConnected}
+                                        placeholder={isVoiceMode && geminiLive.isConnected ? "Listening for your voice..." : t.assistant.placeholder}
                                         className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
                                         rows="1"
                                         onKeyDown={(e) => {
@@ -1053,7 +880,7 @@ Wait for the user to finish speaking before responding.
 
                                     <button
                                         type="submit"
-                                        disabled={!input.trim() || isGenerating || activeMode === 'livecode'}
+                                        disabled={!input.trim() || isGenerating}
                                         className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     >
                                         <SendIcon className="w-4 h-4" />
@@ -1066,7 +893,7 @@ Wait for the user to finish speaking before responding.
                                 </p>
                             )}
                             <div className="text-[10px] text-center text-white/30 mt-3 font-medium uppercase tracking-widest">
-                                {activeMode === 'livecode' ? 'Use the mic or samples above' : 'Press Enter to send, Shift+Enter for new line'}
+                                Press Enter to send, Shift+Enter for new line
                             </div>
                         </div>
                     </Card>

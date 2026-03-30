@@ -202,10 +202,10 @@ export function useGeminiLive() {
           const base64 = arrayBufferToBase64(pcm16);
 
           ws.send(JSON.stringify({
-            realtime_input: {
-              media_chunks: [{
+            realtimeInput: {
+              mediaChunks: [{
                 data: base64,
-                mime_type: `audio/pcm;rate=${INPUT_SAMPLE_RATE}`
+                mimeType: `audio/pcm;rate=${INPUT_SAMPLE_RATE}`
               }]
             }
           }));
@@ -295,7 +295,7 @@ export function useGeminiLive() {
     setStructuredOutput(null);
 
     try {
-      const model = 'gemini-2.0-flash-live-preview';
+      const model = 'gemini-3.1-flash-live-preview';
       const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
 
       console.log('[WS] connecting to:', wsUrl);
@@ -304,21 +304,21 @@ export function useGeminiLive() {
 
       ws.onopen = () => {
         console.log('[WS] connected, state:', ws.readyState);
-        // Use snake_case for the Gemini Live API
+        // Use camelCase for the Gemini Multimodal Live API
         const setupMsg = {
           setup: {
             model: `models/${model}`,
-            generation_config: {
-              response_modalities: responseModalities,
-              speech_config: {
-                voice_config: {
-                  prebuilt_voice_config: {
-                    voice_name: voiceName
+            generationConfig: {
+              responseModalities: responseModalities,
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: {
+                    voiceName: voiceName
                   }
                 }
               }
             },
-            system_instruction: {
+            systemInstruction: {
               parts: [{ text: systemPrompt }]
             }
           }
@@ -329,10 +329,17 @@ export function useGeminiLive() {
       };
 
 
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event) => {
         try {
+          if (event.data instanceof Blob) {
+            // Binary data (likely audio PCM)
+            // console.log('[WS] binary message received:', event.data.size, 'bytes');
+            // In a full implementation, you'd send this to an AudioWorklet
+            return;
+          }
+
           const data = JSON.parse(event.data);
-          // console.log('[WS] message received:', data);
+          // console.log('[WS] message received:', JSON.stringify(data).substring(0, 500));
 
           // Setup complete
           if (data.setupComplete) {
@@ -423,12 +430,12 @@ export function useGeminiLive() {
 
   const sendText = useCallback((text) => {
     sendMessage({
-      client_content: {
+      clientContent: {
         turns: [{
           role: 'user',
           parts: [{ text }]
         }],
-        turn_complete: true
+        turnComplete: true
       }
     });
   }, [sendMessage]);
