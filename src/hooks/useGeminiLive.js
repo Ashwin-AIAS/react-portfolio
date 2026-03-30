@@ -5,29 +5,8 @@ import { portfolioData } from '../data/portfolioData';
 const INPUT_SAMPLE_RATE = 16000;
 const OUTPUT_SAMPLE_RATE = 24000;
 
-const INTERVIEW_SYSTEM_INSTRUCTION = `You are Ashwin's AI portfolio assistant. Answer questions about Ashwin's skills, projects, and experience in a friendly, concise way. Ashwin is an AI Engineer specializing in autonomous systems, RAG pipelines, computer vision, and generative AI. He is pursuing a Master's in AI Engineering at THI Germany.
+// System instructions removed. They are now passed to connect() by the component.
 
-Ashwin's Full Data:
-${JSON.stringify(portfolioData, null, 2)}
-
-RULES:
-- Be enthusiastic, professional, and concise (2-3 sentences per response)
-- Highlight relevant projects and skills when answering
-- If asked about availability: he's open to opportunities in Germany
-- Speak naturally as if in a real interview`;
-
-const LIVECODE_SYSTEM_INSTRUCTION = `You are Ashwin's AI coding assistant on his portfolio. You demonstrate Ashwin's coding expertise by writing code live.
-
-Ashwin's Technical Background:
-- Languages: Python, C/C++, SQL, JavaScript
-- AI/ML: PyTorch, Keras, TensorFlow, OpenCV, YOLOv8, LangChain, Gemini API
-- Projects: RAG systems, Mini-CNN Framework, YOLO Bat Swing Analysis, Radar-AI
-
-RULES:
-- When asked to write code, output the code wrapped in a markdown code block with the language
-- Keep code concise (under 40 lines) but functional and well-commented
-- After the code block, give a 1-sentence explanation
-- Draw from Ashwin's actual project experience when relevant`;
 
 /**
  * Downsample audio buffer from inputRate to outputRate
@@ -84,6 +63,8 @@ export function useGeminiLive() {
   const [codeOutput, setCodeOutput] = useState('');
   const [error, setError] = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
+  const [structuredOutput, setStructuredOutput] = useState(null);
+
 
   const wsRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -92,8 +73,9 @@ export function useGeminiLive() {
   const playbackContextRef = useRef(null);
   const audioQueueRef = useRef([]);
   const isPlayingRef = useRef(false);
-  const modeRef = useRef('interview');
+  const optionsRef = useRef({});
   const sourceRef = useRef(null);
+
   const analyserRef = useRef(null);
   const animFrameRef = useRef(null);
   const isConnectedRef = useRef(false);
@@ -291,7 +273,13 @@ export function useGeminiLive() {
     setAudioLevel(0);
   }, [stopMicCapture]);
 
-  const connect = useCallback(async (mode = 'interview') => {
+  const connect = useCallback(async (systemPrompt, options = {}) => {
+    const {
+      responseModalities = ['AUDIO'],
+      voiceName = 'Aoede',
+      onTextChunk = null
+    } = options;
+
     const apiKey = getApiKey();
     if (!apiKey) {
       setError('API key is missing. Please set VITE_GEMINI_API_KEY in your .env file.');
@@ -315,30 +303,27 @@ export function useGeminiLive() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        const systemInstruction = mode === 'interview' ? INTERVIEW_SYSTEM_INSTRUCTION : LIVECODE_SYSTEM_INSTRUCTION;
-
         // Use snake_case for the Gemini Live API
         const setupMsg = {
           setup: {
             model: `models/${model}`,
             generation_config: {
-              response_modalities: mode === 'interview' ? ['AUDIO'] : ['AUDIO', 'TEXT'],
+              response_modalities: responseModalities,
               speech_config: {
                 voice_config: {
-                  prebuilt_voice_config: {
-                    voice_name: 'Aoede'
-                  }
+                  voice_name: voiceName
                 }
               }
             },
             system_instruction: {
-              parts: [{ text: systemInstruction }]
+              parts: [{ text: systemPrompt }]
             }
           }
         };
 
         ws.send(JSON.stringify(setupMsg));
       };
+
 
       ws.onmessage = (event) => {
         try {
@@ -364,20 +349,32 @@ export function useGeminiLive() {
                 playAudioChunk(part.inlineData.data);
               }
               if (part.text) {
-                if (modeRef.current === 'livecode') {
-                  setCodeOutput(prev => prev + part.text);
-                }
-                setTranscript(prev => prev + part.text);
+                setTranscript(prev => {
+                  const newTranscript = prev + part.text;
+                  
+                  // Try to detect and parse structured output (JSON)
+                  try {
+                    const jsonMatch = newTranscript.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                      const possibleJson = jsonMatch[0];
+                      const parsed = JSON.parse(possibleJson);
+                      setStructuredOutput(parsed);
+                    }
+                  } catch (e) {
+                    // Not valid JSON yet
+                  }
+
+                  if (onTextChunk) onTextChunk(part.text);
+                  return newTranscript;
+                });
               }
             }
 
             if (data.serverContent.turnComplete) {
               setTranscript(prev => prev ? prev + '\n\n' : prev);
-              if (modeRef.current === 'livecode') {
-                setCodeOutput(prev => prev ? prev + '\n' : prev);
-              }
             }
           }
+
         } catch (e) {
           console.error('WS message parse error:', e);
         }
@@ -437,7 +434,9 @@ export function useGeminiLive() {
     isUserSpeaking,
     transcript,
     codeOutput,
+    structuredOutput,
     error,
     audioLevel,
   };
 }
+

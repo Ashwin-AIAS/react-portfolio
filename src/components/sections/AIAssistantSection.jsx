@@ -7,7 +7,9 @@ import AIAssistantVisual from '../visuals/AIAssistantVisual';
 import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon } from '../../icons/Icons';
 import { streamGeminiResponse, getApiKey } from '../../geminiEmbed';
 import { useSpeechInput } from '../../hooks/useSpeechInput';
+import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { motion, AnimatePresence } from 'framer-motion';
+
 
 const SYSTEM_PROMPT = `
 You are Ashwin's AI Recruiter Assistant. You represent Ashwin, an AI Engineer.
@@ -249,8 +251,68 @@ export const AIAssistantSection = ({ t }) => {
     const typingIntervalRef = useRef(null);
     const [copiedId, setCopiedId] = useState(null);
     const [voiceError, setVoiceError] = useState('');
+    const [isVoiceMode, setIsVoiceMode] = useState(false);
     const messagesEndRef = useRef(null);
+
     const chatContainerRef = useRef(null);
+
+    const geminiLive = useGeminiLive();
+
+    const RECRUITER_VOICE_PROMPT = `
+You are Ashwin's AI Recruiter assistant. You are helping evaluate Ashwin Kumar for technical roles.
+Answer questions about his skills, experience, and projects professionally and concisely.
+If the user provides a job description, produce a structured fit report.
+Ashwin's Data: ${JSON.stringify(portfolioData)}
+
+Rules:
+1. If the user asks a question, answer it in 2-3 sentences.
+2. If the user provides a job description, analyze it and then output a JSON object with this structure:
+{
+  "type": "fit_report",
+  "score": <0-100>,
+  "matching_skills": [...],
+  "missing_skills": [...],
+  "alignment": "...",
+  "recommendation": "..."
+}
+Wait for the user to finish speaking before responding.
+`;
+
+    // Handle voice transcript streaming into chat
+    useEffect(() => {
+        if (isVoiceMode && geminiLive.transcript && geminiLive.isConnected) {
+            setMessages(prev => {
+                const last = prev[prev.length - 1];
+                if (last && last.role === 'model' && last.isVoice) {
+                    const updated = [...prev];
+                    updated[updated.length - 1].content = geminiLive.transcript;
+                    return updated;
+                } else {
+                    return [...prev, { role: 'model', content: geminiLive.transcript, isVoice: true }];
+                }
+            });
+        }
+    }, [geminiLive.transcript, isVoiceMode, geminiLive.isConnected]);
+
+    // Handle structured output from voice
+    useEffect(() => {
+        if (geminiLive.structuredOutput && geminiLive.structuredOutput.type === 'fit_report') {
+            // We can choose to replace the last message or just let it be
+            // The transcript effect already pushed the JSON string, but the FitReportCard will render it.
+        }
+    }, [geminiLive.structuredOutput]);
+
+    const toggleVoiceMode = async () => {
+        if (isVoiceMode) {
+            if (geminiLive.isConnected) geminiLive.disconnect();
+            setIsVoiceMode(false);
+        } else {
+            setIsVoiceMode(true);
+            // Don't connect yet, wait for mic click? 
+            // Or maybe click to start voice mode AND connect.
+        }
+    };
+
 
     useEffect(() => {
         return () => clearInterval(typingIntervalRef.current);
@@ -429,18 +491,18 @@ export const AIAssistantSection = ({ t }) => {
             return <div className="bg-blue-600/80 text-white text-sm px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-md max-w-[85%] leading-relaxed">{msg.content}</div>;
         }
 
-        // Try parsing JSON if content looks like JSON
+        // Check if this is a voice-driven structured output or contains JSON
+        const sourceMessage = msg.content;
         try {
-            const possibleJson = msg.content.substring(msg.content.indexOf("{"), msg.content.lastIndexOf("}") + 1);
-            if (possibleJson && possibleJson.includes('"type": "fit_report"')) {
-                const data = JSON.parse(possibleJson);
+            const possibleJsonMatch = sourceMessage.match(/\{[\s\S]*\}/);
+            if (possibleJsonMatch) {
+                const data = JSON.parse(possibleJsonMatch[0]);
                 if (data.type === 'fit_report') {
                     return <FitReportCard data={data} t={t.assistant} />;
                 }
             }
-        } catch (e) {
-            // Not JSON or incomplete JSON (streaming), just render text
-        }
+        } catch (e) {}
+
 
         return (
             <div className="bg-white/5 border border-white/10 text-white/80 text-sm px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-md leading-relaxed whitespace-pre-wrap">
@@ -677,23 +739,57 @@ export const AIAssistantSection = ({ t }) => {
 
                         <div className="flex-shrink-0 p-4 bg-white/[0.02] border-t border-white/[0.06]">
                             <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={isListening ? stopListening : startListening}
-                                    disabled={isGenerating}
-                                    title={isListening ? "Stop listening" : "Speak your message"}
-                                    className={`
-                                        flex-shrink-0 w-10 h-10 rounded-full border transition-all duration-300
-                                        flex items-center justify-center
-                                        ${isListening 
-                                        ? 'bg-red-500/20 border-red-500/50 text-red-400 mic-pulse' 
-                                        : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white/70 hover:bg-white/[0.08]'
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (isVoiceMode) {
+                                                if (geminiLive.isConnected) {
+                                                    geminiLive.disconnect();
+                                                } else {
+                                                    geminiLive.connect(RECRUITER_VOICE_PROMPT, { responseModalities: ['AUDIO', 'TEXT'] });
+                                                }
+                                            } else {
+                                                isListening ? stopListening() : startListening();
+                                            }
+                                        }}
+                                        disabled={isGenerating || (isVoiceMode && geminiLive.isConnecting)}
+                                        className={`
+                                            flex-shrink-0 w-10 h-10 rounded-full border transition-all duration-300
+                                            flex items-center justify-center relative
+                                            ${(isListening || (isVoiceMode && geminiLive.isConnected))
+                                            ? 'bg-red-500/20 border-red-500/50 text-red-400 recruiter-mic-pulse' 
+                                            : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white/70 hover:bg-white/[0.08]'
+                                            }
+                                            ${(isGenerating || (isVoiceMode && geminiLive.isConnecting)) ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
+                                        `}
+                                    >
+                                        {isVoiceMode && geminiLive.isConnected && (
+                                            <div className="recruiter-waveform">
+                                                {Array.from({ length: 8 }).map((_, i) => (
+                                                    <motion.div
+                                                        key={i}
+                                                        animate={{ height: 2 + geminiLive.audioLevel * 15 * (0.5 + Math.random() * 0.5) }}
+                                                        className="recruiter-waveform-bar"
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+                                        {isVoiceMode 
+                                            ? (geminiLive.isConnected ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />)
+                                            : (isListening ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />)
                                         }
-                                        ${isGenerating ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
-                                    `}
-                                >
-                                    {isListening ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />}
-                                </button>
+                                    </button>
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={toggleVoiceMode}
+                                        className={`text-[10px] px-2 py-1 rounded border transition-colors ${isVoiceMode ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-white/5 border-white/10 text-white/30'}`}
+                                    >
+                                        {isVoiceMode ? 'LIVE VOICE' : 'TEXT MODE'}
+                                    </button>
+                                </div>
+
                                 <div className="relative flex-1">
                                     <textarea
                                         value={input}
@@ -704,7 +800,8 @@ export const AIAssistantSection = ({ t }) => {
                                         onBlur={() => {
                                             if (!input.trim()) setShowSuggestions(true);
                                         }}
-                                        placeholder={t.assistant.placeholder}
+                                        disabled={isVoiceMode && geminiLive.isConnected}
+                                        placeholder={isVoiceMode && geminiLive.isConnected ? "Listening for your voice..." : t.assistant.placeholder}
                                         className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
                                         rows="1"
                                         onKeyDown={(e) => {
@@ -714,6 +811,7 @@ export const AIAssistantSection = ({ t }) => {
                                             }
                                         }}
                                     />
+
                                     <button
                                         type="submit"
                                         disabled={!input.trim() || isGenerating}

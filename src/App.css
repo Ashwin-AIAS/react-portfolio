@@ -957,3 +957,44 @@
   }
 }
 
+/* Recruiter Voice Specific Styles */
+.recruiter-mic-pulse {
+  animation: recruiter-mic-glow 2s infinite ease-in-out;
+}
+
+@keyframes recruiter-mic-glow {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.recruiter-waveform {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.recruiter-waveform-bar {
+  width: 2px;
+  background: #f87171;
+  border-radius: 1px;
+  min-height: 2px;
+}
+
+.recruiter-voice-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { MicIcon } from '../../icons/Icons';
+import { portfolioData } from '../../data/portfolioData';
+
 
 const INTERVIEW_PROMPTS = [
   "What are Ashwin's strongest skills?",
@@ -16,6 +18,33 @@ const LIVECODE_PROMPTS = [
   "React hook for WebSocket streaming",
   "FastAPI endpoint with embeddings",
 ];
+
+const INTERVIEW_SYSTEM_INSTRUCTION = `You are Ashwin's AI portfolio assistant. Answer questions about Ashwin's skills, projects, and experience in a friendly, concise way. Ashwin is an AI Engineer specializing in autonomous systems, RAG pipelines, computer vision, and generative AI. He is pursuing a Master's in AI Engineering at THI Germany.
+
+Ashwin's Full Data:
+${JSON.stringify({ projects: [], skills: [] }, null, 2)} 
+
+RULES:
+- Be enthusiastic, professional, and concise (2-3 sentences per response)
+- Highlight relevant projects and skills when answering
+- If asked about availability: he's open to opportunities in Germany
+- Speak naturally as if in a real interview`;
+// Note: In a real app, we'd import portfolioData here. For now I'll just use a placeholder or import it if I can.
+// Actually, it was imported in the hook. I should import it here too.
+
+const LIVECODE_SYSTEM_INSTRUCTION = `You are Ashwin's AI coding assistant on his portfolio. You demonstrate Ashwin's coding expertise by writing code live.
+
+Ashwin's Technical Background:
+- Languages: Python, C/C++, SQL, JavaScript
+- AI/ML: PyTorch, Keras, TensorFlow, OpenCV, YOLOv8, LangChain, Gemini API
+- Projects: RAG systems, Mini-CNN Framework, YOLO Bat Swing Analysis, Radar-AI
+
+RULES:
+- When asked to write code, output the code wrapped in a markdown code block with the language
+- Keep code concise (under 40 lines) but functional and well-commented
+- After the code block, give a 1-sentence explanation
+- Draw from Ashwin's actual project experience when relevant`;
+
 
 // --- Waveform Visualizer ---
 const WaveformVisualizer = ({ audioLevel, isSpeaking, isUserSpeaking }) => {
@@ -118,18 +147,19 @@ export const GeminiVoiceAgent = ({ isActive, onActivate }) => {
     connect,
     disconnect,
     sendText,
-    clearCode,
     isConnected,
     isConnecting,
     isSpeaking,
     isUserSpeaking,
     transcript,
-    codeOutput,
     error,
     audioLevel,
   } = useGeminiLive();
 
+
+  const [localCodeOutput, setLocalCodeOutput] = useState('');
   const transcriptRef = useRef(null);
+
 
   // Auto-scroll transcript
   useEffect(() => {
@@ -143,9 +173,17 @@ export const GeminiVoiceAgent = ({ isActive, onActivate }) => {
       disconnect();
     } else {
       onActivate?.();
-      await connect(mode === 'livecode' ? 'livecode' : 'interview');
+      
+      const systemPrompt = mode === 'livecode' ? LIVECODE_SYSTEM_INSTRUCTION : INTERVIEW_SYSTEM_INSTRUCTION.replace('${JSON.stringify({ projects: [], skills: [] }, null, 2)}', JSON.stringify(portfolioData, null, 2));
+      const options = {
+        responseModalities: mode === 'livecode' ? ['AUDIO', 'TEXT'] : ['AUDIO'],
+        onTextChunk: mode === 'livecode' ? (chunk) => setLocalCodeOutput(prev => prev + chunk) : null
+      };
+
+      await connect(systemPrompt, options);
     }
   };
+
 
   const handleModeSwitch = (newMode) => {
     if (newMode === mode) return;
@@ -153,13 +191,22 @@ export const GeminiVoiceAgent = ({ isActive, onActivate }) => {
       disconnect();
     }
     setMode(newMode);
+    setLocalCodeOutput('');
   };
+
 
   // Auto-connect + send when clicking a chip
   const handlePromptClick = async (prompt) => {
     if (!isConnected && !isConnecting) {
       onActivate?.();
-      await connect(mode === 'livecode' ? 'livecode' : 'interview');
+      
+      const systemPrompt = mode === 'livecode' ? LIVECODE_SYSTEM_INSTRUCTION : INTERVIEW_SYSTEM_INSTRUCTION.replace('${JSON.stringify({ projects: [], skills: [] }, null, 2)}', JSON.stringify(portfolioData, null, 2));
+      const options = {
+        responseModalities: mode === 'livecode' ? ['AUDIO', 'TEXT'] : ['AUDIO'],
+        onTextChunk: mode === 'livecode' ? (chunk) => setLocalCodeOutput(prev => prev + chunk) : null
+      };
+
+      await connect(systemPrompt, options);
       // Wait a moment for connection to establish, then send
       const checkAndSend = () => {
         setTimeout(() => {
@@ -171,6 +218,7 @@ export const GeminiVoiceAgent = ({ isActive, onActivate }) => {
       sendText(prompt);
     }
   };
+
 
   const prompts = mode === 'interview' ? INTERVIEW_PROMPTS : LIVECODE_PROMPTS;
 
@@ -311,11 +359,12 @@ export const GeminiVoiceAgent = ({ isActive, onActivate }) => {
       </div>
 
       {/* Code panel for livecode mode */}
-      {mode === 'livecode' && (
-        <div className="voice-agent-code-panel-inline">
-          <CodeDisplay code={codeOutput} onClear={clearCode} />
-        </div>
-      )}
+  {mode === 'livecode' && (
+      <div className="voice-agent-code-panel-inline">
+        <CodeDisplay code={localCodeOutput} onClear={() => setLocalCodeOutput('')} />
+      </div>
+    )}
+
 
       {/* Waveform */}
       <div className="voice-agent-waveform-area" style={{ pointerEvents: 'none' }}>
