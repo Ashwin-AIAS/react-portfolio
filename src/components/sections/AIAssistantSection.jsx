@@ -306,9 +306,24 @@ Wait for the user to finish speaking before responding.
     useEffect(() => {
         if (geminiLive.structuredOutput && geminiLive.structuredOutput.type === 'fit_report') {
             // We can choose to replace the last message or just let it be
-            // The transcript effect already pushed the JSON string, but the FitReportCard will render it.
         }
     }, [geminiLive.structuredOutput]);
+
+    // Handle completion of a Gemini Live response turn
+    useEffect(() => {
+        if (geminiLive.isResponseComplete) {
+            setIsGenerating(false);
+            stopTypingStatus();
+            
+            // Generate suggestions from the final transcript
+            const lastUserMsg = messages.findLast(m => m.role === 'user');
+            const set = detectSuggestionSet(geminiLive.transcript, lastUserMsg?.content || '');
+            setSuggestions(SUGGESTIONS[set]);
+            setShowSuggestions(true);
+            
+            scrollToBottom(true);
+        }
+    }, [geminiLive.isResponseComplete]);
 
     const toggleVoiceMode = async () => {
         if (isVoiceMode) {
@@ -356,6 +371,8 @@ Wait for the user to finish speaking before responding.
             if (isConnectedRef.current) {
                 console.log('[CHIP] sending message to WebSocket');
                 setMessages(prev => [...prev, { role: 'user', content: chipText }]);
+                setIsGenerating(true);
+                startTypingStatus(chipText);
 
                 geminiLive.sendText(chipText);
                 console.log('[CHIP] message sent successfully');
@@ -702,7 +719,7 @@ Wait for the user to finish speaking before responding.
                                                         initial={{ opacity: 0, scale: 0.9 }}
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         transition={{ delay: i * 0.06, duration: 0.25 }}
-                                                        onClick={() => handleChipClick(suggestion)}
+                                                        onClick={() => isVoiceMode ? handleChipClick(suggestion) : handleSuggestionClick(suggestion)}
                                                         disabled={isGenerating || (activeChip && activeChip !== suggestion)}
                                                         className={`
                                                             suggestion-chip text-xs px-3 py-1.5 rounded-full

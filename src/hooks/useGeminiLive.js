@@ -64,6 +64,7 @@ export function useGeminiLive() {
   const [error, setError] = useState('');
   const [audioLevel, setAudioLevel] = useState(0);
   const [structuredOutput, setStructuredOutput] = useState(null);
+  const [isResponseComplete, setIsResponseComplete] = useState(false);
 
 
   const wsRef = useRef(null);
@@ -293,6 +294,7 @@ export function useGeminiLive() {
     setError('');
     setTranscript('');
     setStructuredOutput(null);
+    setIsResponseComplete(false);
 
     try {
       const model = 'gemini-3.1-flash-live-preview';
@@ -386,6 +388,7 @@ export function useGeminiLive() {
 
             if (data.serverContent.turnComplete) {
               setTranscript(prev => prev ? prev + '\n\n' : prev);
+              setIsResponseComplete(true);
             }
           }
 
@@ -422,6 +425,7 @@ export function useGeminiLive() {
   const sendMessage = useCallback((obj) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       console.log('[WS] sending message:', JSON.stringify(obj, null, 2));
+      setIsResponseComplete(false);
       wsRef.current.send(JSON.stringify(obj));
     } else {
       console.error('[WS] sendMessage called but WebSocket is not open, state:', wsRef.current?.readyState);
@@ -457,6 +461,7 @@ export function useGeminiLive() {
     transcript,
     codeOutput,
     structuredOutput,
+    isResponseComplete,
     error,
     audioLevel,
   };
