@@ -10,6 +10,13 @@ import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const LIVECODE_SUGGESTIONS = [
+  "Write a RAG retrieval pipeline in Python",
+  "CNN inference function in C++",
+  "React hook for WebSocket streaming",
+  "FastAPI endpoint with embeddings"
+];
+
 
 const SYSTEM_PROMPT = `
 You are Ashwin's AI Recruiter Assistant. You represent Ashwin, an AI Engineer.
@@ -252,11 +259,34 @@ export const AIAssistantSection = ({ t }) => {
     const [copiedId, setCopiedId] = useState(null);
     const [voiceError, setVoiceError] = useState('');
     const [isVoiceMode, setIsVoiceMode] = useState(false);
+    const [activeMode, setActiveMode] = useState('interview'); // 'interview' | 'livecode'
+    const [activeChip, setActiveChip] = useState(null);
+    const [codeOutput, setCodeOutput] = useState('');
+    const [detectedLanguage, setDetectedLanguage] = useState('python');
+    const isConnectedRef = useRef(false);
     const messagesEndRef = useRef(null);
 
     const chatContainerRef = useRef(null);
 
     const geminiLive = useGeminiLive();
+
+    useEffect(() => {
+        isConnectedRef.current = geminiLive.isConnected;
+    }, [geminiLive.isConnected]);
+
+    const LIVECODE_SYSTEM_PROMPT = `
+You are an expert coding assistant specialized in AI engineering.
+When asked to write code, generate clean, well-commented, production-ready code. 
+Ashwin is an AI Engineer skilled in Python, C++, React, FastAPI, LangChain, pgvector, PyTorch, OpenCV, and ROS2.
+
+For each coding request:
+1. Briefly describe what you are building (1 sentence, spoken)
+2. Generate the complete code
+3. Explain key design decisions (2-3 sentences, spoken)
+
+When generating code, output it between [CODE_START] and [CODE_END] markers so it can be extracted and displayed in the code panel. 
+Always specify the language after CODE_START, e.g. [CODE_START:python]
+`;
 
     const RECRUITER_VOICE_PROMPT = `
 You are Ashwin's AI Recruiter assistant. You are helping evaluate Ashwin Kumar for technical roles.
@@ -280,19 +310,37 @@ Wait for the user to finish speaking before responding.
 
     // Handle voice transcript streaming into chat
     useEffect(() => {
-        if (isVoiceMode && geminiLive.transcript && geminiLive.isConnected) {
-            setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last && last.role === 'model' && last.isVoice) {
-                    const updated = [...prev];
-                    updated[updated.length - 1].content = geminiLive.transcript;
-                    return updated;
+        if (geminiLive.transcript && geminiLive.isConnected) {
+            if (activeMode === 'livecode') {
+                // Parse code markers for livecode mode
+                const codeRegex = /\[CODE_START:(\w+)\]([\s\S]*?)\[CODE_END\]/g;
+                const matches = [...geminiLive.transcript.matchAll(codeRegex)];
+                if (matches.length > 0) {
+                    const lastMatch = matches[matches.length - 1];
+                    setDetectedLanguage(lastMatch[1]);
+                    setCodeOutput(lastMatch[2].trim());
                 } else {
-                    return [...prev, { role: 'model', content: geminiLive.transcript, isVoice: true }];
+                    // Check for partial start
+                    const partialMatch = geminiLive.transcript.match(/\[CODE_START:(\w+)\]([\s\S]*)$/);
+                    if (partialMatch) {
+                        setDetectedLanguage(partialMatch[1]);
+                        setCodeOutput(partialMatch[2].trim());
+                    }
                 }
-            });
+            } else if (isVoiceMode) {
+                setMessages(prev => {
+                    const last = prev[prev.length - 1];
+                    if (last && last.role === 'model' && last.isVoice) {
+                        const updated = [...prev];
+                        updated[updated.length - 1].content = geminiLive.transcript;
+                        return updated;
+                    } else {
+                        return [...prev, { role: 'model', content: geminiLive.transcript, isVoice: true }];
+                    }
+                });
+            }
         }
-    }, [geminiLive.transcript, isVoiceMode, geminiLive.isConnected]);
+    }, [geminiLive.transcript, isVoiceMode, geminiLive.isConnected, activeMode]);
 
     // Handle structured output from voice
     useEffect(() => {
@@ -308,8 +356,63 @@ Wait for the user to finish speaking before responding.
             setIsVoiceMode(false);
         } else {
             setIsVoiceMode(true);
-            // Don't connect yet, wait for mic click? 
-            // Or maybe click to start voice mode AND connect.
+        }
+    };
+
+    const switchMode = (mode) => {
+        if (mode === activeMode) return;
+        if (geminiLive.isConnected) geminiLive.disconnect();
+        setActiveMode(mode);
+        setCodeOutput('');
+        if (mode === 'livecode') {
+            setIsVoiceMode(true);
+        } else {
+            setIsVoiceMode(false);
+        }
+    };
+
+    const waitForConnection = () => new Promise((resolve, reject) => {
+        const maxWait = 5000;
+        const interval = 100;
+        let elapsed = 0;
+        const check = setInterval(() => {
+            if (isConnectedRef.current) {
+                clearInterval(check);
+                resolve();
+            }
+            elapsed += interval;
+            if (elapsed >= maxWait) {
+                clearInterval(check);
+                reject(new Error('Connection timeout'));
+            }
+        }, interval);
+    });
+
+    const handleChipClick = async (chipText) => {
+        if (isGenerating || activeChip) return;
+        
+        setActiveChip(chipText);
+        const prompt = activeMode === 'livecode' ? LIVECODE_SYSTEM_PROMPT : RECRUITER_VOICE_PROMPT;
+
+        try {
+            if (!geminiLive.isConnected) {
+                await geminiLive.connect(prompt, { responseModalities: ['AUDIO', 'TEXT'] });
+                await waitForConnection();
+            }
+
+            if (geminiLive.isConnected) {
+                geminiLive.sendText(chipText);
+                if (activeMode === 'interview') {
+                    setMessages(prev => [...prev, { role: 'user', content: chipText }]);
+                } else if (activeMode === 'livecode') {
+                    setCodeOutput('');
+                }
+            }
+        } catch (err) {
+            console.error("Chip click error:", err);
+            setVoiceError("Failed to connect for voice. Please try again.");
+        } finally {
+            setTimeout(() => setActiveChip(null), 1000);
         }
     };
 
@@ -515,227 +618,343 @@ Wait for the user to finish speaking before responding.
         <Section id="assistant" title={t.assistant.title} subtitle={t.assistant.subtitle}>
             <div className="grid md:grid-cols-5 gap-8 lg:gap-12">
                 <AnimateOnScroll className="md:col-span-2">
-                    <Card className="h-full bg-gradient-to-b from-blue-900/10 to-transparent p-6 md:p-8 flex flex-col justify-center items-center text-center border border-blue-500/20">
-                        <AIAssistantVisual isGenerating={isGenerating} />
-                        <h3 className="text-xl font-semibold text-white mb-4 mt-8 flex items-center justify-center gap-2">
-                            <SparklesIcon className="w-5 h-5 text-blue-400" /> {t.assistant.badge}
-                        </h3>
-                        <p className="text-sm text-white/50 font-light leading-relaxed">
-                            {t.assistant.disclaimer}
-                        </p>
-                    </Card>
+                    {activeMode === 'livecode' ? (
+                        <Card className="h-full flex flex-col bg-slate-950/90 border border-white/10 overflow-hidden relative group">
+                            <div className="flex items-center justify-between p-4 border-b border-white/[0.06] bg-white/[0.02]">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                    <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">{detectedLanguage || 'Code'} Output</span>
+                                </div>
+                                {codeOutput && (
+                                    <button 
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(codeOutput);
+                                            setCopiedId('livecode');
+                                            setTimeout(() => setCopiedId(null), 2000);
+                                        }}
+                                        className="text-[10px] text-white/40 hover:text-white flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded transition-colors"
+                                    >
+                                        {copiedId === 'livecode' ? '✓ Copied!' : <><CopyIcon className="w-3 h-3" /> Copy</>}
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex-1 p-5 font-mono text-xs overflow-y-auto custom-scrollbar">
+                                {codeOutput ? (
+                                    <pre className="text-blue-100/90 leading-6 whitespace-pre-wrap">
+                                        <code>{codeOutput}</code>
+                                    </pre>
+                                ) : (
+                                    <div className="h-full flex flex-col items-center justify-center text-center opacity-20 pointer-events-none">
+                                        <BotIcon className="w-12 h-12 mb-4" />
+                                        <p className="text-sm">Ask me to write code and it will appear here in real-time</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+                        </Card>
+                    ) : (
+                        <Card className="h-full bg-gradient-to-b from-blue-900/10 to-transparent p-6 md:p-8 flex flex-col justify-center items-center text-center border border-blue-500/20">
+                            <AIAssistantVisual isGenerating={isGenerating} />
+                            <h3 className="text-xl font-semibold text-white mb-4 mt-8 flex items-center justify-center gap-2">
+                                <SparklesIcon className="w-5 h-5 text-blue-400" /> {t.assistant.badge}
+                            </h3>
+                            <p className="text-sm text-white/50 font-light leading-relaxed">
+                                {t.assistant.disclaimer}
+                            </p>
+                        </Card>
+                    )}
                 </AnimateOnScroll>
                 
                 <AnimateOnScroll delay={200} className="md:col-span-3">
-                    <Card className="h-[500px] flex flex-col bg-black/40 border border-white/[0.08] relative overflow-hidden">
+                    <Card className="h-[550px] flex flex-col bg-black/40 border border-white/[0.08] relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 opacity-50"></div>
                         
-                        <div 
-                            ref={chatContainerRef}
-                            onWheel={(e) => e.stopPropagation()}
-                            className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar scroll-smooth min-h-0"
-                        >
-                            <AnimatePresence>
-                                {messages.length === 1 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10, scale: 0.97 }}
-                                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                                        className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-4"
-                                    >
-                                        {CONVERSATION_STARTERS.map((starter, i) => (
-                                            <motion.button
-                                                key={starter.title}
-                                                initial={{ opacity: 0, y: 15 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: i * 0.08, duration: 0.35 }}
-                                                onClick={() => handleSuggestionClick(starter.message)}
-                                                disabled={isGenerating}
-                                                className="
-                                                    group text-left p-4 rounded-2xl
-                                                    bg-white/[0.03] border border-white/[0.06]
-                                                    hover:bg-white/[0.06] hover:border-white/[0.12]
-                                                    transition-all duration-300 cursor-pointer
-                                                    disabled:opacity-30 disabled:cursor-not-allowed
-                                                "
-                                            >
-                                                <div className="text-2xl mb-2">{starter.icon}</div>
-                                                <div className="text-sm font-medium text-white/80 mb-1 leading-snug group-hover:text-white transition-colors">
-                                                    {starter.title}
-                                                </div>
-                                                <div className="text-xs text-white/30 leading-snug group-hover:text-white/50 transition-colors">
-                                                    {starter.subtitle}
-                                                </div>
-                                            </motion.button>
-                                        ))}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                        {/* Tab Switcher */}
+                        <div className="flex items-center gap-1 p-2 bg-white/[0.02] border-b border-white/[0.06]">
+                            <button 
+                                onClick={() => switchMode('interview')}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all ${activeMode === 'interview' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-white/40 hover:text-white/60 hover:bg-white/5'}`}
+                            >
+                                <MicIcon className="w-3.5 h-3.5" /> Interview Me
+                            </button>
+                            <button 
+                                onClick={() => switchMode('livecode')}
+                                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-xs font-medium transition-all ${activeMode === 'livecode' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-white/40 hover:text-white/60 hover:bg-white/5'}`}
+                            >
+                                <BotIcon className="w-3.5 h-3.5" /> Live Code
+                            </button>
+                        </div>
 
-                            {messages.map((msg, i) => {
-                                if (msg.role === 'model' && !msg.content) return null;
+                        {activeMode === 'livecode' ? (
+                            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-transparent to-blue-900/5">
+                                <div className="text-[10px] text-white/20 uppercase tracking-widest mb-8 font-bold flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></div>
+                                    Tap Mic or a sample to start
+                                </div>
+                                
+                                <div className="relative mb-12">
+                                    <button
+                                        onClick={() => {
+                                            if (geminiLive.isConnected) {
+                                                geminiLive.disconnect();
+                                            } else {
+                                                handleChipClick("Hello! Let's write some code.");
+                                            }
+                                        }}
+                                        className={`w-24 h-24 rounded-full border-2 flex items-center justify-center transition-all duration-500 group ${geminiLive.isConnected ? 'bg-red-500/20 border-red-500/50 text-red-500 shadow-[0_0_40px_rgba(239,68,68,0.3)]' : 'bg-white/5 border-white/10 text-white/40 hover:border-blue-500/50 hover:text-blue-400'}`}
+                                    >
+                                        <div className={`absolute inset-0 rounded-full border border-current opacity-20 scale-100 ${geminiLive.isConnected ? 'animate-ping' : 'group-hover:scale-110'}`}></div>
+                                        {geminiLive.isConnected ? <MicOffIcon className="w-8 h-8" /> : <MicIcon className="w-8 h-8" />}
+                                    </button>
+                                </div>
 
-                                return (
-                                    <motion.div 
-                                        key={i} 
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                                    >
-                                        {msg.role === 'model' && (
-                                            <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-blue-400">
-                                                <BotIcon className="w-4 h-4" />
+                                <div className="w-full max-w-sm space-y-3">
+                                    <AnimatePresence mode="wait">
+                                        <motion.div
+                                            key="livecode-suggestions-panel"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            className="flex flex-col gap-2"
+                                        >
+                                            <p className="text-[9px] text-white/20 uppercase tracking-widest font-medium text-center mb-1">Interactive Samples</p>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {LIVECODE_SUGGESTIONS.map((suggestion, i) => (
+                                                    <button
+                                                        key={suggestion}
+                                                        onClick={() => handleChipClick(suggestion)}
+                                                        disabled={geminiLive.isConnecting || activeChip}
+                                                        className={`text-xs p-3 rounded-xl border text-left transition-all ${activeChip === suggestion ? 'bg-blue-500/20 border-blue-500 text-white' : 'bg-white/[0.02] border-white/5 text-white/40 hover:bg-white/5 hover:border-white/10'}`}
+                                                    >
+                                                        {suggestion}
+                                                    </button>
+                                                ))}
                                             </div>
-                                        )}
-                                        {msg.role === 'model' ? (
-                                            <div className="group relative max-w-[85%]">
-                                                {renderMessageContent(msg)}
-                                                <button
-                                                    onClick={() => handleCopy(msg.content, i)}
-                                                    className="
-                                                        absolute top-2 right-2
-                                                        opacity-0 group-hover:opacity-100
-                                                        transition-all duration-200
-                                                        w-7 h-7 rounded-lg
-                                                        bg-white/[0.06] border border-white/[0.08]
-                                                        hover:bg-white/[0.12] hover:border-white/[0.15]
-                                                        flex items-center justify-center
-                                                        text-white/40 hover:text-white/70
-                                                    "
-                                                    title="Copy message"
-                                                >
-                                                    {copiedId === i ? (
-                                                        <motion.span
-                                                            initial={{ scale: 0.8 }}
-                                                            animate={{ scale: 1 }}
-                                                            className="text-green-400 text-[10px] font-medium"
-                                                        >
-                                                            ✓
-                                                        </motion.span>
-                                                    ) : (
-                                                        <CopyIcon className="w-3 h-3" />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            renderMessageContent(msg)
-                                        )}
-                                    </motion.div>
-                                );
-                            })}
-                            
-                            <AnimatePresence>
-                                {showSuggestions && suggestions.length > 0 && (
-                                    <motion.div
-                                        key="suggestions"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 10 }}
-                                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                                        className="flex flex-col gap-1 pb-4"
-                                    >
-                                        <p className="text-[9px] text-white/20 uppercase tracking-widest px-4 pt-2 pb-1 font-medium">
-                                            Suggested
-                                        </p>
-                                        <div className="px-4 flex flex-wrap gap-2">
-                                            {suggestions.map((suggestion, i) => (
+                                        </motion.div>
+                                    </AnimatePresence>
+                                </div>
+                                <div className="mt-auto pt-8 flex items-center gap-2 text-[9px] text-white/10 uppercase tracking-[0.2em] font-bold">
+                                    <span>Powered by Gemini Live</span>
+                                    <div className="w-1 h-1 rounded-full bg-white/10"></div>
+                                    <span>Real-Time Voice AI</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div 
+                                ref={chatContainerRef}
+                                onWheel={(e) => e.stopPropagation()}
+                                className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar scroll-smooth min-h-0"
+                            >
+                                <AnimatePresence>
+                                    {messages.length === 1 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10, scale: 0.97 }}
+                                            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                            className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-4"
+                                        >
+                                            {CONVERSATION_STARTERS.map((starter, i) => (
                                                 <motion.button
-                                                    key={suggestion}
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    transition={{ delay: i * 0.06, duration: 0.25 }}
-                                                    onClick={() => handleSuggestionClick(suggestion)}
+                                                    key={starter.title}
+                                                    initial={{ opacity: 0, y: 15 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.08, duration: 0.35 }}
+                                                    onClick={() => handleSuggestionClick(starter.message)}
                                                     disabled={isGenerating}
                                                     className="
-                                                        suggestion-chip text-xs px-3 py-1.5 rounded-full
-                                                        bg-white/[0.04] border border-white/[0.08]
-                                                        text-white/50 hover:text-white/80
-                                                        hover:bg-white/[0.08] hover:border-white/[0.15]
-                                                        transition-all duration-200 cursor-pointer
+                                                        group text-left p-4 rounded-2xl
+                                                        bg-white/[0.03] border border-white/[0.06]
+                                                        hover:bg-white/[0.06] hover:border-white/[0.12]
+                                                        transition-all duration-300 cursor-pointer
                                                         disabled:opacity-30 disabled:cursor-not-allowed
-                                                        text-left leading-snug
                                                     "
                                                 >
-                                                    {suggestion}
+                                                    <div className="text-2xl mb-2">{starter.icon}</div>
+                                                    <div className="text-sm font-medium text-white/80 mb-1 leading-snug group-hover:text-white transition-colors">
+                                                        {starter.title}
+                                                    </div>
+                                                    <div className="text-xs text-white/30 leading-snug group-hover:text-white/50 transition-colors">
+                                                        {starter.subtitle}
+                                                    </div>
                                                 </motion.button>
                                             ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {messages.map((msg, i) => {
+                                    if (msg.role === 'model' && !msg.content) return null;
+
+                                    return (
+                                        <motion.div 
+                                            key={i} 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                        >
+                                            {msg.role === 'model' && (
+                                                <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-blue-400">
+                                                    <BotIcon className="w-4 h-4" />
+                                                </div>
+                                            )}
+                                            {msg.role === 'model' ? (
+                                                <div className="group relative max-w-[85%]">
+                                                    {renderMessageContent(msg)}
+                                                    <button
+                                                        onClick={() => handleCopy(msg.content, i)}
+                                                        className="
+                                                            absolute top-2 right-2
+                                                            opacity-0 group-hover:opacity-100
+                                                            transition-all duration-200
+                                                            w-7 h-7 rounded-lg
+                                                            bg-white/[0.06] border border-white/[0.08]
+                                                            hover:bg-white/[0.12] hover:border-white/[0.15]
+                                                            flex items-center justify-center
+                                                            text-white/40 hover:text-white/70
+                                                        "
+                                                        title="Copy message"
+                                                    >
+                                                        {copiedId === i ? (
+                                                            <motion.span
+                                                                initial={{ scale: 0.8 }}
+                                                                animate={{ scale: 1 }}
+                                                                className="text-green-400 text-[10px] font-medium"
+                                                            >
+                                                                ✓
+                                                            </motion.span>
+                                                        ) : (
+                                                            <CopyIcon className="w-3 h-3" />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                renderMessageContent(msg)
+                                            )}
+                                        </motion.div>
+                                    );
+                                })}
+                                
+                                <AnimatePresence>
+                                    {showSuggestions && (suggestions.length > 0 || activeMode === 'livecode') && (
+                                        <motion.div
+                                            key="suggestions"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                                            className="flex flex-col gap-1 pb-4"
+                                        >
+                                            <p className="text-[9px] text-white/20 uppercase tracking-widest px-4 pt-2 pb-1 font-medium">
+                                                {activeMode === 'livecode' ? 'Code Samples' : 'Suggested Questions'}
+                                            </p>
+                                            <div className="px-4 flex flex-wrap gap-2">
+                                                {(activeMode === 'livecode' ? LIVECODE_SUGGESTIONS : suggestions).map((suggestion, i) => (
+                                                    <motion.button
+                                                        key={suggestion}
+                                                        initial={{ opacity: 0, scale: 0.9 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        transition={{ delay: i * 0.06, duration: 0.25 }}
+                                                        onClick={() => handleChipClick(suggestion)}
+                                                        disabled={isGenerating || (activeChip && activeChip !== suggestion)}
+                                                        className={`
+                                                            suggestion-chip text-xs px-3 py-1.5 rounded-full
+                                                            transition-all duration-200 cursor-pointer
+                                                            flex items-center gap-2
+                                                            ${activeChip === suggestion 
+                                                                ? 'bg-blue-500/20 border-blue-400 text-white border scale-95' 
+                                                                : 'bg-white/[0.04] border border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/[0.08] hover:border-white/[0.15]'
+                                                            }
+                                                            disabled:opacity-30 disabled:cursor-not-allowed
+                                                            text-left leading-snug
+                                                        `}
+                                                    >
+                                                        {activeChip === suggestion && (
+                                                            <motion.div
+                                                                animate={{ rotate: 360 }}
+                                                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                                className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full"
+                                                            />
+                                                        )}
+                                                        {suggestion}
+                                                    </motion.button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {!isGenerating && 
+                                 !showSuggestions && 
+                                 messages.length > 1 && 
+                                 messages[messages.length - 1].role === 'model' && (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                        className="flex justify-start px-4 pb-2"
+                                    >
+                                        <button
+                                            onClick={handleRegenerate}
+                                            className="
+                                                flex items-center gap-1.5
+                                                text-[11px] text-white/25 
+                                                hover:text-white/50
+                                                transition-colors duration-200
+                                                group
+                                            "
+                                        >
+                                            <svg 
+                                                className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" 
+                                                viewBox="0 0 24 24" fill="none" 
+                                                stroke="currentColor" strokeWidth="2"
+                                            >
+                                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                                <path d="M3 3v5h5"/>
+                                            </svg>
+                                            Regenerate response
+                                        </button>
+                                    </motion.div>
+                                )}
+
+                                {isGenerating && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0 }}
+                                        className="flex items-center gap-3 px-4 py-2"
+                                    >
+                                        <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-blue-400">
+                                            <BotIcon className="w-4 h-4" />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex gap-1">
+                                                {[0, 1, 2].map(i => (
+                                                    <div
+                                                        key={i}
+                                                        className="w-1.5 h-1.5 bg-blue-400/60 rounded-full"
+                                                        style={{ animation: `typing-dot 1.2s ease-in-out infinite`, animationDelay: `${i * 0.2}s` }}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <AnimatePresence mode="wait">
+                                                <motion.span
+                                                    key={typingStatus}
+                                                    initial={{ opacity: 0, x: 6 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: -6 }}
+                                                    transition={{ duration: 0.25 }}
+                                                    className="text-xs text-white/30 font-light italic"
+                                                >
+                                                    {typingStatus}
+                                                </motion.span>
+                                            </AnimatePresence>
                                         </div>
                                     </motion.div>
                                 )}
-                            </AnimatePresence>
 
-                            {!isGenerating && 
-                             !showSuggestions && 
-                             messages.length > 1 && 
-                             messages[messages.length - 1].role === 'model' && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.5 }}
-                                    className="flex justify-start px-4 pb-2"
-                                >
-                                    <button
-                                        onClick={handleRegenerate}
-                                        className="
-                                            flex items-center gap-1.5
-                                            text-[11px] text-white/25 
-                                            hover:text-white/50
-                                            transition-colors duration-200
-                                            group
-                                        "
-                                    >
-                                        <svg 
-                                            className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" 
-                                            viewBox="0 0 24 24" fill="none" 
-                                            stroke="currentColor" strokeWidth="2"
-                                        >
-                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                                            <path d="M3 3v5h5"/>
-                                        </svg>
-                                        Regenerate response
-                                    </button>
-                                </motion.div>
-                            )}
-
-                            {isGenerating && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 8 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0 }}
-                                    className="flex items-center gap-3 px-4 py-2"
-                                >
-                                    <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-blue-400">
-                                        <BotIcon className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex gap-1">
-                                            {[0, 1, 2].map(i => (
-                                                <div
-                                                    key={i}
-                                                    className="w-1.5 h-1.5 bg-blue-400/60 rounded-full"
-                                                    style={{ animation: `typing-dot 1.2s ease-in-out infinite`, animationDelay: `${i * 0.2}s` }}
-                                                />
-                                            ))}
-                                        </div>
-                                        <AnimatePresence mode="wait">
-                                            <motion.span
-                                                key={typingStatus}
-                                                initial={{ opacity: 0, x: 6 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                exit={{ opacity: 0, x: -6 }}
-                                                transition={{ duration: 0.25 }}
-                                                className="text-xs text-white/30 font-light italic"
-                                            >
-                                                {typingStatus}
-                                            </motion.span>
-                                        </AnimatePresence>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            <div ref={messagesEndRef} />
-                        </div>
+                                <div ref={messagesEndRef} />
+                            </div>
+                        )}
 
                         <div className="flex-shrink-0 p-4 bg-white/[0.02] border-t border-white/[0.06]">
                             <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
@@ -743,7 +962,13 @@ Wait for the user to finish speaking before responding.
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            if (isVoiceMode) {
+                                            if (activeMode === 'livecode') {
+                                                if (geminiLive.isConnected) {
+                                                    geminiLive.disconnect();
+                                                } else {
+                                                    handleChipClick("Write some code for me.");
+                                                }
+                                            } else if (isVoiceMode) {
                                                 if (geminiLive.isConnected) {
                                                     geminiLive.disconnect();
                                                 } else {
@@ -757,14 +982,14 @@ Wait for the user to finish speaking before responding.
                                         className={`
                                             flex-shrink-0 w-10 h-10 rounded-full border transition-all duration-300
                                             flex items-center justify-center relative
-                                            ${(isListening || (isVoiceMode && geminiLive.isConnected))
+                                            ${(isListening || geminiLive.isConnected)
                                             ? 'bg-red-500/20 border-red-500/50 text-red-400 recruiter-mic-pulse' 
                                             : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white/70 hover:bg-white/[0.08]'
                                             }
                                             ${(isGenerating || (isVoiceMode && geminiLive.isConnecting)) ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
                                         `}
                                     >
-                                        {isVoiceMode && geminiLive.isConnected && (
+                                        {geminiLive.isConnected && (
                                             <div className="recruiter-waveform">
                                                 {Array.from({ length: 8 }).map((_, i) => (
                                                     <motion.div
@@ -775,19 +1000,21 @@ Wait for the user to finish speaking before responding.
                                                 ))}
                                             </div>
                                         )}
-                                        {isVoiceMode 
+                                        {(isVoiceMode || activeMode === 'livecode')
                                             ? (geminiLive.isConnected ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />)
                                             : (isListening ? <MicOffIcon className="w-4 h-4" /> : <MicIcon className="w-4 h-4" />)
                                         }
                                     </button>
                                     
-                                    <button
-                                        type="button"
-                                        onClick={toggleVoiceMode}
-                                        className={`text-[10px] px-2 py-1 rounded border transition-colors ${isVoiceMode ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-white/5 border-white/10 text-white/30'}`}
-                                    >
-                                        {isVoiceMode ? 'LIVE VOICE' : 'TEXT MODE'}
-                                    </button>
+                                    {activeMode === 'interview' && (
+                                        <button
+                                            type="button"
+                                            onClick={toggleVoiceMode}
+                                            className={`text-[10px] px-2 py-1 rounded border transition-colors ${isVoiceMode ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-white/5 border-white/10 text-white/30'}`}
+                                        >
+                                            {isVoiceMode ? 'LIVE VOICE' : 'TEXT MODE'}
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="relative flex-1">
@@ -800,8 +1027,8 @@ Wait for the user to finish speaking before responding.
                                         onBlur={() => {
                                             if (!input.trim()) setShowSuggestions(true);
                                         }}
-                                        disabled={isVoiceMode && geminiLive.isConnected}
-                                        placeholder={isVoiceMode && geminiLive.isConnected ? "Listening for your voice..." : t.assistant.placeholder}
+                                        disabled={(isVoiceMode && geminiLive.isConnected) || activeMode === 'livecode'}
+                                        placeholder={activeMode === 'livecode' ? "Use voice for Live Code..." : (isVoiceMode && geminiLive.isConnected ? "Listening for your voice..." : t.assistant.placeholder)}
                                         className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
                                         rows="1"
                                         onKeyDown={(e) => {
@@ -814,7 +1041,7 @@ Wait for the user to finish speaking before responding.
 
                                     <button
                                         type="submit"
-                                        disabled={!input.trim() || isGenerating}
+                                        disabled={!input.trim() || isGenerating || activeMode === 'livecode'}
                                         className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     >
                                         <SendIcon className="w-4 h-4" />
@@ -827,7 +1054,7 @@ Wait for the user to finish speaking before responding.
                                 </p>
                             )}
                             <div className="text-[10px] text-center text-white/30 mt-3 font-medium uppercase tracking-widest">
-                                Press Enter to send, Shift+Enter for new line
+                                {activeMode === 'livecode' ? 'Use the mic or samples above' : 'Press Enter to send, Shift+Enter for new line'}
                             </div>
                         </div>
                     </Card>

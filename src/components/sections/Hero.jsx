@@ -4,11 +4,9 @@ import { portfolioData } from '../../data/portfolioData';
 import { MouseGlow } from '../ui/MouseGlow';
 import { GradientMesh } from '../ui/GradientMesh';
 import { DownloadIcon, GitHubIcon, LinkedInIcon } from '../../icons/Icons';
-import { GeminiVoiceAgent } from '../ui/GeminiVoiceAgent';
 
 export const Hero = ({ t }) => {
     const [isResumeOpen, setIsResumeOpen] = useState(false);
-    const [isVoiceActive, setIsVoiceActive] = useState(false);
     const resumePreviewUrl = portfolioData.personalInfo.resumeUrl.replace('/view', '/preview');
 
     const roles = [
@@ -71,78 +69,69 @@ export const Hero = ({ t }) => {
                     <div className="w-1 h-1 bg-cyan-400/50 rounded-full" style={{ animation: 'orbit-3 12s linear infinite' }}></div>
                 </div>
             </div>
-            <div className="container mx-auto max-w-6xl relative z-10">
-                <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
-                    {/* LEFT COLUMN — Text content */}
-                    <div className="text-center md:text-left order-2 md:order-1">
+            
+            <div className="container mx-auto max-w-4xl relative z-10 text-center md:text-left">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.0, duration: 0.6, ease: "easeOut" }}
+                    className="mb-6 flex justify-center md:justify-start"
+                >
+                    <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
                         <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.0, duration: 0.6, ease: "easeOut" }}
-                            className="mb-5 flex justify-center md:justify-start"
-                        >
-                            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
-                                <motion.div
-                                    className="w-2 h-2 rounded-full bg-green-400"
-                                    animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                />
-                                <span className="text-xs font-medium text-green-400 tracking-wide">Open to Opportunities</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
-                        >
-                            <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4 h-5 block">
-                                <span className="text-blue-400">{displayText}</span>
-                                <motion.span 
-                                    animate={{ opacity: [1, 0] }} 
-                                    transition={{ duration: 0.53, repeat: Infinity }}
-                                >|</motion.span>
-                            </p>
-                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-6">{t.hero.greeting} <span className="text-gradient">Ashwin</span></h1>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.30, duration: 0.6, ease: "easeOut" }}
-                        >
-                            <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mx-auto md:mx-0 mb-10">{t.hero.bio}</p>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.45, duration: 0.6, ease: "easeOut" }}
-                            className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center"
-                        >
-                            <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary"><DownloadIcon className="w-4 h-4 mr-2" /> {t.hero.downloadCv}</button>
-                            <div className="flex items-center gap-4 justify-center">
-                                <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><GitHubIcon className="w-4 h-4" /></a>
-                                <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all"><LinkedInIcon className="w-4 h-4" /></a>
-                            </div>
-                        </motion.div>
+                            className="w-2 h-2 rounded-full bg-green-400"
+                            animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                        />
+                        <span className="text-xs font-medium text-green-400 tracking-wide">Open to Opportunities</span>
                     </div>
+                </motion.div>
 
-                    {/* RIGHT COLUMN — Inline Voice Agent */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.7, ease: "easeOut" }}
-                        className="order-1 md:order-2 flex justify-center"
-                    >
-                        <div className="hero-voice-column">
-                            <GeminiVoiceAgent
-                                isActive={isVoiceActive}
-                                onActivate={() => setIsVoiceActive(true)}
-                            />
-                        </div>
-                    </motion.div>
-                </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
+                >
+                    <p className="text-sm font-medium text-white/40 tracking-widest uppercase mb-4 h-5 block">
+                        <span className="text-blue-400">{displayText}</span>
+                        <motion.span 
+                            animate={{ opacity: [1, 0] }} 
+                            transition={{ duration: 0.53, repeat: Infinity }}
+                        >|</motion.span>
+                    </p>
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-8">
+                        {t.hero.greeting} <span className="text-gradient">Ashwin</span>
+                    </h1>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.30, duration: 0.6, ease: "easeOut" }}
+                >
+                    <p className="text-xl md:text-2xl text-white/40 font-light leading-relaxed max-w-2xl mx-auto md:mx-0 mb-12">
+                        {t.hero.bio}
+                    </p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.45, duration: 0.6, ease: "easeOut" }}
+                    className="flex flex-col sm:flex-row gap-6 justify-center md:justify-start items-center"
+                >
+                    <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary">
+                        <DownloadIcon className="w-5 h-5 mr-3" /> {t.hero.downloadCv}
+                    </button>
+                    <div className="flex items-center gap-5">
+                        <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] hover:border-white/20 transition-all">
+                            <GitHubIcon className="w-5 h-5" />
+                        </a>
+                        <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] hover:border-white/20 transition-all">
+                            <LinkedInIcon className="w-5 h-5" />
+                        </a>
+                    </div>
+                </motion.div>
             </div>
         </section>
 
@@ -186,3 +175,4 @@ export const Hero = ({ t }) => {
         </>
     );
 };
+
