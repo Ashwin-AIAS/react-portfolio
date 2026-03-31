@@ -11,14 +11,19 @@ import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SYSTEM_PROMPT = `
-You are Ashwin's AI Recruiter Assistant.
- You represent Ashwin, an AI Engineer.
+You are Ashwin's AI Portfolio Assistant. You handle both general questions about Ashwin (skills, GitHub activity, background, etc.) and job description matching.
+
 Ashwin's Resume Data:
 ${JSON.stringify(portfolioData)}
 
-If the user asks casual questions or wants general info, talk to them normally and sell Ashwin's skills and projects in a friendly, professional way.
-IF you detect that the user has pasted a JOB DESCRIPTION or is asking about Ashwin's fit for a specific role/job, YOU MUST RETURN PURE JSON matching the structure below. NEVER return markdown or conversational text if it is a job evaluation.
+GitHub Activity Highlights (Top 10 Recent Repos):
+{{GITHUB_REPOS}}
 
+INSTRUCTIONS:
+1. For general questions: Answer in a friendly, professional, and concise way (2-3 sentences). Highlight Ashwin's skills and projects.
+2. For job description analysis: If the user pastes a job description or asks about fit, YOU MUST RETURN PURE JSON. NEVER return markdown or conversational text for fit analysis.
+
+JSON structure for fit analysis:
 {
   "type": "fit_report",
   "score": <0-100 number>,
@@ -27,8 +32,6 @@ IF you detect that the user has pasted a JOB DESCRIPTION or is asking about Ashw
   "alignment": "Short paragraph explaining why Ashwin is a good fit.",
   "recommendation": "Short final recommendation statement."
 }
-
-Do NOT wrap the JSON in markdown code blocks like \`\`\`json. Just output the raw JSON object.
 `;
 
 const SUGGESTIONS = {
@@ -463,8 +466,22 @@ Wait for the user to finish speaking before responding.
         setMessages(newMessages);
         setIsGenerating(true);
 
+        // Fetch GitHub repos
+        let githubContext = "GitHub data unavailable.";
+        try {
+            const githubRes = await fetch('https://api.github.com/users/Ashwin-AIAS/repos?sort=updated&per_page=10');
+            if (githubRes.ok) {
+                const repos = await githubRes.json();
+                githubContext = repos.map(r => `- ${r.name}: ${r.description || 'No description'} (Language: ${r.language || 'N/A'})`).join('\n');
+            }
+        } catch (err) {
+            console.error("GitHub fetch error:", err);
+        }
+
+        const fullSystemPrompt = SYSTEM_PROMPT.replace('{{GITHUB_REPOS}}', githubContext);
+
         const apiMessages = [
-            { role: 'user', content: SYSTEM_PROMPT },
+            { role: 'user', content: fullSystemPrompt },
             { role: 'model', content: "Understood. I am ready." },
             ...newMessages.slice(0, -1).map(m => ({ role: m.role, content: m.content }))
         ];
@@ -898,9 +915,16 @@ Wait for the user to finish speaking before responding.
                                     <button
                                         type="submit"
                                         disabled={!input.trim() || isGenerating}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 flex items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-xs font-semibold shadow-lg shadow-blue-500/20"
                                     >
-                                        <SendIcon className="w-4 h-4" />
+                                        {isGenerating ? (
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        ) : (
+                                            <>
+                                                <SparklesIcon className="w-3.5 h-3.5 mr-2 opacity-80" />
+                                                {t.assistant.button}
+                                            </>
+                                        )}
                                     </button>
                                 </div>
                             </form>

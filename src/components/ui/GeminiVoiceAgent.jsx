@@ -255,7 +255,7 @@ export const GeminiVoiceAgent = ({ isActive, onActivate }) => {
           className="hero-avatar-container"
         >
           <div className="hero-avatar-ring">
-            <img src="/Profile pic.jpg" alt="Ashwin" className="hero-avatar-img" />
+            <img src="/Profile%20pic.jpg" alt="Ashwin" className="hero-avatar-img" />
           </div>
         </motion.div>
 
