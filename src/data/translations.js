@@ -11,7 +11,7 @@ export const translations = {
     hero: {
       badge: "AI Engineer for Autonomous Systems",
       greeting: "Hi, I'm",
-      bio: "Aspiring AI Engineer with a background in ERP analysis and a passion for autonomous systems. Experienced in developing automation scripts, managing data, and working on cutting-edge computer vision and generative AI projects. Currently pursuing a Master's in AI Engineering.",
+      bio: "Aspiring AI Engineer with a Bachelor's in Mechanical Engineering and a background in ERP analysis. Passionate about autonomous systems, with experience in developing automation scripts, managing data, and working on cutting-edge computer vision and generative AI projects. Currently pursuing a Master's in AI Engineering.",
       downloadCv: "Download Resume"
     },
     roadmap: {
@@ -38,7 +38,7 @@ export const translations = {
       subtitle: "Paste a job description to get an AI-powered fit analysis",
       badge: "AI Powered",
       cardTitle: "Technical Match Analysis",
-      placeholder: "Ask anything about Ashwin, or paste a job description for a fit analysis...",
+      placeholder: "Ask about Ashwin or paste a JD for fit analysis...",
       button: "Ask AI",
       generating: "Analyzing Match...",
       reportLabel: "Candidate Fit Report",
@@ -92,7 +92,7 @@ export const translations = {
     hero: {
       badge: "KI-Ingenieur für Autonome Systeme",
       greeting: "Hallo, ich bin",
-      bio: "Angehender KI-Ingenieur mit Hintergrund in der ERP-Analyse und einer Leidenschaft für autonome Systeme. Erfahren in der Entwicklung von Automatisierungsskripten, Datenverwaltung sowie in Computer Vision und generativer KI. Derzeit im Masterstudium KI-Engineering.",
+      bio: "Angehender KI-Ingenieur mit einem Bachelor in Maschinenbau und Hintergrund in der ERP-Analyse. Leidenschaft für autonome Systeme, mit Erfahrung in der Entwicklung von Automatisierungsskripten, Datenverwaltung sowie in Computer Vision und generativer KI. Derzeit im Masterstudium KI-Engineering.",
       downloadCv: "Lebenslauf herunterladen"
     },
     roadmap: {
@@ -119,7 +119,7 @@ export const translations = {
       subtitle: "Stellenbeschreibung einfügen für eine KI-gestützte Analyse",
       badge: "KI-gestützt",
       cardTitle: "Technische Übereinstimmungsanalyse",
-      placeholder: "Stellenbeschreibung hier einfügen...",
+      placeholder: "Frag nach Ashwin oder füg eine Stellenbeschreibung ein...",
       button: "Analysebericht erstellen",
       generating: "Analyse läuft...",
       reportLabel: "Kandidaten-Analysebericht",

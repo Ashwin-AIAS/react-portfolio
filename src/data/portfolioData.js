@@ -2,7 +2,7 @@ export const portfolioData = {
   personalInfo: {
     name: "Ashwin",
     title: "AI Engineer for Autonomous Systems",
-    bio: "Master's student in AI Engineering at THI Germany, with production experience building computer vision pipelines, full-stack RAG systems, and LLM-powered tools. Former ERP Analyst at DXC Technology. Focused on bridging AI research and real-world deployment in autonomous systems.",
+    bio: "Master's student in AI Engineering at THI Germany, with a background in Mechanical Engineering and production experience building computer vision pipelines, full-stack RAG systems, and LLM-powered tools. Former ERP Analyst at DXC Technology. Focused on bridging AI research and real-world deployment in autonomous systems.",
     email: "mashwinvignesh@gmail.com",
     phone: "+49 15560090137",
     location: "Ingolstadt, Germany",
