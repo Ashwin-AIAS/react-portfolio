@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { SkillBadge } from '../ui/SkillBadge';
@@ -45,21 +45,46 @@ const categoryConfig = {
 const SkillCard = ({ category, skills, index }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-8% 0px' });
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
   const cfg = categoryConfig[category] || {
     emoji: '•', accent: '#6B7280',
     gradient: 'from-white/[0.05] to-transparent',
     border: 'rgba(107,114,128,0.2)', span: '',
   };
 
+  const handleMouseMove = (e) => {
+    if (!ref.current) return;
+    const { left, top } = ref.current.getBoundingClientRect();
+    mouseX.set(e.clientX - left);
+    mouseY.set(e.clientY - top);
+  };
+
   return (
     <motion.div
       ref={ref}
+      onMouseMove={handleMouseMove}
       initial={{ opacity: 0, y: 50, scale: 0.97 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ duration: 0.65, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
       className={`relative rounded-2xl p-6 bg-gradient-to-br ${cfg.gradient} backdrop-blur-sm overflow-hidden group ${cfg.span}`}
       style={{ border: `1px solid ${cfg.border}` }}
     >
+      {/* Spotlight effect */}
+      <motion.div
+        className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-0"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              600px circle at ${mouseX}px ${mouseY}px,
+              ${cfg.accent}15,
+              transparent 40%
+            )
+          `,
+        }}
+      />
+
       {/* Hover inner glow */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
@@ -74,9 +99,9 @@ const SkillCard = ({ category, skills, index }) => {
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: index * 0.7 }}
       />
 
-      <div className="relative z-10">
+      <div className="relative z-10 pointer-events-none">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
+        <div className="flex items-center gap-3 mb-5 pointer-events-auto">
           <motion.div
             className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
             style={{
@@ -105,7 +130,7 @@ const SkillCard = ({ category, skills, index }) => {
         </div>
 
         {/* Skill pills */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 pointer-events-auto">
           {skills.map((skill, i) => (
             <SkillBadge key={skill} skillName={skill} index={i} />
           ))}

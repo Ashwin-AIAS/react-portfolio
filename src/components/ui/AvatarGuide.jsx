@@ -121,10 +121,12 @@ export const AvatarGuide = () => {
             animate={{ x: safePos.x, y: safePos.y }}
             transition={{ type: "spring", stiffness: 80, damping: 16 }}
         >
-            <div 
+            <motion.div 
                 style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                animate={tourActive && hasStarted ? {} : { y: [0, -12, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             >
                 <AnimatePresence mode="wait">
                     {(tourActive && hasStarted) ? (
@@ -180,7 +182,7 @@ export const AvatarGuide = () => {
                     }}
                     onError={(e) => console.log('Avatar load error:', e)}
                 />
-            </div>
+            </motion.div>
         </motion.div>
     );
 };

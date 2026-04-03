@@ -40,32 +40,50 @@ const skillConfig = {
 
 export const SkillBadge = ({ skillName, index = 0 }) => {
   const cfg = skillConfig[skillName] || { color: '#888', bg: 'rgba(136,136,136,0.12)', icon: null };
+  
+  const x = motion.useMotionValue(0);
+  const y = motion.useMotionValue(0);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((e.clientX - centerX) * 0.3); // Magnetic pull strength
+    y.set((e.clientY - centerY) * 0.3);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.75 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.35, delay: index * 0.035, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ scale: 1.1, y: -3 }}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide cursor-default select-none"
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      whileHover={{ scale: 1.15, zIndex: 10 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       style={{
+        x,
+        y,
         background: cfg.bg,
         border: `1px solid ${cfg.color}35`,
         color: cfg.color,
       }}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 0 14px 2px ${cfg.color}35`; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; }}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide cursor-default select-none shadow-sm hover:shadow-lg transition-shadow duration-300"
     >
       {cfg.icon && (
         <img
           src={`https://cdn.simpleicons.org/${cfg.icon}/${cfg.color.replace('#', '')}`}
           alt=""
-          className="w-3.5 h-3.5 flex-shrink-0"
+          className="w-3.5 h-3.5 flex-shrink-0 pointer-events-none"
           loading="lazy"
           onError={e => { e.currentTarget.style.display = 'none'; }}
         />
       )}
-      {skillName}
+      <span className="pointer-events-none">{skillName}</span>
     </motion.div>
   );
 };
