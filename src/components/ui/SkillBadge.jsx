@@ -1,45 +1,71 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
-export const SkillBadge = ({ skillName }) => {
-    const badgeMap = {
-        Python: 'https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54',
-        'C/C++': 'https://img.shields.io/badge/C%2FC%2B%2B-00599C?style=for-the-badge&logo=cplusplus&logoColor=white',
-        SQL: 'https://img.shields.io/badge/SQL-025E8C?style=for-the-badge&logo=microsoft-sql-server&logoColor=white',
-        FastAPI: 'https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white',
-        Docker: 'https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white',
-        CMake: 'https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white',
-        'Power Automate': 'https://img.shields.io/badge/Power%20Automate-0066FF?style=for-the-badge&logo=powerautomate&logoColor=white',
-        Simulink: 'https://img.shields.io/badge/Simulink-D9230F?style=for-the-badge&logo=simulink&logoColor=white',
-        SUMO: 'https://img.shields.io/badge/SUMO-76B900?style=for-the-badge&logo=eclipse-sumo&logoColor=white',
-        Pandas: 'https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white',
-        NumPy: 'https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white',
-        PyTorch: 'https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white',
-        Keras: 'https://img.shields.io/badge/Keras-%23D00000.svg?style=for-the-badge&logo=Keras&logoColor=white',
-        TensorFlow: 'https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=for-the-badge&logo=TensorFlow&logoColor=white',
-        OpenCV: 'https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white',
-        YOLOv8: 'https://img.shields.io/badge/YOLOv8-00FFFF?style=for-the-badge&logo=yolo&logoColor=black',
-        MediaPipe: 'https://img.shields.io/badge/MediaPipe-0097A7?style=for-the-badge&logo=google&logoColor=white',
-        GANs: 'https://img.shields.io/badge/GANs-FF6F00?style=for-the-badge',
-        LangChain: 'https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white',
-        'Gemini API': 'https://img.shields.io/badge/Gemini%20API-8E75B2?style=for-the-badge&logo=google-gemini&logoColor=white',
-        'Reinforcement Learning': 'https://img.shields.io/badge/Reinforcement%20Learning-FFC107?style=for-the-badge',
-        'Prompt Engineering': 'https://img.shields.io/badge/Prompt%20Engineering-9C27B0?style=for-the-badge',
-        React: 'https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB',
-        PostgreSQL: 'https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white',
-        pgvector: 'https://img.shields.io/badge/pgvector-336791?style=for-the-badge&logo=postgresql&logoColor=white',
-        Streamlit: 'https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white',
-        'Power BI': 'https://img.shields.io/badge/PowerBI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black',
-        Excel: 'https://img.shields.io/badge/Microsoft_Excel-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white',
-        Tableau: 'https://img.shields.io/badge/Tableau-E97627?style=for-the-badge&logo=tableau&logoColor=white',
-        SharePoint: 'https://img.shields.io/badge/SharePoint-0078D4?style=for-the-badge&logo=microsoft-sharepoint&logoColor=white',
-        Confluence: 'https://img.shields.io/badge/Confluence-172B4D?style=for-the-badge&logo=confluence&logoColor=white',
-        Jira: 'https://img.shields.io/badge/Jira-0052CC?style=for-the-badge&logo=Jira&logoColor=white',
-        GitHub: 'https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white',
-        N8N: 'https://img.shields.io/badge/n8n-EA4B71?style=for-the-badge&logo=n8n&logoColor=white',
-    };
-    
-    const url = badgeMap[skillName];
-    if (!url) return null;
-    
-    return <img src={url} alt={`${skillName} skill badge`} className="transition-transform duration-300 transform hover:scale-110" />;
+const skillConfig = {
+  Python:                   { icon: 'python',                   color: '#4B9CD3', bg: 'rgba(75,156,211,0.12)'  },
+  'C/C++':                  { icon: 'cplusplus',                color: '#6CB4E4', bg: 'rgba(0,89,156,0.15)'   },
+  SQL:                      { icon: 'postgresql',               color: '#6B9FD4', bg: 'rgba(68,121,161,0.15)' },
+  FastAPI:                  { icon: 'fastapi',                  color: '#00BFA5', bg: 'rgba(0,150,136,0.15)'  },
+  Docker:                   { icon: 'docker',                   color: '#2496ED', bg: 'rgba(36,150,237,0.15)' },
+  CMake:                    { icon: 'cmake',                    color: '#6BAED6', bg: 'rgba(6,79,140,0.18)'   },
+  'Power Automate':         { icon: 'microsoftpowerautomate',   color: '#5B9BD5', bg: 'rgba(0,102,255,0.15)'  },
+  Simulink:                 { icon: null,                       color: '#E05C4B', bg: 'rgba(217,35,15,0.15)'  },
+  SUMO:                     { icon: null,                       color: '#8BC34A', bg: 'rgba(118,185,0,0.15)'  },
+  Pandas:                   { icon: 'pandas',                   color: '#9B8FE8', bg: 'rgba(130,100,220,0.15)'},
+  NumPy:                    { icon: 'numpy',                    color: '#4DABCF', bg: 'rgba(77,171,207,0.15)' },
+  PyTorch:                  { icon: 'pytorch',                  color: '#EE6C4D', bg: 'rgba(238,76,44,0.15)'  },
+  Keras:                    { icon: 'keras',                    color: '#E05252', bg: 'rgba(208,0,0,0.15)'    },
+  TensorFlow:               { icon: 'tensorflow',               color: '#FF8F00', bg: 'rgba(255,111,0,0.15)'  },
+  OpenCV:                   { icon: 'opencv',                   color: '#7B68EE', bg: 'rgba(92,62,232,0.15)'  },
+  YOLOv8:                   { icon: null,                       color: '#00E5FF', bg: 'rgba(0,229,255,0.10)'  },
+  MediaPipe:                { icon: 'google',                   color: '#26C6DA', bg: 'rgba(0,151,167,0.15)'  },
+  GANs:                     { icon: null,                       color: '#FFA040', bg: 'rgba(255,111,0,0.15)'  },
+  LangChain:                { icon: 'langchain',                color: '#4CAF82', bg: 'rgba(28,124,60,0.15)'  },
+  'Gemini API':             { icon: 'googlegemini',             color: '#A78BFA', bg: 'rgba(142,117,178,0.15)'},
+  'Reinforcement Learning': { icon: null,                       color: '#FFB74D', bg: 'rgba(255,193,7,0.15)'  },
+  'Prompt Engineering':     { icon: null,                       color: '#CE93D8', bg: 'rgba(156,39,176,0.15)' },
+  React:                    { icon: 'react',                    color: '#61DAFB', bg: 'rgba(97,218,251,0.10)'  },
+  PostgreSQL:               { icon: 'postgresql',               color: '#5B8DD9', bg: 'rgba(65,105,225,0.15)' },
+  pgvector:                 { icon: 'postgresql',               color: '#7099C8', bg: 'rgba(51,103,145,0.15)' },
+  Streamlit:                { icon: 'streamlit',                color: '#FF6B6B', bg: 'rgba(255,75,75,0.15)'  },
+  'Power BI':               { icon: 'microsoftpowerbi',         color: '#F2C811', bg: 'rgba(242,200,17,0.15)' },
+  Excel:                    { icon: 'microsoftexcel',           color: '#33A75A', bg: 'rgba(33,115,70,0.15)'  },
+  Tableau:                  { icon: 'tableau',                  color: '#E97627', bg: 'rgba(233,118,39,0.15)' },
+  SharePoint:               { icon: 'microsoftsharepoint',      color: '#2B88D8', bg: 'rgba(0,120,212,0.15)'  },
+  Confluence:               { icon: 'confluence',               color: '#4B79D0', bg: 'rgba(0,82,204,0.18)'   },
+  Jira:                     { icon: 'jira',                     color: '#2684FF', bg: 'rgba(0,82,204,0.15)'   },
+  GitHub:                   { icon: 'github',                   color: '#E0E0E0', bg: 'rgba(255,255,255,0.08)'},
+  N8N:                      { icon: 'n8n',                      color: '#EA4B71', bg: 'rgba(234,75,113,0.15)' },
+};
+
+export const SkillBadge = ({ skillName, index = 0 }) => {
+  const cfg = skillConfig[skillName] || { color: '#888', bg: 'rgba(136,136,136,0.12)', icon: null };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.75 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.35, delay: index * 0.035, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ scale: 1.1, y: -3 }}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide cursor-default select-none"
+      style={{
+        background: cfg.bg,
+        border: `1px solid ${cfg.color}35`,
+        color: cfg.color,
+      }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 0 14px 2px ${cfg.color}35`; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; }}
+    >
+      {cfg.icon && (
+        <img
+          src={`https://cdn.simpleicons.org/${cfg.icon}/${cfg.color.replace('#', '')}`}
+          alt=""
+          className="w-3.5 h-3.5 flex-shrink-0"
+          loading="lazy"
+          onError={e => { e.currentTarget.style.display = 'none'; }}
+        />
+      )}
+      {skillName}
+    </motion.div>
+  );
 };
