@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 
 const skillConfig = {
   Python:                   { icon: 'python',                   color: '#4B9CD3', bg: 'rgba(75,156,211,0.12)'  },
@@ -41,8 +41,8 @@ const skillConfig = {
 export const SkillBadge = ({ skillName, index = 0 }) => {
   const cfg = skillConfig[skillName] || { color: '#888', bg: 'rgba(136,136,136,0.12)', icon: null };
   
-  const x = motion.useMotionValue(0);
-  const y = motion.useMotionValue(0);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
