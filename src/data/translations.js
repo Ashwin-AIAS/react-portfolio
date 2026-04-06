@@ -17,6 +17,7 @@ export const translations = {
     roadmap: {
       title: "Career Roadmap",
       subtitle: "Education & professional experience",
+      previewPaper: "Preview Paper",
       downloadPaper: "Download Paper",
       tags: { education: "Education", work: "Work" }
     },
@@ -98,6 +99,7 @@ export const translations = {
     roadmap: {
       title: "Werdegang",
       subtitle: "Ausbildung & Berufserfahrung",
+      previewPaper: "Paper ansehen",
       downloadPaper: "Paper herunterladen",
       tags: { education: "Ausbildung", work: "Arbeit" }
     },
