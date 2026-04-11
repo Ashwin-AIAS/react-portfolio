@@ -35,8 +35,8 @@ export const translations = {
       subtitle: "Featured work & technical explorations"
     },
     assistant: {
-      title: "AI Recruiter Assistant",
-      subtitle: "Paste a job description to get an AI-powered fit analysis",
+      title: "Talk to my Portfolio",
+      subtitle: "Ask about my background, skills, and projects, or paste a job description for a fit analysis",
       badge: "AI Powered",
       cardTitle: "Technical Match Analysis",
       placeholder: "Ask about Ashwin or paste a JD for fit analysis...",
@@ -117,8 +117,8 @@ export const translations = {
       subtitle: "Ausgewählte Arbeiten & technische Entwicklungen"
     },
     assistant: {
-      title: "KI-Recruiter-Assistent",
-      subtitle: "Stellenbeschreibung einfügen für eine KI-gestützte Analyse",
+      title: "Sprich mit meinem Portfolio",
+      subtitle: "Frag nach meinem Hintergrund, Fähigkeiten und Projekten oder füge eine Stellenbeschreibung für eine Analyse ein",
       badge: "KI-gestützt",
       cardTitle: "Technische Übereinstimmungsanalyse",
       placeholder: "Frag nach Ashwin oder füg eine Stellenbeschreibung ein...",

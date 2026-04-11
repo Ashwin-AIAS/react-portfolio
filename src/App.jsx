@@ -47,6 +47,8 @@ export default function App() {
                 <main>
                     <Hero t={t} />
                     <div className="section-divider"></div>
+                    <AIAssistantSection t={t} />
+                    <div className="section-divider"></div>
                     <CareerRoadmapSection t={t} />
                     <div className="section-divider"></div>
                     <SkillsSection t={t} />
@@ -54,8 +56,6 @@ export default function App() {
                     <GitHubSection t={t} />
                     <div className="section-divider"></div>
                     <ProjectsSection t={t} />
-                    <div className="section-divider"></div>
-                    <AIAssistantSection t={t} />
                     <div className="section-divider"></div>
                     <CertificationsSection t={t} />
                     <div className="section-divider"></div>

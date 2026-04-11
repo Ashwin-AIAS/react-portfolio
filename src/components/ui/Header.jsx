@@ -11,7 +11,7 @@ export const Header = ({ activeSection, lang, t, toggleLang }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const { isDark, setIsDark } = useContext(ThemeContext);
-    const navLinks = ["roadmap", "skills", "github", "projects", "assistant", "certifications", "contact"];
+    const navLinks = ["assistant", "roadmap", "skills", "github", "projects", "certifications", "contact"];
     
     useEffect(() => {
         const handleScroll = () => { setIsScrolled(window.scrollY > 10); };
