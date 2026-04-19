@@ -191,18 +191,17 @@ const SplashScreen = ({ onComplete }) => {
           {/* Black gap */}
           <div style={{ position: 'absolute', inset: '-2px', borderRadius: '50%', background: '#000' }} />
           {/* Emoji avatar — robot themed with blue overlay tint */}
-          <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#1a1a2e' }}>
+          <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#1a1a2e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <img
               src="/avatar-emoji.png"
               alt="Ashwin AI"
               style={{
-                width: '115%',
-                height: '115%',
+                width: '100%',
+                height: '100%',
                 objectFit: 'contain',
-                objectPosition: 'center top',
+                objectPosition: 'center',
                 display: 'block',
-                marginLeft: '-7.5%',
-                marginTop: '-5%',
+                transform: 'scale(1.2) translateY(2%)',
                 filter: 'drop-shadow(0 0 20px rgba(59,130,246,0.5))'
               }}
             />
@@ -355,7 +354,7 @@ export default function App() {
 
                 <Footer t={t} />
                 <ScrollToTop />
-                <AvatarGuide />
+                {splashDone && <AvatarGuide />}
             </div>
         </ThemeContext.Provider>
     );
