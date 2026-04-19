@@ -193,7 +193,7 @@ const SplashScreen = ({ onComplete }) => {
           {/* Emoji avatar — robot themed with blue overlay tint */}
           <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#1a1a2e' }}>
             <img
-              src="/Profile pic.jpg"
+              src="/avatar-emoji.png"
               alt="Ashwin AI"
               style={{
                 width: '115%',
