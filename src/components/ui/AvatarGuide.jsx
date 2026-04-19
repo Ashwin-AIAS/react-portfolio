@@ -33,12 +33,13 @@ const emotionFilters = {
 };
 
 const getScreenConfig = () => {
-  const W = window.innerWidth;
-  const isMobile = W < 640;
+  const W = typeof window !== 'undefined' ? window.innerWidth : 1024;
+  const isMobile = W < 768;
   return { isMobile };
 };
 
 export const AvatarGuide = () => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const [tourActive, setTourActive] = useState(() => !sessionStorage.getItem('toured'));
     const [currentStep, setCurrentStep] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
@@ -115,11 +116,15 @@ export const AvatarGuide = () => {
         }
     };
 
+    // Strip Framer Motion's transform on mobile to prevent coordinate disruption for the 'fixed' popup inside
+    const mobileTransformReset = isMobile ? { transformTemplate: () => "none" } : {};
+
     return (
         <motion.div 
             style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
-            animate={{ x: safePos.x, y: safePos.y }}
+            animate={isMobile ? { x: 0, y: 0 } : { x: safePos.x, y: safePos.y }}
             transition={{ type: "spring", stiffness: 80, damping: 16 }}
+            {...mobileTransformReset}
         >
             <motion.div 
                 style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
@@ -136,12 +141,16 @@ export const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             style={{
-                                pointerEvents: 'auto', background: 'white', position: 'absolute',
-                                bottom: '100%', ...(isRightSide ? { right: 0 } : { left: 0 }),
+                                pointerEvents: 'auto', background: 'white', 
+                                ...(isMobile ? {
+                                    position: 'fixed', bottom: '16px', left: '8px', right: '8px', top: 'auto', width: 'auto'
+                                } : {
+                                    position: 'absolute', bottom: '100%', ...(isRightSide ? { right: 0 } : { left: 0 }),
+                                    width: '260px'
+                                }),
                                 borderRadius: '16px', padding: '12px 16px', marginBottom: '8px',
-                                width: screenConfig.isMobile ? '200px' : '260px',
                                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                                fontSize: screenConfig.isMobile ? '12px' : '13px', color: '#1f2937', fontWeight: 500,
+                                fontSize: isMobile ? '12px' : '13px', color: '#1f2937', fontWeight: 500,
                             }}
                         >
                             <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>{tourSteps[currentStep].message}</p>
@@ -177,8 +186,9 @@ export const AvatarGuide = () => {
                     onClick={handleAvatarClick}
                     style={{
                         pointerEvents: 'auto', cursor: tourActive ? 'default' : 'pointer',
-                        width: screenConfig.isMobile ? '80px' : '130px', height: screenConfig.isMobile ? '80px' : '130px',
-                        objectFit: 'contain', filter: emotionFilters[tourSteps[currentStep].emotion], display: 'block',
+                        width: '130px', height: '130px',
+                        objectFit: 'contain', filter: emotionFilters[tourSteps[currentStep].emotion], 
+                        display: isMobile ? 'none' : 'block',
                     }}
                     onError={(e) => console.log('Avatar load error:', e)}
                 />
