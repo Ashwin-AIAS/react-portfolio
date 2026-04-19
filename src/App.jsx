@@ -191,18 +191,27 @@ const SplashScreen = ({ onComplete }) => {
           {/* Black gap */}
           <div style={{ position: 'absolute', inset: '-2px', borderRadius: '50%', background: '#000' }} />
           {/* Emoji avatar — robot themed with blue overlay tint */}
-          <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden' }}>
+          <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#1a1a2e' }}>
             <img
               src="/Profile pic.jpg"
               alt="Ashwin AI"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+              style={{
+                width: '115%',
+                height: '115%',
+                objectFit: 'contain',
+                objectPosition: 'center top',
+                display: 'block',
+                marginLeft: '-7.5%',
+                marginTop: '-5%',
+                filter: 'drop-shadow(0 0 20px rgba(59,130,246,0.5))'
+              }}
             />
-            {/* Subtle blue AI tint overlay */}
+            {/* Blue AI tint overlay */}
             <div style={{
               position: 'absolute', inset: 0,
-              background: 'rgba(59,130,246,0.12)',
+              background: 'linear-gradient(180deg, rgba(59,130,246,0.08) 0%, rgba(139,92,246,0.12) 100%)',
               borderRadius: '50%',
-              mixBlendMode: 'screen'
+              pointerEvents: 'none'
             }} />
           </div>
           {/* Scan line effect */}
