@@ -148,7 +148,7 @@ const SplashScreen = ({ onComplete }) => {
         alignItems: 'center', gap: 'clamp(18px, 3vh, 30px)', zIndex: 1
       }}>
 
-        {/* AVATAR — big in center, flies LEFT on exit */}
+        {/* AVATAR — big in center, flies TOP LEFT on exit */}
         <motion.div
           initial={{ opacity: 0, scale: 0.7 }}
           animate={phase === 'exit'
@@ -156,7 +156,7 @@ const SplashScreen = ({ onComplete }) => {
                 opacity: 0,
                 scale: 0.45,
                 x: '-38vw',
-                y: '10vh'
+                y: '-20vh'
               }
             : { opacity: 1, scale: 1, x: 0, y: 0 }
           }
