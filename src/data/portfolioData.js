@@ -7,7 +7,7 @@ export const portfolioData = {
     phone: "+49 15560090137",
     location: "Ingolstadt, Germany",
     github: "https://github.com/Ashwin-AIAS",
-    linkedin: "https://linkedin.com/in/ashwin-vignesh-m-902344212",
+    linkedin: "https://www.linkedin.com/in/ashwin-aias",
     resumeUrl: "https://drive.google.com/file/d/1us-aWBOkPxuXZE7wg90DN1T5JsOPpD-g/view?usp=sharing"
   },
   careerRoadmap: [
