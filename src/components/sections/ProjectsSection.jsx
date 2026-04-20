@@ -17,7 +17,8 @@ const VisualComponents = {
     Roundabout: lazy(() => import('../visuals/RoundaboutVisual')),
     ReinforcementLearning: lazy(() => import('../visuals/RLVisual')),
     Webhook: lazy(() => import('../visuals/WebhookVisual')),
-    PortfolioAI: lazy(() => import('../visuals/PortfolioAIVisual'))
+    PortfolioAI: lazy(() => import('../visuals/PortfolioAIVisual')),
+    Jarvis: lazy(() => import('../visuals/JarvisVisual'))
 };
 
 const ProjectCardWrapper = ({ project, index }) => {

@@ -8,7 +8,7 @@ export const portfolioData = {
     location: "Ingolstadt, Germany",
     github: "https://github.com/Ashwin-AIAS",
     linkedin: "https://www.linkedin.com/in/ashwin-aias",
-    resumeUrl: "https://drive.google.com/file/d/1us-aWBOkPxuXZE7wg90DN1T5JsOPpD-g/view?usp=sharing"
+    resumeUrl: "/Ashwin_Vignesh_M_Resume.pdf"
   },
   careerRoadmap: [
     {
@@ -42,6 +42,15 @@ export const portfolioData = {
     "Collaboration": ["SharePoint", "Confluence", "Jira", "GitHub", "N8N"],
   },
   projects: [
+    {
+      title: "JARVIS — Voice-Controlled AI Terminal Agent",
+      description: "• Built a voice-controlled AI agent using OpenAI Whisper for speech recognition and Claude API for command execution.\n• Streams results to a real-time React dashboard in under 3 seconds.\n• Full-stack architecture featuring FastAPI, PostgreSQL, Redis, and ChromaDB (RAG), containerized with Docker.",
+      technologies: ["Python", "FastAPI", "React", "OpenAI Whisper", "Claude API", "ChromaDB", "Docker", "PostgreSQL", "Redis"],
+      visualComponent: 'Jarvis',
+      githubUrl: "https://github.com/Ashwin-AIAS",
+      liveUrl: "#",
+      category: "AI / Full-Stack"
+    },
     {
       title: "RAG System — Full-Stack Retrieval-Augmented Generation",
       description: "• Built a full-stack RAG system with document ingestion, semantic & hybrid retrieval, and grounded generation.\n• Implemented cross-encoder reranking and optional Graph RAG via Neo4j.\n• Features conversation history, feedback system, and admin analytics dashboard.",
@@ -166,6 +175,14 @@ export const portfolioData = {
     }
   ],
   blogPosts: [
+    {
+      title: "JARVIS: Building a Voice-Controlled AI Agent",
+      summary: "Exploring the challenges of low-latency speech recognition and command execution using OpenAI Whisper and Claude API. A deep dive into real-time streaming architecture.",
+      tags: ["AI", "FastAPI", "Voice"],
+      date: "Apr 2026",
+      readTime: "10 min read",
+      url: "https://github.com/Ashwin-AIAS"
+    },
     {
       title: "Building a RAG System from Scratch",
       summary: "Lessons learned from chunking strategies, cross-encoder reranking, and pgvector — from zero to a full-stack retrieval-augmented generation system.",
