@@ -3,6 +3,7 @@ import { motion, useInView, useMotionValue, useMotionTemplate } from 'framer-mot
 import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { SkillBadge } from '../ui/SkillBadge';
+import { SkillsRadarChart } from '../ui/SkillsRadarChart';
 
 const categoryConfig = {
   'Programming & Tools': {
@@ -142,6 +143,19 @@ const SkillCard = ({ category, skills, index }) => {
 
 export const SkillsSection = ({ t }) => (
   <Section id="skills" title={t.skills.title} subtitle={t.skills.subtitle}>
+    {/* ── Interactive Radar Chart ───────────────────────────── */}
+    <div className="mb-10 p-6 md:p-8 rounded-2xl border border-white/[0.06] bg-black/30 backdrop-blur-sm relative overflow-hidden">
+      {/* Subtle corner glow */}
+      <div className="absolute top-0 right-0 w-48 h-48 rounded-bl-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle at top right, rgba(59,130,246,0.06), transparent 70%)' }}
+      />
+      <div className="absolute bottom-0 left-0 w-48 h-48 rounded-tr-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle at bottom left, rgba(168,85,247,0.05), transparent 70%)' }}
+      />
+      <SkillsRadarChart />
+    </div>
+
+    {/* ── Skill Category Cards (existing) ──────────────────── */}
     <div className="grid md:grid-cols-2 gap-4 lg:gap-5">
       {Object.entries(portfolioData.skills).map(([category, skills], index) => (
         <SkillCard key={category} category={category} skills={skills} index={index} />
