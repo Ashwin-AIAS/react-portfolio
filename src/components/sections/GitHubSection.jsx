@@ -35,7 +35,7 @@ export const GitHubSection = ({ t }) => {
                 const [userRes, reposRes, heatmapRes] = await Promise.all([
                     fetch('https://api.github.com/users/Ashwin-AIAS'),
                     fetch('https://api.github.com/users/Ashwin-AIAS/repos?per_page=100'),
-                    fetch('https://github-contributions-api.jogruber.de/v4/Ashwin-AIAS')
+                    fetch('https://github-contributions-api.jogruber.de/v4/Ashwin-AIAS?y=last')
                 ]);
 
                 if (!userRes.ok || !reposRes.ok || !heatmapRes.ok) {
@@ -61,12 +61,9 @@ export const GitHubSection = ({ t }) => {
                     if (count > topCount) { topCount = count; topLang = lang; }
                 }
 
-                const contributions = heatmapData.contributions || [];
-                const today = new Date();
-                const lastYear = new Date(today);
-                lastYear.setDate(lastYear.getDate() - 365);
-                const last365 = contributions.filter(c => new Date(c.date) >= lastYear);
-                const totalContributions = heatmapData.total?.[today.getFullYear()] || last365.reduce((sum, c) => sum + c.count, 0);
+                // ?y=last returns the trailing 365 days, already sorted chronologically
+                const last365 = heatmapData.contributions || [];
+                const totalContributions = heatmapData.total?.lastYear || last365.reduce((sum, c) => sum + c.count, 0);
 
                 if (isMounted) {
                     setStats({

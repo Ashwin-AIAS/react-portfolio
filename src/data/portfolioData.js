@@ -43,6 +43,15 @@ export const portfolioData = {
   },
   projects: [
     {
+      title: "GymVision (PoseCoach) — Real-Time AI Gym Form Coach",
+      description: "• Built a real-time exercise form correction system using YOLO26-Pose keypoint detection streamed over WebSockets, with EMA smoothing, rep counting, and per-joint form scoring.\n• Integrated an AI coaching chatbot powered by Gemini + ChromaDB (RAG) with SSE streaming and reference-video guidance.\n• Full-stack PWA: FastAPI, PostgreSQL & Redis backend with a React + TypeScript frontend, deployed via Docker on Vercel, Render, and Modal GPU.",
+      technologies: ["Python", "FastAPI", "YOLO26-Pose", "React", "TypeScript", "Gemini API", "ChromaDB", "PostgreSQL", "Redis", "Docker"],
+      visualComponent: 'GymVision',
+      githubUrl: "https://github.com/Ashwin-AIAS/posecoach",
+      liveUrl: "https://posecoach-rho.vercel.app",
+      category: "AI / Computer Vision"
+    },
+    {
       title: "JARVIS — Voice-Controlled AI Terminal Agent",
       description: "• Built a voice-controlled AI agent using OpenAI Whisper for speech recognition and Claude API for command execution.\n• Streams results to a real-time React dashboard in under 3 seconds.\n• Full-stack architecture featuring FastAPI, PostgreSQL, Redis, and ChromaDB (RAG), containerized with Docker.",
       technologies: ["Python", "FastAPI", "React", "OpenAI Whisper", "Claude API", "ChromaDB", "Docker", "PostgreSQL", "Redis"],
