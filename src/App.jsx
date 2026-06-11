@@ -1,5 +1,4 @@
 import React, { useState, createContext, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useActiveSection } from './hooks/useActiveSection';
 import { useLang } from './hooks/useLang';
@@ -7,7 +6,6 @@ import { useLang } from './hooks/useLang';
 // UI Components
 import { Header } from './components/ui/Header';
 import { Footer } from './components/ui/Footer';
-import { ParticleField } from './components/ui/ParticleField';
 import { ScrollToTop } from './components/ui/ScrollToTop';
 import { AvatarGuide } from './components/ui/AvatarGuide';
 
@@ -326,10 +324,7 @@ export default function App() {
                 {!splashDone && <SplashScreen key="splash" onComplete={() => { sessionStorage.setItem('splashSeen', '1'); setSplashDone(true); }} />}
             </AnimatePresence>
             <div className={`${isDark ? 'theme-dark' : 'theme-light'} min-h-screen font-sans transition-colors duration-500 relative`}>
-                {/* Render ParticleField globally using React Portal */}
-                {createPortal(<ParticleField />, document.body)}
-
-                <Header activeSection={activeSection} lang={lang} t={t} toggleLang={toggleLang} />
+<Header activeSection={activeSection} lang={lang} t={t} toggleLang={toggleLang} />
                 
                 <main>
                     <Hero t={t} />

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
 import { MouseGlow } from '../ui/MouseGlow';
 import { GradientMesh } from '../ui/GradientMesh';
+import { LidarSweep } from '../ui/LidarSweep';
 import { DownloadIcon, GitHubIcon, LinkedInIcon } from '../../icons/Icons';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 
@@ -64,11 +65,7 @@ export const Hero = ({ t }) => {
             <GradientMesh />
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(139,92,246,0.15) 40%, transparent 70%)' }}></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <div className="w-2 h-2 bg-blue-400/60 rounded-full" style={{ animation: 'orbit-1 15s linear infinite' }}></div>
-                    <div className="w-1.5 h-1.5 bg-violet-400/40 rounded-full" style={{ animation: 'orbit-2 20s linear infinite' }}></div>
-                    <div className="w-1 h-1 bg-cyan-400/50 rounded-full" style={{ animation: 'orbit-3 12s linear infinite' }}></div>
-                </div>
+                <LidarSweep />
             </div>
             
             <div className="container mx-auto max-w-6xl relative z-10">
