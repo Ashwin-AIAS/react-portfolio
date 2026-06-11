@@ -49,16 +49,20 @@ export const portfolioData = {
       visualComponent: 'GymVision',
       githubUrl: "https://github.com/Ashwin-AIAS/posecoach",
       liveUrl: "https://posecoach-rho.vercel.app",
-      category: "AI / Computer Vision"
+      category: "AI / Computer Vision",
+      featured: true,
+      metric: "Live demo — real-time rep counting & form scoring"
     },
     {
       title: "JARVIS — Voice-Controlled AI Terminal Agent",
       description: "• Built a voice-controlled AI agent using OpenAI Whisper for speech recognition and Claude API for command execution.\n• Streams results to a real-time React dashboard in under 3 seconds.\n• Full-stack architecture featuring FastAPI, PostgreSQL, Redis, and ChromaDB (RAG), containerized with Docker.",
       technologies: ["Python", "FastAPI", "React", "OpenAI Whisper", "Claude API", "ChromaDB", "Docker", "PostgreSQL", "Redis"],
       visualComponent: 'Jarvis',
-      githubUrl: "https://github.com/Ashwin-AIAS",
+      githubUrl: "https://github.com/Ashwin-AIAS/jarvis-terminal-agent",
       liveUrl: "#",
-      category: "AI / Full-Stack"
+      category: "AI / Full-Stack",
+      featured: true,
+      metric: "Voice command to dashboard in under 3 seconds"
     },
     {
       title: "RAG System — Full-Stack Retrieval-Augmented Generation",
@@ -67,7 +71,9 @@ export const portfolioData = {
       visualComponent: 'RAGSystem',
       githubUrl: "https://github.com/Ashwin-AIAS/rag-foundation-pgvector",
       liveUrl: "#",
-      category: "NLP/RAG"
+      category: "NLP/RAG",
+      featured: true,
+      metric: "Hybrid retrieval + cross-encoder reranking + Graph RAG"
     },
     {
       title: "Mini-CNN Framework",
@@ -76,7 +82,9 @@ export const portfolioData = {
       visualComponent: 'MiniCNN',
       githubUrl: "https://github.com/Ashwin-AIAS/Mini-CNN-Framework",
       liveUrl: "#",
-      category: "Computer Vision"
+      category: "Computer Vision",
+      featured: true,
+      metric: "Zero frameworks — pure C/C++ with Int8 quantization"
     },
     {
       title: "YOLO Bat Swing Analysis",
@@ -107,10 +115,10 @@ export const portfolioData = {
     },
     {
       title: "Foundation Models for Computer Vision",
-      description: "• Advanced camera-LiDAR fusion models.\n• Led the setup of a development environment on Jetson Nano.\n• Performed data preprocessing for large-scale Kitty and Waymo datasets.\n• Utilized Git and Jira for collaborative project management.",
+      description: "• Advanced camera-LiDAR fusion models.\n• Led the setup of a development environment on Jetson Nano.\n• Performed data preprocessing for large-scale KITTI and Waymo datasets.\n• Utilized Git and Jira for collaborative project management.",
       technologies: ["Python", "PyTorch", "Keras", "OpenCV", "Jetson Nano", "Git", "Jira"],
       visualComponent: 'LidarFusion',
-      githubUrl: "https://github.com/Ashwin-AIAS",
+      githubUrl: "https://github.com/Ashwin-AIAS/Lidar-Camera-Radar",
       liveUrl: "#",
       category: "Autonomous Systems"
     },
@@ -119,7 +127,7 @@ export const portfolioData = {
       description: "• Conducted competitive and scenario analysis to evaluate various mobility strategies.\n• Contributed to roadmap recommendations for advanced traffic systems.\n• Utilized SUMO and Simulink for traffic flow simulation.",
       technologies: ["SUMO", "Simulink", "Python", "Scenario Analysis"],
       visualComponent: 'Roundabout',
-      githubUrl: "https://github.com/Ashwin-AIAS",
+      githubUrl: "https://github.com/Ashwin-AIAS/intelligent-transportation-systems",
       liveUrl: "#",
       category: "Autonomous Systems"
     },
@@ -128,7 +136,7 @@ export const portfolioData = {
       description: "• Developed AI agents using reinforcement learning (Q-Learning, PPO).\n• Simulated complex, multi-stage decision-making in a custom Python environment.\n• Focused on optimizing long-term rewards.",
       technologies: ["Python", "Reinforcement Learning", "Q-Learning", "PPO"],
       visualComponent: 'ReinforcementLearning',
-      githubUrl: "https://github.com/Ashwin-AIAS",
+      githubUrl: "https://github.com/Ashwin-AIAS/Custom-Python-Environment-for-Autonomous-Systems-called-Road-to-Mr.Olympia-2024-",
       liveUrl: "#",
       category: "Tools"
     },
@@ -146,7 +154,7 @@ export const portfolioData = {
       description: "• Built a React-based interactive portfolio utilizing Framer Motion for advanced animations.\n• Upgraded AI recruiter assistant with Gemini Embedding 2 multimodal embeddings for semantic cross-modal match scoring.\n• Implemented an animated avatar tour guide and scroll-based interactions.",
       technologies: ["React", "Framer Motion", "Gemini API", "Tailwind CSS"],
       visualComponent: 'PortfolioAI',
-      githubUrl: "https://github.com/Ashwin-AIAS/portfolio",
+      githubUrl: "https://github.com/Ashwin-AIAS/react-portfolio",
       liveUrl: "#",
       category: "Web & Backend"
     }
@@ -169,52 +177,13 @@ export const portfolioData = {
     },
     {
       name: "Transformer-Based Natural Language Processing",
-      issuer: "Coursera",
+      issuer: "NVIDIA",
       credentialUrl: "https://learn.nvidia.com/certificates?id=n-bm0zFoTnigmiwDZdSKnw#"
     },
     {
       name: "Prompt Engineering for ChatGPT",
-      issuer: "Vanderbilt University",
+      issuer: "Great Learning",
       credentialUrl: "https://www.mygreatlearning.com/certificate/SLUQCJZG"
-    },
-    {
-      name: "Python for Beginners",
-      issuer: "Udemy / Sololearn",
-      credentialUrl: "https://ude.my/UC-f81110b8-48cb-49bb-8e5f-a2e9369a517f"
-    }
-  ],
-  blogPosts: [
-    {
-      title: "JARVIS: Building a Voice-Controlled AI Agent",
-      summary: "Exploring the challenges of low-latency speech recognition and command execution using OpenAI Whisper and Claude API. A deep dive into real-time streaming architecture.",
-      tags: ["AI", "FastAPI", "Voice"],
-      date: "Apr 2026",
-      readTime: "10 min read",
-      url: "https://github.com/Ashwin-AIAS"
-    },
-    {
-      title: "Building a RAG System from Scratch",
-      summary: "Lessons learned from chunking strategies, cross-encoder reranking, and pgvector — from zero to a full-stack retrieval-augmented generation system.",
-      tags: ["RAG", "LangChain", "pgvector"],
-      date: "Feb 2026",
-      readTime: "8 min read",
-      url: "https://github.com/Ashwin-AIAS/rag-foundation-pgvector"
-    },
-    {
-      title: "CNN from C++ — What I Learned",
-      summary: "Implementing LeNet-5 without frameworks forced me to understand every matrix operation. Int8 quantization taught me how edge deployment really works.",
-      tags: ["C++", "LeNet-5", "Quantization"],
-      date: "Jan 2026",
-      readTime: "6 min read",
-      url: "https://github.com/Ashwin-AIAS/Mini-CNN-Framework"
-    },
-    {
-      title: "Why Synthetic Data Works for RADAR",
-      summary: "GAN-generated synthetic RADAR signals can dramatically improve classifier performance when real-world data is scarce. Here's what our Radar-AI project revealed.",
-      tags: ["GANs", "RADAR", "Synthetic Data"],
-      date: "Dec 2025",
-      readTime: "7 min read",
-      url: "https://github.com/Ashwin-AIAS/Radar-AI-Enhancing-Object-Detection-with-Synthetic-Data-and-AI-driven-Classification"
     }
   ]
 };

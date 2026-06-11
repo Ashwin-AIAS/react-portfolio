@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 export const ParticleField = React.memo(() => {
     const particles = useRef(
@@ -9,9 +9,20 @@ export const ParticleField = React.memo(() => {
             size: 1 + Math.random() * 2,
         }))
     ).current;
-    
+
+    // Pause the animation once the user scrolls past the hero — the particles
+    // are invisible behind section backgrounds but still cost compositor time.
+    const [active, setActive] = useState(true);
+
+    useEffect(() => {
+        const onScroll = () => setActive(window.scrollY < window.innerHeight * 1.2);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
     return (
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" style={{ visibility: active ? 'visible' : 'hidden' }}>
             {particles.map((p, i) => (
                 <div
                     key={i}
@@ -21,6 +32,7 @@ export const ParticleField = React.memo(() => {
                         left: p.left, bottom: '-10px',
                         animation: `particle-drift ${p.duration} linear infinite`,
                         animationDelay: p.delay,
+                        animationPlayState: active ? 'running' : 'paused',
                     }}
                 />
             ))}

@@ -12,7 +12,8 @@ export const translations = {
       badge: "AI Engineer for Autonomous Systems",
       greeting: "Hi, I'm",
       bio: "Aspiring AI Engineer with a Bachelor's in Mechanical Engineering and a background in ERP analysis. Passionate about autonomous systems, with experience in developing automation scripts, managing data, and working on cutting-edge computer vision and generative AI projects. Currently pursuing a Master's in AI Engineering.",
-      downloadCv: "Download Resume"
+      downloadCv: "Download Resume",
+      viewProjects: "View Projects"
     },
     roadmap: {
       title: "Career Roadmap",
@@ -32,7 +33,9 @@ export const translations = {
     },
     projects: {
       title: "Projects",
-      subtitle: "Featured work & technical explorations"
+      subtitle: "Featured work & technical explorations",
+      showMore: "Show all projects",
+      showLess: "Show fewer projects"
     },
     assistant: {
       title: "Talk to my Portfolio",
@@ -94,7 +97,8 @@ export const translations = {
       badge: "KI-Ingenieur für Autonome Systeme",
       greeting: "Hallo, ich bin",
       bio: "Angehender KI-Ingenieur mit einem Bachelor in Maschinenbau und Hintergrund in der ERP-Analyse. Leidenschaft für autonome Systeme, mit Erfahrung in der Entwicklung von Automatisierungsskripten, Datenverwaltung sowie in Computer Vision und generativer KI. Derzeit im Masterstudium KI-Engineering.",
-      downloadCv: "Lebenslauf herunterladen"
+      downloadCv: "Lebenslauf herunterladen",
+      viewProjects: "Projekte ansehen"
     },
     roadmap: {
       title: "Werdegang",
@@ -114,7 +118,9 @@ export const translations = {
     },
     projects: {
       title: "Projekte",
-      subtitle: "Ausgewählte Arbeiten & technische Entwicklungen"
+      subtitle: "Ausgewählte Arbeiten & technische Entwicklungen",
+      showMore: "Alle Projekte anzeigen",
+      showLess: "Weniger anzeigen"
     },
     assistant: {
       title: "Sprich mit meinem Portfolio",

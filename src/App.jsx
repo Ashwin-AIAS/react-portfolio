@@ -19,7 +19,6 @@ import { GitHubSection } from './components/sections/GitHubSection';
 import { ProjectsSection } from './components/sections/ProjectsSection';
 import { AIAssistantSection } from './components/sections/AIAssistantSection';
 import { CertificationsSection } from './components/sections/CertificationsSection';
-import { BlogSection } from './components/sections/BlogSection';
 import { ContactSection } from './components/sections/ContactSection';
 
 export const ThemeContext = createContext({ isDark: true, setIsDark: () => {} });
@@ -28,8 +27,8 @@ const SplashScreen = ({ onComplete }) => {
   const [phase, setPhase] = useState('intro');
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase('exit'), 2800);
-    const t2 = setTimeout(onComplete, 3600);
+    const t1 = setTimeout(() => setPhase('exit'), 1900);
+    const t2 = setTimeout(onComplete, 2500);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [onComplete]);
 
@@ -309,7 +308,7 @@ const SplashScreen = ({ onComplete }) => {
 
 export default function App() {
     const [isDark, setIsDark] = useState(true);
-    const [splashDone, setSplashDone] = useState(false);
+    const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('splashSeen') === '1');
     const activeSection = useActiveSection();
     const { lang, t, toggleLang } = useLang();
 
@@ -324,7 +323,7 @@ export default function App() {
     return (
         <ThemeContext.Provider value={{ isDark, setIsDark }}>
             <AnimatePresence>
-                {!splashDone && <SplashScreen key="splash" onComplete={() => setSplashDone(true)} />}
+                {!splashDone && <SplashScreen key="splash" onComplete={() => { sessionStorage.setItem('splashSeen', '1'); setSplashDone(true); }} />}
             </AnimatePresence>
             <div className={`${isDark ? 'theme-dark' : 'theme-light'} min-h-screen font-sans transition-colors duration-500 relative`}>
                 {/* Render ParticleField globally using React Portal */}
@@ -346,8 +345,6 @@ export default function App() {
                     <ProjectsSection t={t} />
                     <div className="section-divider"></div>
                     <CertificationsSection t={t} />
-                    <div className="section-divider"></div>
-                    <BlogSection />
                     <div className="section-divider"></div>
                     <ContactSection t={t} />
                 </main>
