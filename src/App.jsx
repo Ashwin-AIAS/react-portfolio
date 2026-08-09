@@ -1,7 +1,11 @@
-import React, { useState, createContext, useEffect } from 'react';
+import React, { useState, createContext, useEffect, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useActiveSection } from './hooks/useActiveSection';
 import { useLang } from './hooks/useLang';
+
+// Voice guide (§8): the whole bundle loads after first paint so it can't affect
+// paint metrics. Nothing in src/voice-guide is imported eagerly from here.
+const VoiceGuideMount = lazy(() => import('./voice-guide/VoiceGuideMount'));
 
 // UI Components
 import { Header } from './components/ui/Header';
@@ -309,9 +313,21 @@ export default function App() {
     const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('splashSeen') === '1');
     const activeSection = useActiveSection();
     const { lang, t, toggleLang } = useLang();
+    const [voiceGuideReady, setVoiceGuideReady] = useState(false);
 
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, []);
+
+    // §8: defer the voice-guide chunk until the browser is idle after first paint.
+    useEffect(() => {
+        const start = () => setVoiceGuideReady(true);
+        if (typeof window.requestIdleCallback === 'function') {
+            const id = window.requestIdleCallback(start, { timeout: 2000 });
+            return () => window.cancelIdleCallback?.(id);
+        }
+        const id = setTimeout(start, 0);
+        return () => clearTimeout(id);
     }, []);
 
     useEffect(() => {
@@ -347,6 +363,11 @@ export default function App() {
                 <Footer t={t} />
                 <ScrollToTop />
                 {splashDone && <AvatarGuide />}
+                {voiceGuideReady && (
+                    <Suspense fallback={null}>
+                        <VoiceGuideMount />
+                    </Suspense>
+                )}
             </div>
         </ThemeContext.Provider>
     );
