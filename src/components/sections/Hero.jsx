@@ -60,7 +60,7 @@ export const Hero = ({ t }) => {
 
     return (
         <>
-        <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
+        <section id="hero" data-narrate="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
             <MouseGlow />
             <GradientMesh />
             <div className="absolute inset-0 overflow-hidden">

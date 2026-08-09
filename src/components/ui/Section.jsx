@@ -2,7 +2,7 @@ import React from 'react';
 import { StaggeredReveal } from './StaggeredReveal';
 
 export const Section = ({ id, title, subtitle, children }) => (
-    <section id={id} className="py-32 md:py-44 px-6">
+    <section id={id} data-narrate={id} className="py-32 md:py-44 px-6">
         <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-20">
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
