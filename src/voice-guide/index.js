@@ -6,7 +6,8 @@
  * the eager UI imports ./useVoiceGuide + ./components/* directly so the heavy
  * half stays out of the initial bundle (§8).
  */
-export { VoiceGuideProvider, VoiceGuideContext } from './VoiceGuideProvider';
+export { VoiceGuideProvider } from './VoiceGuideProvider';
+export { VoiceGuideContext } from './context';
 export { default as VoiceGuideMount } from './VoiceGuideMount';
 export { useVoiceGuide } from './useVoiceGuide';
 export { useScrollTracker } from './useScrollTracker';

@@ -6,7 +6,8 @@
  * State is pushed out through ./store so the eager UI (the existing avatar
  * bubble) can read it without importing any of this.
  */
-import React, { createContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { VoiceGuideContext } from './context';
 import { useScrollTracker } from './useScrollTracker';
 import { useActiveNarrationSection } from './useActiveSection';
 import { createNarrationEngine, STATE } from './narrationEngine';
@@ -15,8 +16,6 @@ import { setState, setActions, setLevel } from './store';
 import { getEnabled, isSaveData, isDebugEnabled } from './utils/storage';
 import { smoothAmplitude } from './utils/amplitude';
 import { DebugOverlay } from './components/DebugOverlay';
-
-export const VoiceGuideContext = createContext(null);
 
 export const VoiceGuideProvider = ({ children }) => {
   const scrollRef = useScrollTracker();
