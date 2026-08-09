@@ -87,6 +87,17 @@ export function createNarrationEngine(handlers) {
 
   let committedSectionId = null;
   let speakingSectionId = null;
+  /**
+   * Whether we have already acted on the *current* commit of
+   * committedSectionId — spoken it, or decided it should be silent.
+   *
+   * A section acts once per commit. Without this, finishing a clip and
+   * dropping back to `armed` re-evaluates the section that is still committed,
+   * finds it now marked completed/count:1, and immediately plays its revisit
+   * line — so every section would speak twice in a row with the visitor
+   * standing still. Reset only when a *different* section commits.
+   */
+  let sectionHandled = false;
   let currentClips = [];
   let currentClipIndex = 0;
   let settleTimer = null;
@@ -217,8 +228,33 @@ export function createNarrationEngine(handlers) {
     // Already saying this exact section: leave it alone.
     if (state === STATE.speaking && speakingSectionId === committedSectionId) return;
 
+    // Already acted on this commit. Re-entering `armed` after a clip must not
+    // start the section over.
+    if (sectionHandled) return;
+
     const decision = decideNarration(committedSectionId, getVisits(), velocityOverride);
     if (decision.action === 'suppressed') return;
+
+    const token = ++playToken;
+
+    // A different section has taken over. Stop the old clip regardless of what
+    // the new one turns out to say — the visitor has moved on, so the previous
+    // section must not keep talking over where they now are.
+    if (state === STATE.speaking && speakingSectionId && speakingSectionId !== committedSectionId) {
+      const interrupted = speakingSectionId;
+      speakingSectionId = null;
+      await stopActive(FADE_INTERRUPT_MS);
+      updateVisitStatus(interrupted, 'partial');
+      if (token !== playToken || destroyed) return;
+      setState(STATE.armed);
+    }
+
+    if (settleTimer) {
+      clearTimeout(settleTimer);
+      settleTimer = null;
+    }
+
+    sectionHandled = true;
 
     if (decision.action === 'silent') {
       // Captions still update in every state (§3.3).
@@ -232,22 +268,8 @@ export function createNarrationEngine(handlers) {
           total: 1,
         });
       }
+      if (state !== STATE.speaking) setState(STATE.armed);
       return;
-    }
-
-    const token = ++playToken;
-
-    // A different section interrupting: fade out and mark the old one partial.
-    if (state === STATE.speaking && speakingSectionId) {
-      const interrupted = speakingSectionId;
-      await stopActive(FADE_INTERRUPT_MS);
-      updateVisitStatus(interrupted, 'partial');
-      if (token !== playToken || destroyed) return;
-    }
-
-    if (settleTimer) {
-      clearTimeout(settleTimer);
-      settleTimer = null;
     }
 
     // Count the visit up front, marked partial until it finishes.
@@ -311,6 +333,9 @@ export function createNarrationEngine(handlers) {
 
       setEnabled(true);
       setState(STATE.armed);
+      // Unlocking is an explicit request to hear the current section, even if
+      // it was already handled while muted (§4.5).
+      sectionHandled = false;
 
       // §4.5: the hero clip fires on unlock, not on scroll — but only if the
       // visitor is still at the hero. If they've already scrolled past, speak
@@ -337,7 +362,10 @@ export function createNarrationEngine(handlers) {
 
     /** Called whenever the commit logic promotes a new section. */
     onSectionCommitted(sectionId, velocity = 0) {
-      committedSectionId = sectionId;
+      if (sectionId !== committedSectionId) {
+        committedSectionId = sectionId;
+        sectionHandled = false; // a new commit gets one chance to act
+      }
 
       // Captions are driven by the active section and render in ALL states,
       // including disabled (§3.3) — so update them before any state gate.

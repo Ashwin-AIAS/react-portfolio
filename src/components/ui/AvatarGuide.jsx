@@ -52,6 +52,7 @@ export const AvatarGuide = () => {
     // Voice guide state. Reports ready:false until the lazy provider mounts, so
     // this component behaves exactly as before until then.
     const voice = useVoiceGuide();
+    const [dismissed, setDismissed] = useState(false);
 
     useEffect(() => {
         const handleResize = () => setScreenConfig(getScreenConfig());
@@ -126,11 +127,13 @@ export const AvatarGuide = () => {
     // Strip Framer Motion's transform on mobile to prevent coordinate disruption for the 'fixed' popup inside
     const mobileTransformReset = isMobile ? { transformTemplate: () => "none" } : {};
 
-    // Captions are the primary channel (§1.4), so the bubble also shows whenever
-    // voice is on — even if the original tour was dismissed earlier this session.
-    const showBubble = (tourActive && hasStarted) || voice.enabled;
+    // Captions are the primary channel and render in every state, including
+    // `disabled` (§1.4, §3.3, §1.6: "a visitor who never clicks anything gets a
+    // silent, captioned tour"). So the bubble follows the narration caption and
+    // is no longer gated behind the once-per-session tour flag — only × hides it.
+    const showBubble = !dismissed && (!!voice.caption || (tourActive && hasStarted));
     // × is the single off switch: hides the bubble AND stops narration (§6.2).
-    const dismissAll = () => { setTourActive(false); voice.disable(); };
+    const dismissAll = () => { setDismissed(true); setTourActive(false); voice.disable(); };
 
     return (
         <motion.div 
