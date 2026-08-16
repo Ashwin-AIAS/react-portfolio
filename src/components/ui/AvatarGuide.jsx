@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import avatarEmoji from '/avatar-emoji.png'; // Assuming avatar-emoji.png is in public folder. If not, this might need fallback
+// Voice guide: these three are tiny and engine-free — the heavy half is lazy (§8).
+import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
+import { AvatarMouth } from '../../voice-guide/components/AvatarMouth';
+import { CaptionText } from '../../voice-guide/components/CaptionBubble';
 
 const tourSteps = [
   { section: 'hero',           emotion: 'wave',    message: "👋 Hey! I'm Ashwin — welcome! Let me show you around." ,           x: '38vw', y: '-60vh' },
@@ -22,15 +26,10 @@ const emotionAnimations = {
   bye: { rotate: [0, -25, 25, -25, 25, -25, 25, 0], y: [0, -10, 0], scale: [1, 1.1, 1], transition: { duration: 1.2 } },
 };
 
-const emotionFilters = {
-  wave: "drop-shadow(0 0 12px rgba(59,130,246,0.9))",
-  nod: "drop-shadow(0 0 10px rgba(99,102,241,0.8))",
-  flex: "drop-shadow(0 0 14px rgba(234,179,8,0.9))",
-  excited: "drop-shadow(0 0 16px rgba(239,68,68,0.9))",
-  think: "drop-shadow(0 0 10px rgba(148,163,184,0.7))",
-  proud: "drop-shadow(0 0 14px rgba(34,197,94,0.9))",
-  bye: "drop-shadow(0 0 12px rgba(251,146,60,0.9))",
-};
+// Seven emotions used to mean seven glow colours — blue, indigo, yellow,
+// red, slate, green, orange — on a page with one accent. The motion still
+// differs per emotion; the light no longer does.
+const AVATAR_GLOW = 'drop-shadow(0 0 12px var(--accent-line))';
 
 const getScreenConfig = () => {
   const W = typeof window !== 'undefined' ? window.innerWidth : 1024;
@@ -45,6 +44,10 @@ export const AvatarGuide = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [hasStarted, setHasStarted] = useState(false);
     const [screenConfig, setScreenConfig] = useState(getScreenConfig);
+    // Voice guide state. Reports ready:false until the lazy provider mounts, so
+    // this component behaves exactly as before until then.
+    const voice = useVoiceGuide();
+    const [dismissed, setDismissed] = useState(false);
 
     useEffect(() => {
         const handleResize = () => setScreenConfig(getScreenConfig());
@@ -119,6 +122,14 @@ export const AvatarGuide = () => {
     // Strip Framer Motion's transform on mobile to prevent coordinate disruption for the 'fixed' popup inside
     const mobileTransformReset = isMobile ? { transformTemplate: () => "none" } : {};
 
+    // Captions are the primary channel and render in every state, including
+    // `disabled` (§1.4, §3.3, §1.6: "a visitor who never clicks anything gets a
+    // silent, captioned tour"). So the bubble follows the narration caption and
+    // is no longer gated behind the once-per-session tour flag — only × hides it.
+    const showBubble = !dismissed && (!!voice.caption || (tourActive && hasStarted));
+    // × is the single off switch: hides the bubble AND stops narration (§6.2).
+    const dismissAll = () => { setDismissed(true); setTourActive(false); voice.disable(); };
+
     return (
         <motion.div 
             style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
@@ -134,35 +145,38 @@ export const AvatarGuide = () => {
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             >
                 <AnimatePresence mode="wait">
-                    {(tourActive && hasStarted) ? (
+                    {showBubble ? (
                         <motion.div
                             key={currentStep}
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             style={{
-                                pointerEvents: 'auto', background: 'white', 
+                                pointerEvents: 'auto',
+                                background: 'var(--surface-1)',
+                                border: '1px solid var(--rule-strong)',
                                 ...(isMobile ? {
                                     position: 'fixed', bottom: '16px', left: '8px', right: '8px', top: 'auto', width: 'auto'
                                 } : {
                                     position: 'absolute', bottom: '100%', ...(isRightSide ? { right: 0 } : { left: 0 }),
                                     width: '260px'
                                 }),
-                                borderRadius: '16px', padding: '12px 16px', marginBottom: '8px',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                                fontSize: isMobile ? '12px' : '13px', color: '#1f2937', fontWeight: 500,
+                                borderRadius: 'var(--r-md)', padding: '12px 14px', marginBottom: '8px',
+                                fontSize: isMobile ? '12px' : '13px', color: 'var(--text)', fontWeight: 400,
                             }}
                         >
-                            <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>{tourSteps[currentStep].message}</p>
+                            <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>
+                                <CaptionText text={voice.caption?.text} fallback={tourSteps[currentStep].message} />
+                            </p>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                                 <div style={{ display: 'flex', gap: '4px' }}>
                                     {tourSteps.map((_, i) => (
-                                        <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: i === currentStep ? '#2563eb' : '#cbd5e1', transition: 'background 0.3s' }} />
+                                        <div key={i} style={{ width: 5, height: 5, background: i === currentStep ? 'var(--accent)' : 'var(--rule-strong)', transition: 'background 0.3s' }} />
                                     ))}
                                 </div>
-                                <button onClick={(e) => { e.stopPropagation(); setTourActive(false); }} style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0, fontWeight: 'bold' }}>✕</button>
+                                <button onClick={(e) => { e.stopPropagation(); dismissAll(); }} style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }} aria-label="Dismiss and stop narration">✕</button>
                             </div>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>scroll to explore ↓</p>
+                            <p className="label" style={{ textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>scroll to explore ↓</p>
                         </motion.div>
                     ) : (!tourActive && isHovered) ? (
                         <motion.div
@@ -171,27 +185,44 @@ export const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             style={{
-                                pointerEvents: 'auto', background: 'white', borderRadius: '12px',
-                                padding: '8px 12px', marginBottom: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                                fontSize: '12px', color: '#1f2937', fontWeight: 600, whiteSpace: 'nowrap'
+                                pointerEvents: 'auto',
+                                background: 'var(--surface-1)',
+                                border: '1px solid var(--rule-strong)',
+                                borderRadius: 'var(--r-md)',
+                                padding: '8px 12px', marginBottom: '8px',
+                                fontSize: '12px', color: 'var(--text)', whiteSpace: 'nowrap'
                             }}
-                        >Click to restart 👆</motion.div>
+                        >Click to restart</motion.div>
                     ) : null}
                 </AnimatePresence>
 
-                <motion.img 
+                {/* Avatar + mouth share one positioned wrapper so they scale together (§6.1).
+                    The emotion animation moved from the <img> to this wrapper so the mouth
+                    overlay stays aligned through it; the image keeps its own filter. */}
+                <motion.div
                     key={`avatar-${currentStep}`}
-                    src={avatarEmoji}
+                    className={`vg-avatar-wrap${voice.enabled && !voice.isSpeaking ? ' vg-idle' : ''}`}
                     animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
                     onClick={handleAvatarClick}
                     style={{
                         pointerEvents: 'auto', cursor: tourActive ? 'default' : 'pointer',
                         width: '130px', height: '130px',
-                        objectFit: 'contain', filter: emotionFilters[tourSteps[currentStep].emotion], 
                         display: isMobile ? 'none' : 'block',
                     }}
-                    onError={(e) => console.log('Avatar load error:', e)}
-                />
+                >
+                    <img
+                        src={avatarEmoji}
+                        alt=""
+                        style={{
+                            width: '130px', height: '130px',
+                            objectFit: 'contain', filter: AVATAR_GLOW,
+                            display: 'block',
+                        }}
+                        onError={(e) => console.log('Avatar load error:', e)}
+                    />
+                    <div className="vg-avatar-glow" aria-hidden="true" />
+                    <AvatarMouth active={voice.isSpeaking} />
+                </motion.div>
             </motion.div>
         </motion.div>
     );

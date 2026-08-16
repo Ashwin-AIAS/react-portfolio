@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
-import { MouseGlow } from '../ui/MouseGlow';
-import { GradientMesh } from '../ui/GradientMesh';
 import { LidarSweep } from '../ui/LidarSweep';
 import { DownloadIcon, GitHubIcon, LinkedInIcon } from '../../icons/Icons';
-import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 
 export const Hero = ({ t }) => {
     const [isResumeOpen, setIsResumeOpen] = useState(false);
@@ -60,97 +57,94 @@ export const Hero = ({ t }) => {
 
     return (
         <>
-        <section id="hero" className="relative min-h-screen flex items-center justify-center bg-black px-6 py-20 overflow-hidden">
-            <MouseGlow />
-            <GradientMesh />
+        <section id="hero" data-narrate="hero" className="relative min-h-screen flex items-center px-6 py-28 overflow-hidden" style={{ backgroundColor: 'var(--bg)' }}>
+            {/* Single background layer. The LiDAR sweep is the only one with
+                actual shape — the three blue blurs it used to compete with
+                (MouseGlow, GradientMesh, an 800px radial) are gone. */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(139,92,246,0.15) 40%, transparent 70%)' }}></div>
                 <LidarSweep />
             </div>
-            
+
             <div className="container mx-auto max-w-6xl relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 items-center">
-                    {/* Image Column - order-2 on mobile, order-1 on md+ */}
-                    <div className="flex justify-center order-2 md:order-1">
-                        <AnimateOnScroll delay={100} className="flex justify-center order-2 md:order-1">
-                            <div className="relative w-56 h-56 md:w-72 md:h-72 flex-shrink-0">
-                                <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-2xl animate-pulse"></div>
-                                <img 
-                                    src="/profile.jpg" 
-                                    alt="Ashwin Vignesh" 
-                                    className="relative w-56 h-56 md:w-72 md:h-72 object-cover rounded-full border-2 border-white/10 shadow-2xl"
-                                />
-                                <div className="absolute -bottom-2 -right-2 bg-black/60 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-2 flex items-center gap-2 shadow-xl">
-                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                    <span className="text-[10px] font-bold text-white/90 tracking-widest uppercase">Available</span>
-                                </div>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-16 items-center">
+                    {/* Text column — flush left, wider than the portrait */}
+                    <div className="order-1 md:col-span-7">
+                        {/* Mono role ticker replaces the blue badge pill */}
+                        <p className="label mb-6 h-5">
+                            <span className="label-accent">{displayText}</span>
+                            <motion.span
+                                aria-hidden="true"
+                                animate={{ opacity: [1, 0] }}
+                                transition={{ duration: 0.53, repeat: Infinity }}
+                                className="label-accent"
+                            >_</motion.span>
+                        </p>
+
+                        {/* Rendered statically — no opacity:0 mount, so this is a
+                            real LCP candidate instead of an invisible one. */}
+                        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-ink leading-[0.92] mb-7">
+                            {t.hero.greeting} Ashwin
+                        </h1>
+
+                        <p className="text-base md:text-lg text-ink-muted font-light leading-relaxed max-w-xl mb-9">
+                            {t.hero.bio}
+                        </p>
+
+                        {/* Instrument readout — also the only place the site
+                            states availability and location outright. */}
+                        <dl className="max-w-md mb-10 border-t border-rule">
+                            <div className="readout-row">
+                                <dt>Status</dt>
+                                <dd className="flex items-center gap-2">
+                                    <span className="status-dot" />
+                                    Available &middot; {portfolioData.personalInfo.location}
+                                </dd>
                             </div>
-                        </AnimateOnScroll>
+                            <div className="readout-row">
+                                <dt>Focus</dt>
+                                <dd>Perception &middot; LLM Systems</dd>
+                            </div>
+                            <div className="readout-row">
+                                <dt>Degree</dt>
+                                <dd>MSc AI Engineering &middot; THI</dd>
+                            </div>
+                        </dl>
+
+                        <div className="flex flex-wrap gap-4 items-center">
+                            <a href="#projects" className="btn btn-primary">
+                                {t.hero.viewProjects}
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                            </a>
+                            <button onClick={() => setIsResumeOpen(true)} className="btn btn-secondary">
+                                <DownloadIcon className="w-4 h-4" /> {t.hero.downloadCv}
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="w-10 h-10 rounded border border-rule flex items-center justify-center text-ink-muted hover:text-accent hover:border-accent transition-colors">
+                                    <GitHubIcon className="w-4 h-4" />
+                                </a>
+                                <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-10 h-10 rounded border border-rule flex items-center justify-center text-ink-muted hover:text-accent hover:border-accent transition-colors">
+                                    <LinkedInIcon className="w-4 h-4" />
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Text Column - order-1 on mobile, order-2 on md+ */}
-                    <div className="order-1 md:order-2 text-center md:text-left">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1, duration: 0.6 }}
-                            className="mb-8 flex justify-center md:justify-start"
-                        >
-                            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 backdrop-blur-sm">
-                                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
-                                <span className="text-xs font-bold text-blue-400 tracking-widest uppercase">{t.hero.badge}</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2, duration: 0.6 }}
-                        >
-                            <p className="text-sm font-medium text-white/40 tracking-[0.3em] uppercase mb-4 h-6">
-                                <span className="text-blue-400">{displayText}</span>
-                                <motion.span 
-                                    animate={{ opacity: [1, 0] }} 
-                                    transition={{ duration: 0.53, repeat: Infinity }}
-                                >|</motion.span>
-                            </p>
-                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[0.9] mb-8">
-                                {t.hero.greeting} <span className="text-gradient">Ashwin</span>
-                            </h1>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3, duration: 0.6 }}
-                        >
-                            <p className="text-lg md:text-xl text-white/40 font-light leading-relaxed max-w-xl mb-12">
-                                {t.hero.bio}
-                            </p>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4, duration: 0.6 }}
-                            className="flex flex-col sm:flex-row gap-6 justify-center md:justify-start items-center"
-                        >
-                            <a href="#projects" className="btn-premium btn-primary">
-                                {t.hero.viewProjects}
-                                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                            </a>
-                            <button onClick={() => setIsResumeOpen(true)} className="btn-premium btn-secondary">
-                                <DownloadIcon className="w-5 h-5 mr-3" /> {t.hero.downloadCv}
-                            </button>
-                            <div className="flex items-center gap-5">
-                                <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] hover:border-white/20 transition-all">
-                                    <GitHubIcon className="w-5 h-5" />
-                                </a>
-                                <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] hover:border-white/20 transition-all">
-                                    <LinkedInIcon className="w-5 h-5" />
-                                </a>
-                            </div>
-                        </motion.div>
+                    {/* Portrait — sharp panel with a mono caption strip,
+                        replacing the circle + pulsing blue halo. */}
+                    <div className="order-2 md:col-span-5 flex md:justify-end">
+                        <figure className="panel overflow-hidden w-full max-w-xs">
+                            <img
+                                src="/profile.jpg"
+                                alt="Ashwin Vignesh M"
+                                width="640"
+                                height="640"
+                                className="w-full aspect-square object-cover"
+                            />
+                            <figcaption className="flex items-center justify-between px-3 py-2 border-t border-rule">
+                                <span className="label">Ashwin Vignesh M</span>
+                                <span className="label label-accent">AI ENG</span>
+                            </figcaption>
+                        </figure>
                     </div>
                 </div>
             </div>
@@ -163,7 +157,8 @@ export const Hero = ({ t }) => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
+                    style={{ background: 'rgba(0,0,0,0.72)' }}
                     onClick={() => setIsResumeOpen(false)}
                 >
                     <motion.div
@@ -171,12 +166,13 @@ export const Hero = ({ t }) => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative w-full max-w-4xl h-[85vh] bg-black/60 rounded-2xl border border-white/10 overflow-hidden flex flex-col"
+                        className="panel relative w-full max-w-4xl h-[85vh] overflow-hidden flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             onClick={() => setIsResumeOpen(false)}
-                            className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 transition-all text-sm"
+                            aria-label="Close resume preview"
+                            className="absolute top-3 right-3 z-10 w-8 h-8 rounded border border-rule bg-surface-2 flex items-center justify-center text-ink-muted hover:text-accent hover:border-accent transition-colors text-sm"
                         >✕</button>
                         <iframe
                             src={resumePreviewUrl}
@@ -184,9 +180,9 @@ export const Hero = ({ t }) => {
                             className="w-full flex-grow border-0"
                             allow="autoplay"
                         />
-                        <div className="p-4 border-t border-white/[0.06] flex justify-center">
-                            <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-premium btn-primary text-sm px-6 py-2.5">
-                                <DownloadIcon className="w-4 h-4 mr-2" /> {t.hero.downloadCv}
+                        <div className="p-4 border-t border-rule flex justify-center">
+                            <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-6 py-2.5">
+                                <DownloadIcon className="w-4 h-4" /> {t.hero.downloadCv}
                             </a>
                         </div>
                     </motion.div>

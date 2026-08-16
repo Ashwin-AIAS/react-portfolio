@@ -173,74 +173,76 @@ const CopyIcon = (props) => (
   </svg>
 );
 
+// A gauge, not a party trick: the ring is the track, the arc is the reading,
+// and the number is mono so it lines up whatever the score. Green/yellow/red
+// became the status pair plus the accent — three states, no new hues.
 const ScoreDial = ({ score }) => {
     const circumference = 2 * Math.PI * 40;
     const offset = circumference - (score / 100) * circumference;
-    const color = score >= 80 ? '#4ade80' : score >= 60 ? '#facc15' : '#ef4444';
+    const color = score >= 80 ? 'var(--ok)' : score >= 60 ? 'var(--accent)' : 'var(--err)';
 
     return (
-        <div className="relative w-24 h-24 flex items-center justify-center">
+        <div className="relative w-24 h-24 flex-shrink-0 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
+                <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--rule)" strokeWidth="6" />
                 <motion.circle
-                    cx="50" cy="50" r="40" fill="transparent" stroke={color} strokeWidth="8"
+                    cx="50" cy="50" r="40" fill="transparent" stroke={color} strokeWidth="6"
                     strokeDasharray={circumference}
                     initial={{ strokeDashoffset: circumference }}
                     animate={{ strokeDashoffset: offset }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                    strokeLinecap="round"
+                    transition={{ duration: 0.9, ease: 'easeOut' }}
                 />
             </svg>
             <div className="absolute flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-white leading-none">{score}</span>
-                <span className="text-[9px] text-white/50 tracking-wider">SCORE</span>
+                <span className="readout-value text-2xl leading-none" style={{ color }}>{score}</span>
+                <span className="label mt-1">Score</span>
             </div>
         </div>
     );
 };
 
-const FitReportCard = ({ data, t }) => {
-    return (
-        <div className="bg-black/40 border border-white/10 rounded-xl p-5 mt-2 flex flex-col gap-6 w-full shadow-lg">
-            <div className="flex items-center gap-6 pb-6 border-b border-white/[0.06]">
-                <ScoreDial score={data.score || 0} />
-                <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-white/90 mb-2">{t.cardTitle}</h4>
-                    <p className="text-sm text-white/60 leading-relaxed">{data.alignment}</p>
-                </div>
+const FitReportCard = ({ data, t }) => (
+    <div className="panel p-5 mt-2 flex flex-col gap-5 w-full">
+        <div className="flex items-center gap-5 pb-5 border-b border-rule">
+            <ScoreDial score={data.score || 0} />
+            <div className="flex-1 min-w-0">
+                <h4 className="font-display text-base font-bold tracking-tight text-ink mb-2">{t.cardTitle}</h4>
+                <p className="text-sm text-ink-muted leading-relaxed">{data.alignment}</p>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                    <h5 className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                        Matching Skills
-                    </h5>
-                    <div className="flex flex-wrap gap-2">
-                        {data.matching_skills?.map(skill => (
-                            <span key={skill} className="px-2.5 py-1 rounded bg-green-500/10 border border-green-500/20 text-green-300 text-xs">{skill}</span>
-                        ))}
-                    </div>
-                </div>
-                <div>
-                    <h5 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        Skill Gaps
-                    </h5>
-                    <div className="flex flex-wrap gap-2">
-                        {data.missing_skills?.length > 0 ? data.missing_skills.map(skill => (
-                            <span key={skill} className="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">{skill}</span>
-                        )) : <span className="text-xs text-white/40 italic">No major gaps detected.</span>}
-                    </div>
-                </div>
-            </div>
-            
-            <blockquote className="border-l-2 border-blue-500/50 pl-4 py-1 text-sm text-white/80 italic bg-blue-500/5 rounded-r-lg mt-2">
-                "{data.recommendation}"
-            </blockquote>
         </div>
-    );
-};
+
+        <div className="grid md:grid-cols-2 gap-5">
+            <div>
+                <h5 className="label mb-3" style={{ color: 'var(--ok)' }}>Matching Skills</h5>
+                <div className="flex flex-wrap gap-1.5">
+                    {data.matching_skills?.map(skill => (
+                        <span
+                            key={skill}
+                            className="tech-tag"
+                            style={{ color: 'var(--ok)', borderColor: 'var(--ok-wash)' }}
+                        >
+                            {skill}
+                        </span>
+                    ))}
+                </div>
+            </div>
+            <div>
+                <h5 className="label label-accent mb-3">Skill Gaps</h5>
+                <div className="flex flex-wrap gap-1.5">
+                    {data.missing_skills?.length > 0
+                        ? data.missing_skills.map(skill => (
+                            <span key={skill} className="tech-tag">{skill}</span>
+                        ))
+                        : <span className="label">No major gaps detected</span>}
+                </div>
+            </div>
+        </div>
+
+        <blockquote className="border-l-2 pl-4 py-1 text-sm text-ink leading-relaxed" style={{ borderColor: 'var(--accent)' }}>
+            {data.recommendation}
+        </blockquote>
+    </div>
+);
 
 export const AIAssistantSection = ({ t }) => {
     const [messages, setMessages] = useState([
@@ -577,7 +579,14 @@ Wait for the user to finish speaking before responding.
 
     const renderMessageContent = (msg) => {
         if (msg.role === 'user') {
-            return <div className="bg-blue-600/80 text-white text-sm px-4 py-2.5 rounded-2xl rounded-tr-sm shadow-md max-w-[85%] leading-relaxed">{msg.content}</div>;
+            return (
+                <div
+                    className="text-sm px-4 py-2.5 max-w-[85%] leading-relaxed text-ink bg-surface-3 border border-accent-line"
+                    style={{ borderRadius: 'var(--r-md)' }}
+                >
+                    {msg.content}
+                </div>
+            );
         }
 
         // Check if this is a voice-driven structured output or contains JSON
@@ -594,7 +603,10 @@ Wait for the user to finish speaking before responding.
 
 
         return (
-            <div className="bg-white/5 border border-white/10 text-white/80 text-sm px-4 py-2.5 rounded-2xl rounded-tl-sm shadow-md leading-relaxed whitespace-pre-wrap">
+            <div
+                className="bg-surface-1 border border-rule text-ink-muted text-sm px-4 py-2.5 leading-relaxed whitespace-pre-wrap"
+                style={{ borderRadius: 'var(--r-md)' }}
+            >
                 {msg.content}
             </div>
         );
@@ -602,23 +614,48 @@ Wait for the user to finish speaking before responding.
 
     return (
         <Section id="assistant" title={t.assistant.title} subtitle={t.assistant.subtitle}>
-            <div className="grid md:grid-cols-5 gap-8 lg:gap-12">
+            <div className="grid md:grid-cols-5 gap-4">
                 <AnimateOnScroll className="md:col-span-2">
-                    <Card className="h-full bg-gradient-to-b from-blue-900/10 to-transparent p-6 md:p-8 flex flex-col justify-center items-center text-center border border-blue-500/20">
-                        <AIAssistantVisual isGenerating={isGenerating} />
-                        <h3 className="text-xl font-semibold text-white mb-4 mt-8 flex items-center justify-center gap-2">
-                            <SparklesIcon className="w-5 h-5 text-blue-400" /> {t.assistant.badge}
-                        </h3>
-                        <p className="text-sm text-white/50 font-light leading-relaxed">
-                            {t.assistant.disclaimer}
-                        </p>
+                    <Card className="h-full">
+                        <div className="p-6 h-full flex flex-col">
+                            <div className="flex items-baseline gap-3 mb-5 pb-3 border-b border-rule">
+                                <span className="label label-accent flex items-center gap-2">
+                                    <SparklesIcon className="w-3 h-3" /> {t.assistant.badge}
+                                </span>
+                            </div>
+
+                            <AIAssistantVisual isGenerating={isGenerating} />
+
+                            <p className="text-sm text-ink-muted font-light leading-relaxed mt-6">
+                                {t.assistant.disclaimer}
+                            </p>
+
+                            <dl className="mt-auto pt-6 border-t border-rule">
+                                <div className="readout-row">
+                                    <dt>Mode</dt>
+                                    <dd>{isVoiceMode ? 'Live voice' : 'Text'}</dd>
+                                </div>
+                                <div className="readout-row">
+                                    <dt>State</dt>
+                                    <dd className="flex items-center gap-2">
+                                        <span
+                                            className="status-dot"
+                                            style={{ background: isGenerating ? 'var(--accent)' : 'var(--ok)' }}
+                                        />
+                                        {isGenerating ? 'Generating' : 'Ready'}
+                                    </dd>
+                                </div>
+                                <div className="readout-row">
+                                    <dt>Model</dt>
+                                    <dd>Gemini 2.5 Flash</dd>
+                                </div>
+                            </dl>
+                        </div>
                     </Card>
                 </AnimateOnScroll>
-                
-                <AnimateOnScroll delay={200} className="md:col-span-3">
-                    <Card className="h-[550px] flex flex-col bg-black/40 border border-white/[0.08] relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 opacity-50"></div>
-                        
+
+                <AnimateOnScroll delay={120} className="md:col-span-3">
+                    <Card className="h-[550px] flex flex-col relative overflow-hidden">
 
                         <div 
                                 ref={chatContainerRef}
@@ -634,27 +671,32 @@ Wait for the user to finish speaking before responding.
                                             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                                             className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 py-4"
                                         >
+                                            {/* The four emoji tiles are now numbered entries —
+                                                same four routes in, one less visual language. */}
                                             {CONVERSATION_STARTERS.map((starter, i) => (
                                                 <motion.button
                                                     key={starter.title}
-                                                    initial={{ opacity: 0, y: 15 }}
+                                                    initial={{ opacity: 0, y: 10 }}
                                                     animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: i * 0.08, duration: 0.35 }}
+                                                    transition={{ delay: i * 0.06, duration: 0.3 }}
                                                     onClick={() => handleSuggestionClick(starter.message)}
                                                     disabled={isGenerating}
                                                     className="
-                                                        group text-left p-4 rounded-2xl
-                                                        bg-white/[0.03] border border-white/[0.06]
-                                                        hover:bg-white/[0.06] hover:border-white/[0.12]
-                                                        transition-all duration-300 cursor-pointer
+                                                        group text-left p-4
+                                                        bg-surface-1 border border-rule
+                                                        hover:border-accent
+                                                        transition-colors duration-200 cursor-pointer
                                                         disabled:opacity-30 disabled:cursor-not-allowed
                                                     "
+                                                    style={{ borderRadius: 'var(--r-md)' }}
                                                 >
-                                                    <div className="text-2xl mb-2">{starter.icon}</div>
-                                                    <div className="text-sm font-medium text-white/80 mb-1 leading-snug group-hover:text-white transition-colors">
+                                                    <div className="label label-accent mb-2">
+                                                        {String(i + 1).padStart(2, '0')}
+                                                    </div>
+                                                    <div className="font-display text-sm font-bold tracking-tight text-ink mb-1 leading-snug group-hover:text-accent transition-colors">
                                                         {starter.title}
                                                     </div>
-                                                    <div className="text-xs text-white/30 leading-snug group-hover:text-white/50 transition-colors">
+                                                    <div className="text-xs text-ink-dim leading-snug">
                                                         {starter.subtitle}
                                                     </div>
                                                 </motion.button>
@@ -674,7 +716,10 @@ Wait for the user to finish speaking before responding.
                                             className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                         >
                                             {msg.role === 'model' && (
-                                                <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-blue-400">
+                                                <div
+                                                    className="w-8 h-8 border border-rule flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-accent"
+                                                    style={{ borderRadius: 'var(--r-sm)' }}
+                                                >
                                                     <BotIcon className="w-4 h-4" />
                                                 </div>
                                             )}
@@ -686,23 +731,20 @@ Wait for the user to finish speaking before responding.
                                                         className="
                                                             absolute top-2 right-2
                                                             opacity-0 group-hover:opacity-100
-                                                            transition-all duration-200
-                                                            w-7 h-7 rounded-lg
-                                                            bg-white/[0.06] border border-white/[0.08]
-                                                            hover:bg-white/[0.12] hover:border-white/[0.15]
+                                                            transition-opacity duration-200
+                                                            w-7 h-7
+                                                            bg-surface-2 border border-rule
+                                                            hover:border-accent
                                                             flex items-center justify-center
-                                                            text-white/40 hover:text-white/70
+                                                            text-ink-dim hover:text-accent
                                                         "
+                                                        style={{ borderRadius: 'var(--r-sm)' }}
                                                         title="Copy message"
                                                     >
                                                         {copiedId === i ? (
-                                                            <motion.span
-                                                                initial={{ scale: 0.8 }}
-                                                                animate={{ scale: 1 }}
-                                                                className="text-green-400 text-[10px] font-medium"
-                                                            >
+                                                            <span className="text-[10px] font-medium" style={{ color: 'var(--ok)' }}>
                                                                 ✓
-                                                            </motion.span>
+                                                            </span>
                                                         ) : (
                                                             <CopyIcon className="w-3 h-3" />
                                                         )}
@@ -725,7 +767,7 @@ Wait for the user to finish speaking before responding.
                                             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                                             className="flex flex-col gap-1 pb-4"
                                         >
-                                            <p className="text-[9px] text-white/20 uppercase tracking-widest px-4 pt-2 pb-1 font-medium">
+                                            <p className="label px-4 pt-2 pb-1">
                                                 Suggested Questions
                                             </p>
                                             <div className="px-4 flex flex-wrap gap-2">
@@ -739,22 +781,20 @@ Wait for the user to finish speaking before responding.
                                                         onClick={() => isVoiceMode ? handleChipClick(suggestion) : handleSuggestionClick(suggestion)}
                                                         disabled={isGenerating || (activeChip && activeChip !== suggestion)}
                                                         className={`
-                                                            suggestion-chip text-xs px-3 py-1.5 rounded-full
-                                                            transition-all duration-200 cursor-pointer
-                                                            flex items-center gap-2
-                                                            ${activeChip === suggestion 
-                                                                ? 'bg-blue-500/20 border-blue-400 text-white border scale-95' 
-                                                                : 'bg-white/[0.04] border border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/[0.08] hover:border-white/[0.15]'
-                                                            }
+                                                            suggestion-chip chip
+                                                            ${activeChip === suggestion ? 'chip-active' : ''}
                                                             disabled:opacity-30 disabled:cursor-not-allowed
-                                                            text-left leading-snug
                                                         `}
                                                     >
                                                         {activeChip === suggestion && (
                                                             <motion.div
                                                                 animate={{ rotate: 360 }}
-                                                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                                                className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full"
+                                                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                                                className="w-3 h-3 rounded-full flex-shrink-0"
+                                                                style={{
+                                                                    border: '2px solid var(--rule-strong)',
+                                                                    borderTopColor: 'var(--accent)',
+                                                                }}
                                                             />
                                                         )}
                                                         {suggestion}
@@ -777,13 +817,7 @@ Wait for the user to finish speaking before responding.
                                     >
                                         <button
                                             onClick={handleRegenerate}
-                                            className="
-                                                flex items-center gap-1.5
-                                                text-[11px] text-white/25 
-                                                hover:text-white/50
-                                                transition-colors duration-200
-                                                group
-                                            "
+                                            className="label hover:text-accent transition-colors duration-200 group flex items-center gap-2"
                                         >
                                             <svg 
                                                 className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" 
@@ -805,7 +839,10 @@ Wait for the user to finish speaking before responding.
                                         exit={{ opacity: 0 }}
                                         className="flex items-center gap-3 px-4 py-2"
                                     >
-                                        <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-blue-400">
+                                        <div
+                                            className="w-8 h-8 border border-rule flex items-center justify-center flex-shrink-0 text-accent"
+                                            style={{ borderRadius: 'var(--r-sm)' }}
+                                        >
                                             <BotIcon className="w-4 h-4" />
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -813,8 +850,12 @@ Wait for the user to finish speaking before responding.
                                                 {[0, 1, 2].map(i => (
                                                     <div
                                                         key={i}
-                                                        className="w-1.5 h-1.5 bg-blue-400/60 rounded-full"
-                                                        style={{ animation: `typing-dot 1.2s ease-in-out infinite`, animationDelay: `${i * 0.2}s` }}
+                                                        className="w-1.5 h-1.5"
+                                                        style={{
+                                                            background: 'var(--accent)',
+                                                            animation: `typing-dot 1.2s ease-in-out infinite`,
+                                                            animationDelay: `${i * 0.2}s`,
+                                                        }}
                                                     />
                                                 ))}
                                             </div>
@@ -825,7 +866,7 @@ Wait for the user to finish speaking before responding.
                                                     animate={{ opacity: 1, x: 0 }}
                                                     exit={{ opacity: 0, x: -6 }}
                                                     transition={{ duration: 0.25 }}
-                                                    className="text-xs text-white/30 font-light italic"
+                                                    className="label"
                                                 >
                                                     {typingStatus}
                                                 </motion.span>
@@ -837,7 +878,7 @@ Wait for the user to finish speaking before responding.
                                 <div ref={messagesEndRef} />
                             </div>
 
-                        <div className="flex-shrink-0 p-4 bg-white/[0.02] border-t border-white/[0.06]">
+                        <div className="flex-shrink-0 p-4 bg-surface-2 border-t border-rule">
                             <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
                                 <div className="flex items-center gap-2">
                                     <button
@@ -855,14 +896,15 @@ Wait for the user to finish speaking before responding.
                                         }}
                                         disabled={isGenerating || (isVoiceMode && geminiLive.isConnecting)}
                                         className={`
-                                            flex-shrink-0 w-10 h-10 rounded-full border transition-all duration-300
+                                            flex-shrink-0 w-10 h-10 border transition-colors duration-200
                                             flex items-center justify-center relative
                                             ${(isListening || geminiLive.isConnected)
-                                            ? 'bg-red-500/20 border-red-500/50 text-red-400 recruiter-mic-pulse' 
-                                            : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white/70 hover:bg-white/[0.08]'
+                                            ? 'border-accent text-accent recruiter-mic-pulse'
+                                            : 'bg-surface-1 border-rule text-ink-dim hover:text-accent hover:border-accent'
                                             }
                                             ${(isGenerating || (isVoiceMode && geminiLive.isConnecting)) ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
                                         `}
+                                        style={{ borderRadius: 'var(--r-md)' }}
                                     >
                                         {geminiLive.isConnected && (
                                             <div className="recruiter-waveform">
@@ -884,7 +926,8 @@ Wait for the user to finish speaking before responding.
                                     <button
                                         type="button"
                                         onClick={toggleVoiceMode}
-                                        className={`text-[10px] px-2 py-1 rounded border transition-colors ${isVoiceMode ? 'bg-blue-500/20 border-blue-500 text-blue-400' : 'bg-white/5 border-white/10 text-white/30'}`}
+                                        className={`label px-2 py-1.5 border transition-colors ${isVoiceMode ? 'border-accent label-accent' : 'border-rule hover:border-rule-strong'}`}
+                                        style={{ borderRadius: 'var(--r-sm)' }}
                                     >
                                         {isVoiceMode ? 'LIVE VOICE' : 'TEXT MODE'}
                                     </button>
@@ -902,7 +945,7 @@ Wait for the user to finish speaking before responding.
                                         }}
                                         disabled={isVoiceMode && geminiLive.isConnected}
                                         placeholder={isVoiceMode && geminiLive.isConnected ? "Listening for your voice..." : t.assistant.placeholder}
-                                        className="w-full bg-white/[0.04] border border-white/[0.1] focus:border-blue-500/50 rounded-xl pl-4 pr-28 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/30 resize-none min-h-[50px] max-h-[150px]"
+                                        className="input-field pr-28 resize-none min-h-[50px] max-h-[150px]"
                                         rows="1"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -915,13 +958,16 @@ Wait for the user to finish speaking before responding.
                                     <button
                                         type="submit"
                                         disabled={!input.trim() || isGenerating}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 flex items-center justify-center rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-xs font-semibold shadow-lg shadow-blue-500/20"
+                                        className="btn btn-primary absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 py-0 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {isGenerating ? (
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <div
+                                                className="w-3.5 h-3.5 rounded-full animate-spin"
+                                                style={{ border: '2px solid rgba(0,0,0,0.25)', borderTopColor: 'currentColor' }}
+                                            />
                                         ) : (
                                             <>
-                                                <SparklesIcon className="w-3.5 h-3.5 mr-2 opacity-80" />
+                                                <SparklesIcon className="w-3.5 h-3.5" />
                                                 {t.assistant.button}
                                             </>
                                         )}
@@ -929,12 +975,12 @@ Wait for the user to finish speaking before responding.
                                 </div>
                             </form>
                             {voiceError && (
-                                <p className="text-amber-400/70 text-xs mt-2 text-center">
+                                <p className="label mt-2 text-center" style={{ color: 'var(--err)' }}>
                                     {voiceError}
                                 </p>
                             )}
-                            <div className="text-[10px] text-center text-white/30 mt-3 font-medium uppercase tracking-widest">
-                                Press Enter to send, Shift+Enter for new line
+                            <div className="label text-center mt-3">
+                                Enter to send &middot; Shift+Enter for new line
                             </div>
                         </div>
                     </Card>

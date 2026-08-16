@@ -47,7 +47,7 @@ export const LidarSweep = () => {
             ctx.clearRect(0, 0, w, h);
 
             // Range rings
-            ctx.strokeStyle = 'rgba(59,130,246,0.05)';
+            ctx.strokeStyle = 'rgba(255,159,28,0.06)';
             ctx.lineWidth = 1;
             for (const f of [0.22, 0.42, 0.62, 0.82]) {
                 ctx.beginPath();
@@ -63,7 +63,7 @@ export const LidarSweep = () => {
                 ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, maxR, a, a + 0.011);
                 ctx.closePath();
-                ctx.fillStyle = `rgba(59,130,246,${0.09 * (1 - i / SEGMENTS)})`;
+                ctx.fillStyle = `rgba(255,159,28,${0.10 * (1 - i / SEGMENTS)})`;
                 ctx.fill();
             }
 
@@ -71,14 +71,14 @@ export const LidarSweep = () => {
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.lineTo(cx + Math.cos(sweep) * maxR, cy + Math.sin(sweep) * maxR);
-            ctx.strokeStyle = 'rgba(96,165,250,0.30)';
+            ctx.strokeStyle = 'rgba(255,181,77,0.32)';
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
             // Center hub
             ctx.beginPath();
             ctx.arc(cx, cy, 2.5, 0, TWO_PI);
-            ctx.fillStyle = 'rgba(96,165,250,0.4)';
+            ctx.fillStyle = 'rgba(255,181,77,0.45)';
             ctx.fill();
 
             // Detected points: flash when the beam passes, then decay
@@ -95,12 +95,12 @@ export const LidarSweep = () => {
                 if (p.glow > 0.4) {
                     ctx.beginPath();
                     ctx.arc(px, py, p.size * 3, 0, TWO_PI);
-                    ctx.fillStyle = `rgba(34,211,238,${p.glow * 0.12})`;
+                    ctx.fillStyle = `rgba(255,159,28,${p.glow * 0.14})`;
                     ctx.fill();
                 }
                 ctx.beginPath();
                 ctx.arc(px, py, p.size, 0, TWO_PI);
-                ctx.fillStyle = `rgba(125,211,252,${alpha})`;
+                ctx.fillStyle = `rgba(255,200,130,${alpha})`;
                 ctx.fill();
             }
 

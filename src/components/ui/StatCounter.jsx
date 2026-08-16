@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useInView } from 'framer-motion';
 
-export const StatCounter = ({ end, suffix = '', label }) => {
+// Renders the number only. It used to carry its own centered layout, gradient
+// type and a glow keyframe; the panel around it now owns all of that, so the
+// same counter reads correctly wherever it is dropped.
+export const StatCounter = ({ end, suffix = '' }) => {
     const [count, setCount] = useState(0);
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
-    
+
     useEffect(() => {
         if (!isInView) return;
-        let start = 0;
         const duration = 1500;
         const startTime = performance.now();
-        
+
         const step = (now) => {
             const progress = Math.min((now - startTime) / duration, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
@@ -20,13 +22,10 @@ export const StatCounter = ({ end, suffix = '', label }) => {
         };
         requestAnimationFrame(step);
     }, [isInView, end]);
-    
+
     return (
-        <div ref={ref} className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-gradient" style={{ animation: isInView ? 'count-up-glow 1.5s ease-out' : 'none' }}>
-                {count}{suffix}
-            </div>
-            <div className="text-xs text-white/30 font-light mt-1 tracking-wider uppercase">{label}</div>
-        </div>
+        <span ref={ref} className="tabular-nums">
+            {count}{suffix}
+        </span>
     );
 };
