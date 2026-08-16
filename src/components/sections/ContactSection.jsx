@@ -5,8 +5,28 @@ import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import { MailIcon, MapPinIcon, PhoneIcon, SendIcon } from '../../icons/Icons';
 
+// The contact details were three circular icon chips in a blue-gradient card.
+// They are facts, so they render as a readout: LABEL ......... value.
+const CONTACT_ROWS = [
+    { label: 'Email', key: 'email', Icon: MailIcon, href: (v) => `mailto:${v}` },
+    { label: 'Phone', key: 'phone', Icon: PhoneIcon, href: (v) => `tel:${v.replace(/[^+\d]/g, '')}` },
+    { label: 'Location', key: 'location', Icon: MapPinIcon, href: null },
+];
+
+const Field = ({ id, label, type = 'text', rows }) => (
+    <div className="space-y-2">
+        <label htmlFor={id} className="label block">{label}</label>
+        {rows ? (
+            <textarea id={id} name={id} required rows={rows} className="input-field resize-none" placeholder={label} />
+        ) : (
+            <input type={type} id={id} name={id} required className="input-field" placeholder={label} />
+        )}
+    </div>
+);
+
 export const ContactSection = ({ t }) => {
     const [formStatus, setFormStatus] = useState('');
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormStatus('sending');
@@ -28,59 +48,98 @@ export const ContactSection = ({ t }) => {
             setFormStatus('error');
         }
     };
-    
+
     return (
         <Section id="contact" title={t.contact.title} subtitle={t.contact.subtitle}>
-            <div className="grid md:grid-cols-5 gap-12">
+            <div className="grid md:grid-cols-5 gap-6">
                 <AnimateOnScroll className="md:col-span-2">
-                    <Card className="h-full bg-gradient-to-br from-blue-900/10 to-transparent p-8 md:p-10 border border-blue-500/20">
-                        <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 mb-8"><MailIcon className="w-6 h-6" /></div>
-                        <h3 className="text-2xl font-semibold text-white/90 mb-4 tracking-tight">Let's Connect</h3>
-                        <p className="text-sm text-white/40 font-light leading-relaxed mb-10">Whether you have a question, a project idea, or just want to say hi, I'll try my best to get back to you!</p>
-                        <div className="space-y-6">
-                            <a href={`mailto:${portfolioData.personalInfo.email}`} className="flex items-center gap-4 text-white/60 hover:text-white transition-colors group">
-                                <div className="w-10 h-10 rounded-full bg-white/[0.04] flex items-center justify-center group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-all"><MailIcon className="w-4 h-4" /></div>
-                                <span className="text-sm tracking-wide">{portfolioData.personalInfo.email}</span>
-                            </a>
-                            <div className="flex items-center gap-4 text-white/60">
-                                <div className="w-10 h-10 rounded-full bg-white/[0.04] flex items-center justify-center"><PhoneIcon className="w-4 h-4" /></div>
-                                <span className="text-sm tracking-wide">{portfolioData.personalInfo.phone}</span>
+                    <Card className="h-full">
+                        <div className="p-6 md:p-8 h-full flex flex-col">
+                            <div className="flex items-baseline gap-3 mb-5 pb-3 border-b border-rule">
+                                <span className="label label-accent">Direct</span>
+                                <span className="label ml-auto flex items-center gap-1.5">
+                                    <span className="status-dot" /> Open to work
+                                </span>
                             </div>
-                            <div className="flex items-center gap-4 text-white/60">
-                                <div className="w-10 h-10 rounded-full bg-white/[0.04] flex items-center justify-center"><MapPinIcon className="w-4 h-4" /></div>
-                                <span className="text-sm tracking-wide">{portfolioData.personalInfo.location}</span>
-                            </div>
+
+                            <h3 className="font-display text-xl font-bold tracking-tight text-ink mb-3">
+                                Let's Connect
+                            </h3>
+                            <p className="text-sm text-ink-muted font-light leading-relaxed mb-8">
+                                Whether you have a question, a project idea, or just want to say hi,
+                                I'll try my best to get back to you.
+                            </p>
+
+                            <dl className="mt-auto border-t border-rule">
+                                {CONTACT_ROWS.map(({ label, key, Icon, href }) => {
+                                    const value = portfolioData.personalInfo[key];
+                                    return (
+                                        <div key={key} className="readout-row">
+                                            <dt className="flex items-center gap-2">
+                                                <Icon className="w-3 h-3 flex-shrink-0" /> {label}
+                                            </dt>
+                                            <dd className="truncate">
+                                                {href ? (
+                                                    <a href={href(value)} className="hover:text-accent transition-colors">
+                                                        {value}
+                                                    </a>
+                                                ) : value}
+                                            </dd>
+                                        </div>
+                                    );
+                                })}
+                            </dl>
                         </div>
                     </Card>
                 </AnimateOnScroll>
-                <AnimateOnScroll delay={200} className="md:col-span-3">
-                    <Card className="p-8 md:p-10">
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label htmlFor="name" className="text-xs font-medium text-white/60 uppercase tracking-widest pl-1">{t.contact.namePlaceholder}</label>
-                                    <input type="text" id="name" name="name" required className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-blue-500/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/20" placeholder={t.contact.namePlaceholder} />
+
+                <AnimateOnScroll delay={120} className="md:col-span-3">
+                    <Card className="h-full">
+                        <div className="p-6 md:p-8">
+                            <div className="flex items-baseline gap-3 mb-6 pb-3 border-b border-rule">
+                                <span className="label label-accent">Message</span>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                <div className="grid md:grid-cols-2 gap-5">
+                                    <Field id="name" label={t.contact.namePlaceholder} />
+                                    <Field id="email" label={t.contact.emailPlaceholder} type="email" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="email" className="text-xs font-medium text-white/60 uppercase tracking-widest pl-1">{t.contact.emailPlaceholder}</label>
-                                    <input type="email" id="email" name="email" required className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-blue-500/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/20" placeholder={t.contact.emailPlaceholder} />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="subject" className="text-xs font-medium text-white/60 uppercase tracking-widest pl-1">{t.contact.subjectPlaceholder}</label>
-                                <input type="text" id="subject" name="subject" required className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-blue-500/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/20" placeholder={t.contact.subjectPlaceholder} />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="message" className="text-xs font-medium text-white/60 uppercase tracking-widest pl-1">{t.contact.messagePlaceholder}</label>
-                                <textarea id="message" name="message" required rows="5" className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-blue-500/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-white/20 resize-none" placeholder={t.contact.messagePlaceholder}></textarea>
-                            </div>
-                            <button type="submit" disabled={formStatus === 'sending'} className="w-full btn-premium btn-primary py-4 mt-2 flex justify-center items-center">
-                                {formStatus === 'sending' ? (<span className="flex items-center"><svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {t.contact.sending}</span>) : 
-                                 formStatus === 'success' ? (<span className="text-green-300">{t.contact.success}</span>) : 
-                                 (<span className="flex items-center"><SendIcon className="w-4 h-4 mr-2" /> {t.contact.send}</span>)}
-                            </button>
-                            {formStatus === 'error' && <p className="text-red-400 text-xs text-center mt-2">{t.contact.error}</p>}
-                        </form>
+                                <Field id="subject" label={t.contact.subjectPlaceholder} />
+                                <Field id="message" label={t.contact.messagePlaceholder} rows={5} />
+
+                                <button
+                                    type="submit"
+                                    disabled={formStatus === 'sending'}
+                                    className="btn btn-primary w-full py-3.5 disabled:opacity-60"
+                                >
+                                    {formStatus === 'sending' ? (
+                                        <>
+                                            <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                            </svg>
+                                            {t.contact.sending}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <SendIcon className="w-3.5 h-3.5" /> {t.contact.send}
+                                        </>
+                                    )}
+                                </button>
+
+                                {formStatus === 'success' && (
+                                    <p className="label flex items-center justify-center gap-2" style={{ color: 'var(--ok)' }}>
+                                        <span className="status-dot" /> {t.contact.success}
+                                    </p>
+                                )}
+                                {formStatus === 'error' && (
+                                    <p className="label text-center" style={{ color: 'var(--err)' }}>
+                                        {t.contact.error}
+                                    </p>
+                                )}
+                            </form>
+                        </div>
                     </Card>
                 </AnimateOnScroll>
             </div>
