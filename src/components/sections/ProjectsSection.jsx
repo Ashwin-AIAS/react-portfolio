@@ -22,65 +22,112 @@ const VisualComponents = {
     GymVision: lazy(() => import('../visuals/GymVisionVisual'))
 };
 
-const ProjectCardWrapper = ({ project, index, featured = false }) => {
+// Media slot: a real screenshot when the project has one, otherwise the
+// existing animated visual. Drop a file in public/projects/ and set
+// `image` in portfolioData.js and that project upgrades automatically.
+const ProjectMedia = ({ project, featured }) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: '0px 0px -100px 0px' });
     const Visual = VisualComponents[project.visualComponent];
+    const height = featured ? 'aspect-[16/10]' : 'aspect-[16/9]';
+
+    if (project.image) {
+        return (
+            <div className={`${height} relative overflow-hidden border-b border-rule`}>
+                <img
+                    src={project.image}
+                    alt={`${project.title} screenshot`}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+            </div>
+        );
+    }
 
     return (
-        <AnimateOnScroll delay={index * 150} className="h-full">
-            <Card className={`h-full flex flex-col group border bg-black/40 transition-all duration-500 glow-card ${featured ? 'border-blue-500/20 hover:border-blue-500/50 hover:shadow-[0_0_40px_rgba(59,130,246,0.2)]' : 'border-white/[0.06] hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]'}`}>
-                <div ref={ref} className={`${featured ? 'h-56' : 'h-48'} relative overflow-hidden bg-gradient-to-b from-white/[0.05] to-transparent border-b border-white/[0.05]`}>
-                    {isInView ? (
-                        <Suspense fallback={
-                            <div className="w-full h-full flex items-center justify-center">
-                                <span className="flex items-center text-white/30 text-xs tracking-widest"><svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> LOADING VISUAL</span>
-                            </div>
-                        }>
-                            {Visual ? <Visual /> : <div className="w-full h-full flex items-center justify-center text-white/20 text-xs">Visual Not Found</div>}
-                        </Suspense>
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-white/10 text-xs tracking-widest">SCROLL TO LOAD</span>
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-80 mix-blend-multiply"></div>
-                    {featured && (
-                        <span className="absolute top-3 right-3 text-[9px] font-bold tracking-widest uppercase text-amber-300/90 bg-amber-500/10 border border-amber-500/30 px-2 py-1 rounded-full backdrop-blur-sm">★ Featured</span>
-                    )}
-                </div>
-                <div className="p-6 flex-grow flex flex-col">
-                    <div className="flex justify-between items-start mb-4">
-                        <span className="text-[10px] font-medium tracking-widest text-blue-400/80 uppercase px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">{project.category}</span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-white/90 mb-3 group-hover:text-blue-400 transition-colors duration-300">{project.title}</h3>
-                    {project.metric && (
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
-                            <span className="text-xs font-medium text-emerald-300/90">{project.metric}</span>
-                        </div>
-                    )}
-                    <p className="text-sm text-white/40 font-light leading-relaxed mb-6 whitespace-pre-line flex-grow">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        {project.technologies.map(tech => (
-                            <span key={tech} className="text-[10px] text-white/50 bg-white/[0.03] border border-white/[0.05] px-2 py-1 rounded capitalize">{tech}</span>
-                        ))}
-                    </div>
-                    <div className="flex gap-4 pt-4 border-t border-white/[0.06]">
-                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-medium text-white/60 hover:text-white transition-colors">
-                            <GitHubIcon className="w-4 h-4 mr-2" /> Code
-                        </a>
-                        {project.liveUrl !== '#' && (
-                            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                                Live Demo <ExternalLinkIcon className="w-3.5 h-3.5 ml-2" />
-                            </a>
-                        )}
-                    </div>
-                </div>
-            </Card>
-        </AnimateOnScroll>
+        <div ref={ref} className={`${height} relative overflow-hidden border-b border-rule bg-surface-2`}>
+            {isInView && (
+                <Suspense fallback={<div className="w-full h-full" />}>
+                    {Visual ? <Visual /> : null}
+                </Suspense>
+            )}
+            {/* Corner marker instead of the old full-bleed black scrim that
+                crushed the bottom half of every visual. */}
+            <span className="label absolute bottom-2 left-3 opacity-60">Schematic</span>
+        </div>
     );
 };
+
+const MetricReadout = ({ project }) => {
+    const rows = project.metrics
+        || (project.metric ? [{ label: 'Result', value: project.metric }] : null);
+    if (!rows) return null;
+
+    return (
+        <dl className="mb-5 border-t border-rule">
+            {rows.map((m) => (
+                <div key={m.label} className="readout-row">
+                    <dt>{m.label}</dt>
+                    <dd>{m.value}</dd>
+                </div>
+            ))}
+        </dl>
+    );
+};
+
+const ProjectCardWrapper = ({ project, index, featured = false }) => (
+    <AnimateOnScroll delay={index * 90} className="h-full">
+        <Card className={`h-full flex flex-col group ${featured ? 'panel-accent' : ''}`}>
+            <ProjectMedia project={project} featured={featured} />
+
+            <div className={`${featured ? 'p-6' : 'p-5'} flex-grow flex flex-col`}>
+                {/* NN ── CATEGORY ............ ▸ LIVE */}
+                <div className="flex items-center gap-3 mb-3">
+                    <span className="label label-accent">
+                        {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="label truncate">{project.category}</span>
+                    {project.liveUrl && project.liveUrl !== '#' && (
+                        <span className="label label-accent ml-auto flex items-center gap-1.5 flex-shrink-0">
+                            <span className="status-dot" /> Live
+                        </span>
+                    )}
+                </div>
+
+                <h3 className={`font-display ${featured ? 'text-2xl' : 'text-lg'} font-bold tracking-tight text-ink mb-3 group-hover:text-accent transition-colors`}>
+                    {project.title}
+                </h3>
+
+                <p className={`${featured ? 'text-sm' : 'text-[13px]'} text-ink-muted font-light leading-relaxed mb-5 whitespace-pre-line flex-grow`}>
+                    {project.description}
+                </p>
+
+                {featured && <MetricReadout project={project} />}
+
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                    {(featured ? project.technologies : project.technologies.slice(0, 5)).map(tech => (
+                        <span key={tech} className="tech-tag">{tech}</span>
+                    ))}
+                    {!featured && project.technologies.length > 5 && (
+                        <span className="tech-tag">+{project.technologies.length - 5}</span>
+                    )}
+                </div>
+
+                <div className="flex gap-5 pt-4 border-t border-rule mt-auto">
+                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="label hover:text-accent transition-colors inline-flex items-center gap-2">
+                        <GitHubIcon className="w-3.5 h-3.5" /> Code
+                    </a>
+                    {project.liveUrl && project.liveUrl !== '#' && (
+                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="label label-accent hover:text-accent-strong transition-colors inline-flex items-center gap-2">
+                            Live Demo <ExternalLinkIcon className="w-3 h-3" />
+                        </a>
+                    )}
+                </div>
+            </div>
+        </Card>
+    </AnimateOnScroll>
+);
 
 export const ProjectsSection = ({ t }) => {
     const [showAll, setShowAll] = useState(false);
@@ -89,7 +136,7 @@ export const ProjectsSection = ({ t }) => {
 
     return (
         <Section id="projects" title={t.projects.title} subtitle={t.projects.subtitle}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {featured.map((project, index) => (
                     <ProjectCardWrapper key={project.title} project={project} index={index} featured />
                 ))}
@@ -100,21 +147,21 @@ export const ProjectsSection = ({ t }) => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                         className="overflow-hidden"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6">
                             {rest.map((project, index) => (
-                                <ProjectCardWrapper key={project.title} project={project} index={index % 3} />
+                                <ProjectCardWrapper key={project.title} project={project} index={featured.length + index} />
                             ))}
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-            <div className="flex justify-center mt-12">
-                <button onClick={() => setShowAll(!showAll)} className="btn-premium btn-secondary text-sm">
+            <div className="flex justify-start mt-10">
+                <button onClick={() => setShowAll(!showAll)} className="btn btn-secondary">
                     {showAll ? t.projects.showLess : `${t.projects.showMore} (${rest.length})`}
-                    <svg className={`w-4 h-4 ml-2 transition-transform duration-300 ${showAll ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                    <svg className={`w-3.5 h-3.5 transition-transform duration-300 ${showAll ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
                 </button>
             </div>
         </Section>
