@@ -8,64 +8,64 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        // Display: tight technical grotesk for headings
+        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        // Body: unchanged, still Inter
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        // Mono: instrument labels, metric readouts, tech tags
+        mono: ['IBM Plex Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
-        apple: {
-          black: '#000000',
-          dark: '#0a0a0a',
-          gray: {
-            50: '#fafafa',
-            100: '#f5f5f7',
-            200: '#e8e8ed',
-            300: '#d2d2d7',
-            400: '#a1a1a6',
-            500: '#86868b',
-            600: '#6e6e73',
-            700: '#424245',
-            800: '#1d1d1f',
-            900: '#0a0a0a',
-          },
+        // Every value resolves to a token in index.css, so both themes
+        // work without per-class !important overrides.
+        bg: 'var(--bg)',
+        surface: {
+          1: 'var(--surface-1)',
+          2: 'var(--surface-2)',
+          3: 'var(--surface-3)',
+        },
+        rule: {
+          DEFAULT: 'var(--rule)',
+          strong: 'var(--rule-strong)',
+        },
+        ink: {
+          DEFAULT: 'var(--text)',
+          muted: 'var(--text-muted)',
+          dim: 'var(--text-dim)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          strong: 'var(--accent-strong)',
+          dim: 'var(--accent-dim)',
+          wash: 'var(--accent-wash)',
+          line: 'var(--accent-line)',
+        },
+        ok: {
+          DEFAULT: 'var(--ok)',
+          wash: 'var(--ok-wash)',
         },
       },
+      borderRadius: {
+        // Instruments are sharp — the old 20px/980px geometry is gone.
+        sm: 'var(--r-sm)',
+        DEFAULT: 'var(--r-md)',
+        md: 'var(--r-md)',
+        lg: 'var(--r-lg)',
+      },
+      letterSpacing: {
+        label: '0.14em',
+      },
+      // Only motion that survives: a single directional reveal.
+      // The old float / glow-pulse / text-shimmer / orbit / gradient-shift
+      // loops were unreferenced anywhere in src/ and are removed.
       animation: {
-        'float': 'float 6s ease-in-out infinite',
-        'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
-        'text-shimmer': 'text-shimmer 3s ease-in-out infinite',
-        'orbit': 'orbit 20s linear infinite',
-        'fade-up': 'fade-up 0.8s ease-out forwards',
-        'gradient-shift': 'gradient-shift 8s ease infinite',
+        'fade-up': 'fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        'glow-pulse': {
-          '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
-          '50%': { opacity: '0.8', transform: 'scale(1.05)' },
-        },
-        'text-shimmer': {
-          '0%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-          '100%': { backgroundPosition: '0% 50%' },
-        },
-        orbit: {
-          '0%': { transform: 'rotate(0deg) translateX(120px) rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg) translateX(120px) rotate(-360deg)' },
-        },
         'fade-up': {
-          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        'gradient-shift': {
-          '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-        },
-      },
-      backdropBlur: {
-        '2xl': '40px',
-        '3xl': '64px',
       },
     },
   },
