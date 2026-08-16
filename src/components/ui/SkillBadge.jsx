@@ -59,20 +59,23 @@ export const SkillBadge = ({ skillName, index = 0 }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.75 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      whileHover={{ scale: 1.15, zIndex: 10 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25, delay: index * 0.02 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
         x,
         y,
-        background: cfg.bg,
+        background: 'transparent',
         border: `1px solid ${cfg.color}35`,
         color: cfg.color,
+        borderRadius: 'var(--r-sm)',
       }}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide cursor-default select-none shadow-sm hover:shadow-lg transition-shadow duration-300"
+      /* The pill was 980px-round, tinted, shadowed and scaled to 115% on
+         hover. Colour still comes from the logo — the geometry no longer
+         fights the rest of the page. */
+      className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-mono tracking-wide cursor-default select-none"
     >
       {cfg.icon && (
         <img
