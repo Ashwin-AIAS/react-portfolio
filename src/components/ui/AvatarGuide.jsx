@@ -202,6 +202,11 @@ export const AvatarGuide = () => {
                 <motion.div
                     key={`avatar-${currentStep}`}
                     className={`vg-avatar-wrap${voice.enabled && !voice.isSpeaking ? ' vg-idle' : ''}`}
+                    /* Optimus spec §5.2 — the only hook the persona visual mode
+                       needs. The aura recolours in CSS off this attribute; the
+                       intensity stays driven by --vg-level, so nothing here
+                       re-renders per frame. */
+                    data-vg-persona={voice.persona}
                     animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
                     onClick={handleAvatarClick}
                     style={{

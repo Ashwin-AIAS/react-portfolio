@@ -78,6 +78,7 @@ export const DebugOverlay = ({
         <span>{info.clipCount ? `${(info.clipIndex ?? 0) + 1}/${info.clipCount}` : '—'}</span>
       </div>
       <div style={row}><span style={dim}>source</span><span>{info.sourceKind ?? '—'}</span></div>
+      <div style={row}><span style={dim}>persona</span><span>{info.persona ?? '—'}</span></div>
 
       <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '7px 0' }} />
 

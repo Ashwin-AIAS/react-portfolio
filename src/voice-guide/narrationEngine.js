@@ -15,7 +15,13 @@ import {
   FADE_MUTE_MS,
   FAST_SCROLL,
 } from './config';
-import { getSection, getNextSectionId, HERO_SECTION_ID } from './data/narrationScript';
+import {
+  getSection,
+  getNextSectionId,
+  HERO_SECTION_ID,
+  getActivePersona,
+  setActivePersona,
+} from './data/narrationScript';
 import {
   getVisits,
   recordVisit,
@@ -74,9 +80,10 @@ export function decideNarration(sectionId, visits, velocity) {
  * @param {(level: number) => void} handlers.onAmplitude
  * @param {(caption: {sectionId: string, text: string, clipIndex: number, total: number} | null) => void} handlers.onCaption
  * @param {(kind: string | null) => void} [handlers.onSourceKind]
+ * @param {(persona: string) => void} [handlers.onPersona]
  */
 export function createNarrationEngine(handlers) {
-  const { onState, onAmplitude, onCaption, onSourceKind } = handlers;
+  const { onState, onAmplitude, onCaption, onSourceKind, onPersona } = handlers;
 
   let state = STATE.disabled;
   let audioContext = null;
@@ -111,6 +118,11 @@ export function createNarrationEngine(handlers) {
   /** url -> boolean; avoids re-HEADing the same file. */
   const audioAvailability = new Map();
   let activeSource = null;
+
+  // Seed both profiles from the persisted persona before anything speaks —
+  // the speech voice (§4.1) and the recorded-audio DSP routing (§4.2).
+  speechSource.setPersona(getActivePersona());
+  audioSource.setPersona(getActivePersona());
 
   const setState = (next) => {
     if (state === next) return;
@@ -302,6 +314,7 @@ export function createNarrationEngine(handlers) {
         clipIndex: currentClipIndex,
         clipCount: currentClips.length,
         sourceKind: activeSource?.kind ?? null,
+        persona: getActivePersona(),
         visits: getVisits(),
       };
     },
@@ -341,6 +354,66 @@ export function createNarrationEngine(handlers) {
       // visitor is still at the hero. If they've already scrolled past, speak
       // where they actually are instead of dragging them backwards.
       await evaluate();
+    },
+
+    get persona() {
+      return getActivePersona();
+    },
+
+    /**
+     * Switches narration persona (Optimus spec §2).
+     *
+     * Order matters here. The current clip has to be cancelled *before* the
+     * script swaps, otherwise the old voice keeps talking over the new one —
+     * speechSynthesis holds its own utterance and does not care that we changed
+     * our minds. Bumping playToken first also invalidates the in-flight
+     * playClips loop so it cannot resume into the new script mid-list.
+     *
+     * The section is then re-armed rather than left handled: switching voice is
+     * an explicit request to hear *this* persona, so the section the visitor is
+     * actually looking at speaks again in the new voice.
+     *
+     * @param {string} nextPersona
+     * @returns {Promise<boolean>} false if the id was unknown
+     */
+    async setPersona(nextPersona) {
+      if (destroyed) return false;
+      if (nextPersona === getActivePersona()) return true;
+
+      playToken++;
+      if (settleTimer) {
+        clearTimeout(settleTimer);
+        settleTimer = null;
+      }
+
+      // Whatever was mid-sentence never finished, so it must not count as heard.
+      if (speakingSectionId) {
+        updateVisitStatus(speakingSectionId, 'partial');
+        speakingSectionId = null;
+      }
+      await stopActive(FADE_INTERRUPT_MS);
+
+      if (!setActivePersona(nextPersona)) return false;
+      speechSource.setPersona(nextPersona);
+      audioSource.setPersona(nextPersona);
+      onPersona?.(nextPersona);
+
+      // Audio availability is keyed by url and the urls differ per persona, so
+      // the map stays valid — but the caption must refresh to the new copy.
+      if (committedSectionId) {
+        const section = getSection(committedSectionId);
+        const clip = section?.intro?.[0] ?? section?.revisit;
+        if (clip) {
+          onCaption({ sectionId: committedSectionId, text: clip.text, clipIndex: 0, total: 1 });
+        }
+      }
+
+      if (state === STATE.disabled || state === STATE.suspended) return true;
+
+      sectionHandled = false;
+      setState(STATE.armed);
+      await evaluate();
+      return true;
     },
 
     /** §3.3 speaking -> disabled (mute / Esc). */

@@ -8,14 +8,14 @@
  * from `onboundary` word events driving an attack/decay envelope.
  */
 import {
-  SPEECH_RATE,
-  SPEECH_PITCH,
   VOICE_PREFERENCE,
   ENVELOPE_ATTACK_MS,
   ENVELOPE_PEAK_BASE,
   ENVELOPE_PEAK_JITTER,
   ENVELOPE_FLOOR,
   ESTIMATED_WORD_MS,
+  DEFAULT_PERSONA,
+  getSpeechProfile,
 } from '../config';
 import { createEnvelope } from '../utils/amplitude';
 import { SOURCE_KIND } from './NarrationSource';
@@ -49,14 +49,39 @@ function loadVoices(timeoutMs = 1000) {
   });
 }
 
-/** Prefer en-IN, then en-GB, then any en-* (§5.3). */
-export function pickVoice(voices) {
+/**
+ * Picks a voice for a persona.
+ *
+ * Named voices come first (Optimus spec §4.1): pitch 0.65 applied to a female
+ * or a thin synthetic voice does not read as a baritone, it reads as a slowed
+ * tape. Matching 'Microsoft David' or 'Google UK English Male' by name is what
+ * actually gets the timbre; the lang preference is only the fallback for
+ * machines that have none of them.
+ *
+ * Name matching is loose and case-insensitive because platforms decorate the
+ * strings differently — Chrome reports 'Google UK English Male', Edge reports
+ * 'Microsoft David - English (United States)'.
+ *
+ * @param {SpeechSynthesisVoice[]} voices
+ * @param {string} [personaId]
+ */
+export function pickVoice(voices, personaId = DEFAULT_PERSONA) {
   if (!voices || !voices.length) return null;
-  for (const pref of VOICE_PREFERENCE) {
+
+  const profile = getSpeechProfile(personaId);
+
+  for (const wanted of profile.preferredVoices ?? []) {
+    const needle = wanted.toLowerCase();
+    const hit = voices.find((v) => v.name?.toLowerCase().includes(needle));
+    if (hit) return hit;
+  }
+
+  const langs = profile.langPreference ?? VOICE_PREFERENCE;
+  for (const pref of langs) {
     const exact = voices.find((v) => v.lang?.replace('_', '-') === pref);
     if (exact) return exact;
   }
-  for (const pref of VOICE_PREFERENCE) {
+  for (const pref of langs) {
     const loose = voices.find((v) => v.lang?.replace('_', '-').startsWith(pref));
     if (loose) return loose;
   }
@@ -69,6 +94,9 @@ export function pickVoice(voices) {
 export function createSpeechSynthesisSource() {
   let voice = null;
   let voicesLoaded = false;
+  /** Cached so a persona switch can re-pick without re-awaiting the voice list. */
+  let availableVoices = [];
+  let personaId = DEFAULT_PERSONA;
   let utterance = null;
   let rafId = 0;
   let envelope = null;
@@ -105,11 +133,23 @@ export function createSpeechSynthesisSource() {
       return true;
     },
 
+    /**
+     * Switches the speech profile (Optimus spec §4.1). Re-picks from the
+     * already-loaded voice list, because the preferred *name* differs per
+     * persona, not just the pitch.
+     * @param {string} nextPersonaId
+     */
+    setPersona(nextPersonaId) {
+      if (nextPersonaId === personaId) return;
+      personaId = nextPersonaId;
+      if (voicesLoaded) voice = pickVoice(availableVoices, personaId);
+    },
+
     async prepare() {
       if (!hasSpeech()) return;
       if (!voicesLoaded) {
-        const voices = await loadVoices();
-        voice = pickVoice(voices);
+        availableVoices = await loadVoices();
+        voice = pickVoice(availableVoices, personaId);
         voicesLoaded = true;
       }
     },
@@ -133,8 +173,12 @@ export function createSpeechSynthesisSource() {
           utterance.voice = voice;
           utterance.lang = voice.lang;
         }
-        utterance.rate = SPEECH_RATE;
-        utterance.pitch = SPEECH_PITCH;
+        // Optimus spec §4.1 — rate 0.85 / pitch 0.65 for the commander, the
+        // original 0.95 / 1.0 for Ashwin, brighter and quicker for JARVIS.
+        const profile = getSpeechProfile(personaId);
+        utterance.rate = profile.rate;
+        utterance.pitch = profile.pitch;
+        utterance.volume = profile.volume ?? 1;
 
         envelope = createEnvelope({
           attackMs: ENVELOPE_ATTACK_MS,
