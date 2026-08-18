@@ -15,8 +15,11 @@ export { useActiveNarrationSection, pickCandidate } from './useActiveSection';
 export { createNarrationEngine, decideNarration, STATE } from './narrationEngine';
 
 export { AvatarMouth } from './components/AvatarMouth';
-export { CaptionText } from './components/CaptionBubble';
-export { VoiceToggle } from './components/VoiceToggle';
+export { CaptionText, AgentControls } from './components/CaptionBubble';
+export { PersonaAvatar } from './components/PersonaAvatar';
+export { OptimusAvatarVisual } from './components/OptimusAvatarVisual';
+export { JarvisAvatarVisual } from './components/JarvisAvatarVisual';
+export { MobileVoicePill } from './components/MobileVoicePill';
 export { DebugOverlay } from './components/DebugOverlay';
 
 export { NARRATION, getSection, getNextSectionId } from './data/narrationScript';

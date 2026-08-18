@@ -1,11 +1,16 @@
 /**
- * Voice guide styles — spec §6.1, §7.
+ * Voice guide styles — spec §6.1, §7; personas spec §3.
  *
  * Imported by VoiceGuideMount, which is lazy-loaded, so none of this lands in
  * the initial CSS payload.
  *
  * Everything visual is driven off one custom property, --vg-level (0..1),
  * written each frame by the engine. No React re-render is involved.
+ *
+ * The persona visuals (OptimusAvatarVisual, JarvisAvatarVisual) ship their
+ * shape and colour inline instead of here: AvatarGuide.jsx is eager, so it can
+ * paint an avatar before this file has downloaded. Only their keyframed motion
+ * lives here, where arriving a few hundred ms late costs nothing.
  */
 
 :root {
@@ -20,14 +25,24 @@
   line-height: 0;
 }
 
-/* Head bob (§6.1). The wrapper carries framer-motion's inline transform, so the
-   bob lives on the image, which has none. */
-.vg-avatar-wrap > img {
+/* PersonaAvatar owns this box: the positioning context for the memoji glow
+   ring and the mouth overlay, and the square the persona SVGs fill. */
+.vg-persona-avatar {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+/* Head bob (§6.1). The wrapper carries the inline framer-motion transform, so
+   the bob lives on the image, which has none. Descendant rather than child:
+   the image sits inside PersonaAvatar now, one level further down. */
+.vg-avatar-wrap img {
   transform: translateY(calc(var(--vg-level) * -2px));
   will-change: transform;
 }
 
-/* Glow ring around the avatar, intensity from the same level. */
+/* Glow ring around the avatar, intensity from the same level. Memoji only —
+   the Optimus and JARVIS visuals carry their own aura. */
 .vg-avatar-glow {
   position: absolute;
   inset: 4%;
@@ -42,7 +57,7 @@
 }
 
 /* Idle breathing when armed and silent (§6.1). */
-.vg-avatar-wrap.vg-idle > img {
+.vg-avatar-wrap.vg-idle img {
   animation: vg-breathe 4.5s ease-in-out infinite;
 }
 
@@ -101,315 +116,51 @@
   opacity: calc(var(--vg-level) * 0.75);
 }
 
-/* ---------------------------------------------------------------- toggle --- */
+/* ----------------------------------------- persona visuals (§3.1, §3.2) --- */
 
-/* The fixed anchor moved off .vg-toggle onto this wrapper when the persona
-   trigger was added — the two buttons have to travel together, and the menu
-   needs a positioned parent to open upward from. */
-.vg-controls {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  z-index: 45;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.vg-toggle-group {
-  display: inline-flex;
-  align-items: stretch;
-  gap: 6px;
-}
-
-.vg-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 12px;
-  /* Was a 9999px glass pill in blue. Now the same instrument geometry and
-     mono label as every other control on the page. */
-  border-radius: var(--r-md);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-muted);
-  background: var(--surface-1);
-  border: 1px solid var(--rule);
-  transition:
-    background 220ms ease,
-    border-color 220ms ease,
-    color 220ms ease;
-}
-
-.vg-toggle:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.vg-toggle:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.vg-toggle-on {
-  color: var(--accent);
-  border-color: var(--accent-line);
-  background: var(--accent-wash);
-}
-
-.vg-toggle-icon {
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-/* While speaking, the icon brightens with the voice. */
-.vg-toggle-speaking {
-  filter: drop-shadow(0 0 calc(var(--vg-level) * 7px) var(--accent));
-}
-
-.vg-toggle-speaking .vg-wave-1 {
-  opacity: calc(0.35 + var(--vg-level) * 0.65);
-}
-
-.vg-toggle-speaking .vg-wave-2 {
-  opacity: calc(0.15 + var(--vg-level) * 0.85);
-}
-
-/* Gentle pulse to draw the eye. Stops for good after the first interaction,
-   which is enforced in JS via localStorage (§7). */
-.vg-toggle-pulse {
-  animation: vg-pulse 2.4s ease-in-out infinite;
-}
-
-@keyframes vg-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 var(--accent-line);
-  }
-  50% {
-    box-shadow: 0 0 0 9px transparent;
-  }
-}
-
-@media (max-width: 640px) {
-  /* bottom/left moved with the anchor when .vg-controls took over the fixed
-     positioning — leaving them on .vg-toggle made this block a no-op. */
-  .vg-controls {
-    bottom: 1rem;
-    left: 1rem;
-  }
-
-  .vg-toggle {
-    padding: 7px 12px;
-    font-size: 10px;
-  }
-
-  /* Must not run past the right edge on a 320px screen. */
-  .vg-persona-menu {
-    width: min(232px, calc(100vw - 2rem));
-  }
-}
-
-/* ---------------------------------------------- persona selector (§5.1) --- */
-
-/* Sits flush against the pill and carries only the active glyph — the pill
-   next to it already spends the horizontal budget on a label. */
-.vg-persona-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 9px;
-  border-radius: var(--r-md);
-  cursor: pointer;
-  color: var(--text-muted);
-  background: var(--surface-1);
-  border: 1px solid var(--rule);
-  transition:
-    background 220ms ease,
-    border-color 220ms ease,
-    color 220ms ease;
-}
-
-.vg-persona-trigger:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.vg-persona-trigger:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.vg-persona-trigger[aria-expanded='true'] {
-  color: var(--accent);
-  border-color: var(--accent-line);
-  background: var(--accent-wash);
-}
-
-.vg-persona-trigger-icon {
-  font-size: 13px;
-  line-height: 1;
-}
-
-/* Opens upward. The controls are pinned to the bottom of the viewport, so a
-   downward menu would open off-screen. */
-.vg-persona-menu {
-  width: 232px;
-  padding: 6px;
-  background: var(--surface-1);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--r-md);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  animation: vg-menu-in 160ms ease;
-}
-
-@keyframes vg-menu-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.vg-persona-menu-head {
-  padding: 5px 8px 7px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--rule);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--text-dim);
-}
-
-.vg-persona-item {
+.vg-optimus,
+.vg-jarvis {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 9px;
+  justify-content: center;
+}
+
+.vg-optimus-svg,
+.vg-jarvis-svg {
   width: 100%;
-  padding: 7px 8px;
-  border: 1px solid transparent;
-  border-radius: var(--r-sm);
-  background: none;
-  cursor: pointer;
-  text-align: left;
-  color: var(--text-muted);
-  transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease;
+  height: 100%;
+  overflow: visible;
 }
 
-.vg-persona-item:hover {
-  background: var(--surface-2);
-  color: var(--text);
-}
-
-.vg-persona-item:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-
-.vg-persona-item-active {
-  color: var(--accent);
-  border-color: var(--accent-line);
-  background: var(--accent-wash);
-}
-
-.vg-persona-icon {
-  flex-shrink: 0;
-  font-size: 15px;
-  line-height: 1;
-}
-
-.vg-persona-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.vg-persona-name {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: inherit;
-}
-
-.vg-persona-tag {
-  overflow: hidden;
-  font-size: 10.5px;
-  color: var(--text-dim);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.vg-persona-dot {
-  flex-shrink: 0;
-  width: 5px;
-  height: 5px;
-  margin-left: auto;
-  background: var(--accent);
-  box-shadow: 0 0 6px var(--accent);
-}
-
-/* ------------------------------------------------ caption badge (§5.2) --- */
-/* `[ TRANSMISSION // OPTIMUS PRIME ]` above the caption line. Deliberately
-   quiet — it labels the voice, it is not the message. */
-.vg-caption-badge {
-  display: block;
-  margin-bottom: 6px;
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--accent);
-  opacity: 0.85;
-}
-
-/* ------------------------------------------ optimus visual mode (§5.2) --- */
+/* --- Optimus: Cybertronian aura + Matrix of Leadership ring --- */
 /*
- * "Matrix of Leadership cyan / Autobot amber". The base glow already tracks
- * --vg-level, so this only recolours it and adds a slow expanding ring — the
- * commander should read as energy rather than backlight.
+ * The amber is a literal on purpose, inherited from the aura pair this
+ * replaces: it is the Autobot half of the palette and must not follow whichever
+ * accent the visitor picked in the theme switcher. The cyan half does follow
+ * it, so the crest still belongs to the active theme.
  *
- * The amber is a literal value on purpose: it is the Autobot half of the pair
- * and must not follow whichever accent the visitor picked in the palette
- * switcher. The cyan half does follow it, so the avatar still belongs to the
- * active theme.
- *
- * Both layers stay multiplied by --vg-level through the base rule's opacity,
- * which is what confines the pulse to "when speaking" (§5.2) with no JS.
+ * Both layers stay multiplied by --vg-level, which is what confines the pulse
+ * to "when speaking" (§5.2) with no JS.
  */
-.vg-avatar-wrap[data-vg-persona='optimus'] {
-  --vg-optimus-core: var(--accent);
-  --vg-optimus-amber: rgba(255, 176, 32, 0.55);
-}
-
-.vg-avatar-wrap[data-vg-persona='optimus'] .vg-avatar-glow {
-  box-shadow:
-    0 0 calc(12px + var(--vg-level) * 34px) var(--vg-optimus-core),
-    0 0 calc(5px + var(--vg-level) * 16px) var(--vg-optimus-amber);
-}
-
-.vg-avatar-wrap[data-vg-persona='optimus'] .vg-avatar-glow::after {
-  content: '';
+.vg-optimus-aura {
   position: absolute;
-  inset: -6%;
+  inset: 0;
   border-radius: 50%;
-  border: 1px solid var(--vg-optimus-amber);
-  opacity: calc(var(--vg-level) * 0.5);
+  pointer-events: none;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  filter: blur(12px);
+  opacity: calc(0.22 + var(--vg-level) * 0.45);
+  transition: opacity 90ms linear;
+}
+
+.vg-optimus-ring {
+  position: absolute;
+  inset: -4%;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1px solid rgba(255, 176, 32, 0.55);
+  opacity: calc(0.12 + var(--vg-level) * 0.5);
   animation: vg-optimus-ring 2.2s ease-out infinite;
 }
 
@@ -423,31 +174,451 @@
   }
 }
 
-/* -------------------------------------------------- reduced motion (§6.1) --- */
+/* --- JARVIS: arc glow + counter-rotating HUD rings --- */
+.vg-jarvis-aura {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, #38bdf8 0%, #6366f1 50%, transparent 75%);
+  filter: blur(16px);
+  opacity: calc(0.18 + var(--vg-level) * 0.4);
+  transition: opacity 90ms linear;
+}
+
+/* transform-box so the rotation pivots on the viewBox centre rather than the
+   SVG user-space origin, which is where an unset transform-origin would put
+   it. */
+.vg-jarvis-spin,
+.vg-jarvis-spin-rev {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+
+.vg-jarvis-spin {
+  animation: vg-spin 20s linear infinite;
+}
+
+.vg-jarvis-spin-rev {
+  animation: vg-spin 12s linear infinite reverse;
+}
+
+@keyframes vg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --------------------------------------- docked agent controls (§3.5) --- */
 /*
- * Keep the mouth — it carries the information. Drop the bob, the glow pulse,
- * the breathing and the attention pulse.
+ * Was .vg-controls / .vg-toggle: a separate pill floating at bottom-left with
+ * its own persona menu. Same three controls, now docked at the foot of the
+ * agent bubble, so the widget that offers the tour is the one that gives it.
+ *
+ * Everything here renders only once the provider is ready, which is also what
+ * guarantees this stylesheet has landed — AgentControls is imported eagerly by
+ * AvatarGuide.jsx but is never on screen before the lazy chunk (§8).
+ */
+.vg-agent-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.vg-agent-prompt {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--text-dim);
+}
+
+/* Clip n of m within the current section. */
+.vg-agent-progress {
+  height: 2px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.vg-agent-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 260ms ease;
+}
+
+.vg-persona-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.vg-persona-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.vg-persona-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.vg-persona-pill-active {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.vg-agent-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 7px 12px;
+  /* Instrument geometry and mono label, like every other control on the page. */
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+.vg-agent-cta:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.vg-agent-cta-on {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+/* While speaking, the icon brightens with the voice. */
+.vg-agent-cta-on svg {
+  filter: drop-shadow(0 0 calc(var(--vg-level) * 7px) var(--accent));
+}
+
+.vg-agent-cta-on .vg-wave-1 {
+  opacity: calc(0.35 + var(--vg-level) * 0.65);
+}
+
+.vg-agent-cta-on .vg-wave-2 {
+  opacity: calc(0.15 + var(--vg-level) * 0.85);
+}
+
+/* Gentle pulse to draw the eye. Stops for good after the first interaction,
+   which is enforced in JS via localStorage (§7). */
+.vg-agent-cta-pulse {
+  animation: vg-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes vg-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--accent-line);
+  }
+  50% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+}
+
+.vg-persona-pill:focus-visible,
+.vg-agent-cta:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------- mobile mini-pill (§3.4) --- */
+/*
+ * Under 768px this is the entire guide: AvatarGuide.jsx returns null and the
+ * bubble goes with it, so nothing sits on top of the page any more.
+ *
+ * The right inset is not symmetric on purpose. ScrollToTop is fixed at
+ * bottom-6 right-6 with a 40px hit area and a lower z-index, so a pill running
+ * to right:1rem would cover it exactly when it appears.
+ */
+.vg-pill-wrap {
+  position: fixed;
+  left: 1rem;
+  right: 4.5rem;
+  bottom: 1rem;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+/* Desktop docks these controls in the bubble instead (§3.5). */
+@media (min-width: 768px) {
+  .vg-pill-wrap {
+    display: none;
+  }
+}
+
+.vg-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 6px 0 7px;
+  background: var(--surface-1);
+  border: 1px solid var(--rule-strong);
+  /* The one rounded thing on an otherwise square page — it is a dynamic
+     island, and it only reads as one at this radius. */
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.vg-pill-on {
+  border-color: var(--accent-line);
+}
+
+.vg-pill-persona {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--surface-2);
+  cursor: pointer;
+}
+
+.vg-pill-persona[aria-expanded='true'] {
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.vg-pill-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Four-bar equaliser, heights straight off --vg-level. Flat and grey until a
+   clip is actually playing. */
+.vg-pill-eq {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.vg-pill-bar {
+  width: 2px;
+  height: 3px;
+  background: var(--rule-strong);
+  transition:
+    height 80ms linear,
+    background 200ms ease;
+}
+
+.vg-pill-eq-live .vg-pill-bar {
+  background: var(--accent);
+}
+
+.vg-pill-eq-live .vg-pill-bar:nth-child(1) {
+  height: calc(3px + var(--vg-level) * 7px);
+}
+
+.vg-pill-eq-live .vg-pill-bar:nth-child(2) {
+  height: calc(3px + var(--vg-level) * 11px);
+}
+
+.vg-pill-eq-live .vg-pill-bar:nth-child(3) {
+  height: calc(3px + var(--vg-level) * 5px);
+}
+
+.vg-pill-eq-live .vg-pill-bar:nth-child(4) {
+  height: calc(3px + var(--vg-level) * 9px);
+}
+
+.vg-pill-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vg-pill-name {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+}
+
+/* One line, always. A caption that wrapped would change the height of the pill
+   on every clip. */
+.vg-pill-caption {
+  display: block;
+  min-width: 0;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.vg-pill-caption > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.vg-pill-btn {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 9999px;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+.vg-pill-btn-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.vg-pill-btn-pulse {
+  animation: vg-pulse 2.4s ease-in-out infinite;
+}
+
+/* Persona picker. Opens upward — the pill is already on the bottom edge. */
+.vg-pill-sheet {
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  background: var(--surface-1);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.vg-pill-sheet-item {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.vg-pill-sheet-item-active {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-wash);
+}
+
+.vg-pill-persona:focus-visible,
+.vg-pill-body:focus-visible,
+.vg-pill-btn:focus-visible,
+.vg-pill-sheet-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* -------------------------------------------------- caption badge (§5.2) --- */
+/* `[ TRANSMISSION // OPTIMUS PRIME ]` above the caption line, or
+   `[ AUDIO BRIEFING READY ]` while still muted. Deliberately quiet — it labels
+   the voice, it is not the message. */
+.vg-caption-badge {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/* ------------------------------------------------ reduced motion (§6.1) --- */
+/*
+ * Keep the mouth — it carries the information. Same for the laser eyes, the
+ * reactor core and the equaliser bars: those are the persona lip sync, not
+ * decoration. Everything that moves on its own timer goes.
  */
 @media (prefers-reduced-motion: reduce) {
-  .vg-avatar-wrap > img {
+  .vg-avatar-wrap img {
     transform: none !important;
     animation: none !important;
   }
 
-  .vg-avatar-glow {
+  .vg-avatar-glow,
+  .vg-optimus-aura,
+  .vg-optimus-ring,
+  .vg-jarvis-aura {
     display: none !important;
   }
 
-  .vg-toggle-pulse {
+  .vg-jarvis-spin,
+  .vg-jarvis-spin-rev,
+  .vg-agent-cta-pulse,
+  .vg-pill-btn-pulse {
     animation: none !important;
   }
 
-  .vg-toggle-speaking {
+  .vg-agent-cta-on svg {
     filter: none !important;
-  }
-
-  /* The glow (and with it the Optimus ring) is already display:none above. */
-  .vg-persona-menu {
-    animation: none !important;
   }
 }

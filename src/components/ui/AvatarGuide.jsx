@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import avatarEmoji from '/avatar-emoji.png'; // Assuming avatar-emoji.png is in public folder. If not, this might need fallback
 // Voice guide: these three are tiny and engine-free — the heavy half is lazy (§8).
 import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
-import { AvatarMouth } from '../../voice-guide/components/AvatarMouth';
-import { CaptionText } from '../../voice-guide/components/CaptionBubble';
+import { PersonaAvatar } from '../../voice-guide/components/PersonaAvatar';
+import { CaptionText, AgentControls } from '../../voice-guide/components/CaptionBubble';
 
 const tourSteps = [
   { section: 'hero',           emotion: 'wave',    message: "👋 Hey! I'm Ashwin — welcome! Let me show you around." ,           x: '38vw', y: '-60vh' },
@@ -25,11 +24,6 @@ const emotionAnimations = {
   proud: { scale: [1, 1.3, 1.1, 1.25, 1], y: [0, -30, -10, -20, 0], rotate: [0, 5, -5, 3, 0], transition: { duration: 0.7 } },
   bye: { rotate: [0, -25, 25, -25, 25, -25, 25, 0], y: [0, -10, 0], scale: [1, 1.1, 1], transition: { duration: 1.2 } },
 };
-
-// Seven emotions used to mean seven glow colours — blue, indigo, yellow,
-// red, slate, green, orange — on a page with one accent. The motion still
-// differs per emotion; the light no longer does.
-const AVATAR_GLOW = 'drop-shadow(0 0 12px var(--accent-line))';
 
 const getScreenConfig = () => {
   const W = typeof window !== 'undefined' ? window.innerWidth : 1024;
@@ -82,6 +76,12 @@ export const AvatarGuide = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [tourActive, hasStarted]);
 
+    // Under 768px MobileVoicePill is the entire guide (personas spec §3.4): a
+    // 38px bar that never covers content, instead of this bubble sitting on top
+    // of the page. The handover waits for voice.ready, so if the lazy chunk
+    // never lands the old mobile bubble is still what shows, not nothing.
+    if (screenConfig.isMobile && voice.ready) return null;
+
     const getPositions = () => {
         const W = window.innerWidth;
         const H = window.innerHeight;
@@ -112,6 +112,11 @@ export const AvatarGuide = () => {
     const isRightSide = safePos.x > window.innerWidth / 2;
 
     const handleAvatarClick = () => {
+        // × now hides the persona selector and the unmute CTA along with the
+        // bubble, since they are docked inside it (personas spec §3.5) and
+        // there is no floating pill left to fall back on. Clicking the avatar
+        // is the way back.
+        setDismissed(false);
         if (!tourActive) {
             setCurrentStep(0);
             setTourActive(true);
@@ -126,7 +131,10 @@ export const AvatarGuide = () => {
     // `disabled` (§1.4, §3.3, §1.6: "a visitor who never clicks anything gets a
     // silent, captioned tour"). So the bubble follows the narration caption and
     // is no longer gated behind the once-per-session tour flag — only × hides it.
-    const showBubble = !dismissed && (!!voice.caption || (tourActive && hasStarted));
+    // Once the guide is ready the bubble also carries the unmute prompt and the
+    // persona selector, so it stays up after the tour copy runs out (personas
+    // spec §3.5) — that offer is the only place left to unmute from.
+    const showBubble = !dismissed && (!!voice.caption || voice.ready || (tourActive && hasStarted));
     // × is the single off switch: hides the bubble AND stops narration (§6.2).
     const dismissAll = () => { setDismissed(true); setTourActive(false); voice.disable(); };
 
@@ -176,9 +184,13 @@ export const AvatarGuide = () => {
                                 </div>
                                 <button onClick={(e) => { e.stopPropagation(); dismissAll(); }} style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }} aria-label="Dismiss and stop narration">✕</button>
                             </div>
+                            {/* Unmute CTA, mute toggle and persona selector, docked here
+                                rather than floating in their own box at bottom-left
+                                (personas spec §3.5). Renders nothing until ready. */}
+                            <AgentControls />
                             <p className="label" style={{ textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>scroll to explore ↓</p>
                         </motion.div>
-                    ) : (!tourActive && isHovered) ? (
+                    ) : ((!tourActive || dismissed) && isHovered) ? (
                         <motion.div
                             key="idle-bubble"
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -198,7 +210,7 @@ export const AvatarGuide = () => {
 
                 {/* Avatar + mouth share one positioned wrapper so they scale together (§6.1).
                     The emotion animation moved from the <img> to this wrapper so the mouth
-                    overlay stays aligned through it; the image keeps its own filter. */}
+                    overlay stays aligned through it; PersonaAvatar keeps its own filters. */}
                 <motion.div
                     key={`avatar-${currentStep}`}
                     className={`vg-avatar-wrap${voice.enabled && !voice.isSpeaking ? ' vg-idle' : ''}`}
@@ -210,23 +222,14 @@ export const AvatarGuide = () => {
                     animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
                     onClick={handleAvatarClick}
                     style={{
-                        pointerEvents: 'auto', cursor: tourActive ? 'default' : 'pointer',
+                        pointerEvents: 'auto', cursor: tourActive && !dismissed ? 'default' : 'pointer',
                         width: '130px', height: '130px',
                         display: isMobile ? 'none' : 'block',
                     }}
                 >
-                    <img
-                        src={avatarEmoji}
-                        alt=""
-                        style={{
-                            width: '130px', height: '130px',
-                            objectFit: 'contain', filter: AVATAR_GLOW,
-                            display: 'block',
-                        }}
-                        onError={(e) => console.log('Avatar load error:', e)}
-                    />
-                    <div className="vg-avatar-glow" aria-hidden="true" />
-                    <AvatarMouth active={voice.isSpeaking} />
+                    {/* Autobot crest, arc-reactor HUD, or the memoji and its
+                        overlaid mouth — personas spec §3.3. */}
+                    <PersonaAvatar persona={voice.persona} size={130} speaking={voice.isSpeaking} />
                 </motion.div>
             </motion.div>
         </motion.div>
