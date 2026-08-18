@@ -33,18 +33,18 @@ export const JARVIS_NARRATION = [
       {
         text: 'Systems online. I am JARVIS, running on Ashwin Vignesh’s portfolio stack.',
         audio: '/audio/narration/jarvis/hero-1.mp3',
-        estimatedMs: 5200,
+        estimatedMs: 6312,
       },
       {
         text: 'Scroll to advance. I will brief each subsystem as it comes into view.',
         audio: '/audio/narration/jarvis/hero-2.mp3',
-        estimatedMs: 4600,
+        estimatedMs: 5832,
       },
     ],
     revisit: {
       text: 'Returned to origin. Standing by.',
       audio: '/audio/narration/jarvis/hero-revisit.mp3',
-      estimatedMs: 2400,
+        estimatedMs: 4056,
     },
   },
   {
@@ -55,18 +55,18 @@ export const JARVIS_NARRATION = [
       {
         text: 'Subsystem: conversational assistant. Retrieval is bound to his portfolio data.',
         audio: '/audio/narration/jarvis/assistant-1.mp3',
-        estimatedMs: 5000,
+        estimatedMs: 6528,
       },
       {
         text: 'You may interrogate it directly, or supply a job description and request a match assessment.',
         audio: '/audio/narration/jarvis/assistant-2.mp3',
-        estimatedMs: 5600,
+        estimatedMs: 5664,
       },
     ],
     revisit: {
       text: 'Assistant subsystem still responsive.',
       audio: '/audio/narration/jarvis/assistant-revisit.mp3',
-      estimatedMs: 2600,
+        estimatedMs: 3096,
     },
   },
   {
@@ -77,18 +77,18 @@ export const JARVIS_NARRATION = [
       {
         text: 'Trajectory log: mechanical engineering, then enterprise ERP analysis, now a Master’s in AI Engineering in Germany.',
         audio: '/audio/narration/jarvis/roadmap-1.mp3',
-        estimatedMs: 7000,
+        estimatedMs: 8112,
       },
       {
         text: 'Three domains, one consistent vector — systems that hold up outside the lab.',
         audio: '/audio/narration/jarvis/roadmap-2.mp3',
-        estimatedMs: 4400,
+        estimatedMs: 5256,
       },
     ],
     revisit: {
       text: 'Trajectory log.',
       audio: '/audio/narration/jarvis/roadmap-revisit.mp3',
-      estimatedMs: 1600,
+        estimatedMs: 2016,
     },
   },
   {
@@ -99,13 +99,13 @@ export const JARVIS_NARRATION = [
       {
         text: 'Capability matrix: computer vision with YOLO and OpenCV, PyTorch model work, and C++ inference tuned for edge hardware.',
         audio: '/audio/narration/jarvis/skills-1.mp3',
-        estimatedMs: 7400,
+        estimatedMs: 8976,
       },
     ],
     revisit: {
       text: 'Capability matrix on screen.',
       audio: '/audio/narration/jarvis/skills-revisit.mp3',
-      estimatedMs: 2000,
+        estimatedMs: 2808,
     },
   },
   {
@@ -116,13 +116,13 @@ export const JARVIS_NARRATION = [
       {
         text: 'Telemetry feed: live commit activity, pulled straight from his GitHub account.',
         audio: '/audio/narration/jarvis/github-1.mp3',
-        estimatedMs: 5200,
+        estimatedMs: 5280,
       },
     ],
     revisit: {
       text: 'Telemetry feed active.',
       audio: '/audio/narration/jarvis/github-revisit.mp3',
-      estimatedMs: 1800,
+        estimatedMs: 2400,
     },
   },
   {
@@ -133,18 +133,18 @@ export const JARVIS_NARRATION = [
       {
         text: 'Deployment manifest: GymVision, real-time pose analysis. My own build, a voice-controlled terminal agent. And a CNN inference engine written in C++ with no frameworks at all.',
         audio: '/audio/narration/jarvis/projects-1.mp3',
-        estimatedMs: 9200,
+        estimatedMs: 13536,
       },
       {
         text: 'Each entry expands with its stack and its source repository.',
         audio: '/audio/narration/jarvis/projects-2.mp3',
-        estimatedMs: 4000,
+        estimatedMs: 3912,
       },
     ],
     revisit: {
       text: 'Deployment manifest.',
       audio: '/audio/narration/jarvis/projects-revisit.mp3',
-      estimatedMs: 1600,
+        estimatedMs: 2208,
     },
   },
   {
@@ -155,13 +155,13 @@ export const JARVIS_NARRATION = [
       {
         text: 'Credential registry: deep learning, transformer language models, and agent engineering. Every entry links to its verification record.',
         audio: '/audio/narration/jarvis/certifications-1.mp3',
-        estimatedMs: 7000,
+        estimatedMs: 9336,
       },
     ],
     revisit: {
       text: 'Credential registry.',
       audio: '/audio/narration/jarvis/certifications-revisit.mp3',
-      estimatedMs: 1700,
+        estimatedMs: 2184,
     },
   },
   {
@@ -172,18 +172,18 @@ export const JARVIS_NARRATION = [
       {
         text: 'End of walkthrough. All subsystems reported.',
         audio: '/audio/narration/jarvis/contact-1.mp3',
-        estimatedMs: 3600,
+        estimatedMs: 4296,
       },
       {
         text: 'Transmission channel is open below — the form, and his direct address.',
         audio: '/audio/narration/jarvis/contact-2.mp3',
-        estimatedMs: 4400,
+        estimatedMs: 4848,
       },
     ],
     revisit: {
       text: 'Transmission channel open.',
       audio: '/audio/narration/jarvis/contact-revisit.mp3',
-      estimatedMs: 1800,
+        estimatedMs: 2448,
     },
   },
 ];

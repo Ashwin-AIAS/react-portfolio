@@ -103,7 +103,7 @@ export const PERSONA_META = {
     short: 'JARVIS',
     tagline: 'Tactical system diagnostics',
     icon: '⚡',
-    badge: '[ TRANSMISSION // JARVIS ]',
+    badge: '[ JARVIS // TACTICAL TELEMETRY ]',
   },
 };
 
