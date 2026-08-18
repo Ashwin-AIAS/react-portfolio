@@ -3,23 +3,35 @@ import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
-import { ExternalLinkIcon, GraduationCapIcon } from '../../icons/Icons';
+import { ExternalLinkIcon } from '../../icons/Icons';
 
+// The blue circular icon tile scaled to 110% on hover on every card, which
+// read as decoration rather than information. A mono index and the issuer
+// carry the same weight without the motion.
 export const CertificationsSection = ({ t }) => (
     <Section id="certifications" title={t.certifications.title} subtitle={t.certifications.subtitle}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {portfolioData.certifications.map((cert, index) => (
-                <AnimateOnScroll key={index} delay={index * 100}>
-                    <Card className="h-full group hover:border-blue-500/30 transition-all duration-500">
-                        <div className="p-6 h-full flex flex-col">
-                            <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 text-blue-400 group-hover:scale-110 transition-transform duration-500">
-                                <GraduationCapIcon className="w-5 h-5" />
+                <AnimateOnScroll key={cert.name} delay={index * 70} className="h-full">
+                    <Card className="h-full group">
+                        <div className="p-5 h-full flex flex-col">
+                            <div className="flex items-baseline gap-3 mb-4 pb-3 border-b border-rule">
+                                <span className="label label-accent">{String(index + 1).padStart(2, '0')}</span>
+                                <span className="label truncate">{cert.issuer}</span>
                             </div>
-                            <h3 className="text-lg font-medium text-white/90 mb-2 leading-tight">{cert.name}</h3>
-                            <p className="text-sm text-white/40 mb-6 font-light">{cert.issuer}</p>
-                            <div className="mt-auto">
-                                <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider">
-                                    {t.certifications.viewCredential} <ExternalLinkIcon className="w-3 h-3 ml-2" />
+
+                            <h3 className="font-display text-base font-bold tracking-tight text-ink leading-snug mb-6 group-hover:text-accent transition-colors">
+                                {cert.name}
+                            </h3>
+
+                            <div className="mt-auto pt-4 border-t border-rule">
+                                <a
+                                    href={cert.credentialUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="label label-accent hover:text-accent-strong transition-colors inline-flex items-center gap-2"
+                                >
+                                    {t.certifications.viewCredential} <ExternalLinkIcon className="w-3 h-3" />
                                 </a>
                             </div>
                         </div>

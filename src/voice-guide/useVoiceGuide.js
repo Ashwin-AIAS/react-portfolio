@@ -17,5 +17,6 @@ export function useVoiceGuide() {
     enable: actions.enable,
     disable: actions.disable,
     toggle: actions.toggle,
+    setPersona: actions.setPersona,
   };
 }

@@ -2,7 +2,7 @@
  * SSR-safe, throw-safe persistence (spec §7).
  * Safari private mode throws on any Storage access, so every call is wrapped.
  */
-import { STORAGE_KEYS } from '../config';
+import { STORAGE_KEYS, PERSONA_IDS, DEFAULT_PERSONA } from '../config';
 
 const hasWindow = () => typeof window !== 'undefined';
 
@@ -34,6 +34,24 @@ export function getEnabled() {
 
 export function setEnabled(enabled) {
   safeSet('localStorage', STORAGE_KEYS.enabled, enabled ? '1' : '0');
+}
+
+// --- vg:persona (localStorage) ----------------------------------------------
+
+/**
+ * @returns {string} a persona id that definitely exists. An unknown or absent
+ * value falls back to the default rather than leaving the engine with a script
+ * it cannot resolve.
+ */
+export function getPersona() {
+  const raw = safeGet('localStorage', STORAGE_KEYS.persona);
+  return PERSONA_IDS.includes(raw) ? raw : DEFAULT_PERSONA;
+}
+
+/** @param {string} personaId ignored unless it is a known persona. */
+export function setPersona(personaId) {
+  if (!PERSONA_IDS.includes(personaId)) return false;
+  return safeSet('localStorage', STORAGE_KEYS.persona, personaId);
 }
 
 // --- vg:pulse-seen (localStorage) -------------------------------------------

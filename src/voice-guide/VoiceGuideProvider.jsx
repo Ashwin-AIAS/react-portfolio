@@ -41,6 +41,9 @@ export const VoiceGuideProvider = ({ children }) => {
       onSourceKind: (sourceKind) => {
         setState({ sourceKind });
       },
+      onPersona: (persona) => {
+        setState({ persona });
+      },
     });
     engineRef.current = engine;
 
@@ -49,8 +52,11 @@ export const VoiceGuideProvider = ({ children }) => {
       disable: () => engine.disable(),
       toggle: () =>
         engine.state === STATE.disabled ? engine.enable() : engine.disable(),
+      setPersona: (id) => engine.setPersona(id),
     });
-    setState({ ready: true });
+    // Publish the persisted persona now the engine has resolved it — the store
+    // was holding the compile-time default until this point.
+    setState({ ready: true, persona: engine.persona });
 
     const removeSpeechCleanup = installSpeechCleanup();
 

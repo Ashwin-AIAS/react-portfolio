@@ -32,10 +32,31 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <meta name="theme-color" content="#06080b" />
     <title>Ashwin Vignesh M — AI Engineer</title>
+    <script>
+      // Stamp the stored mode + palette onto <html> before first paint. The
+      // effects in src/App.jsx do the same thing, but they only run after the
+      // first commit — long enough for a returning visitor to see one frame of
+      // the cyan/dark default behind their actual theme. Keep in sync with the
+      // two useEffects in App.jsx.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var dark = localStorage.getItem('theme-mode') !== 'light';
+          root.classList.toggle('theme-dark', dark);
+          root.classList.toggle('theme-light', !dark);
+          var known = ['cyan', 'amber', 'indigo', 'emerald', 'crimson'];
+          var saved = localStorage.getItem('theme-palette');
+          root.classList.add('palette-' + (known.indexOf(saved) > -1 ? saved : 'cyan'));
+        } catch (e) {
+          /* storage blocked (private mode) — the CSS defaults already cover it */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

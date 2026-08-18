@@ -7,6 +7,8 @@
 import {
   FFT_SIZE,
   SMOOTHING_TIME_CONSTANT,
+  DEFAULT_PERSONA,
+  OPTIMUS_DSP,
 } from '../config';
 import { rmsFromTimeDomain } from '../utils/amplitude';
 import { SOURCE_KIND } from './NarrationSource';
@@ -35,6 +37,77 @@ export async function audioFileExists(url, timeoutMs = 2500) {
 }
 
 /**
+ * Cybertronian bass and resonance — Optimus spec §4.2.
+ *
+ * Low-shelf chest rumble -> high-mid presence for metal articulation -> a short
+ * feedback comb for the metallic slapback, summed back in parallel.
+ *
+ * TWO DELIBERATE DEPARTURES FROM THE SPEC LISTING:
+ *
+ *  1. `destinationNode` is the analyser, not ctx.destination. Wiring straight
+ *     to the destination would bypass the gain node, and the gain node is what
+ *     stop(fadeMs) ramps — the voice would keep playing through every fade,
+ *     mute and section interrupt. It also keeps the mouth reading the signal
+ *     that is actually audible.
+ *
+ *  2. A trim gain sits at the end. +8 dB of shelf plus a parallel comb branch
+ *     is enough to clip a normalised recording, and clipping on a voice reads
+ *     as buzz, not as bass.
+ *
+ * Applies only to recorded audio. speechSynthesis output cannot be routed
+ * through Web Audio in any current browser, so the TTS fallback gets its
+ * character from the voice/rate/pitch profile instead (config.SPEECH_PROFILES).
+ *
+ * @param {AudioContext} audioContext
+ * @param {AudioNode} sourceNode
+ * @param {AudioNode} destinationNode
+ * @returns {AudioNode[]} the created nodes, so the caller can disconnect them
+ */
+export function applyOptimusDSP(audioContext, sourceNode, destinationNode) {
+  // 1. Heavy low-end sub bass boost (chest resonance).
+  const bassBoost = audioContext.createBiquadFilter();
+  bassBoost.type = 'lowshelf';
+  bassBoost.frequency.value = OPTIMUS_DSP.bassFrequency;
+  bassBoost.gain.value = OPTIMUS_DSP.bassGain;
+
+  // 2. High-mid presence filter (metal articulation).
+  const presence = audioContext.createBiquadFilter();
+  presence.type = 'peaking';
+  presence.frequency.value = OPTIMUS_DSP.presenceFrequency;
+  presence.gain.value = OPTIMUS_DSP.presenceGain;
+  presence.Q.value = OPTIMUS_DSP.presenceQ;
+
+  // 3. Subtle metallic comb.
+  const delay = audioContext.createDelay(1);
+  delay.delayTime.value = OPTIMUS_DSP.combDelaySeconds;
+
+  const feedback = audioContext.createGain();
+  feedback.gain.value = OPTIMUS_DSP.combFeedback;
+
+  const combMix = audioContext.createGain();
+  combMix.gain.value = OPTIMUS_DSP.combMix;
+
+  const trim = audioContext.createGain();
+  trim.gain.value = OPTIMUS_DSP.outputTrim;
+
+  sourceNode.connect(bassBoost);
+  bassBoost.connect(presence);
+  presence.connect(trim);
+
+  // Parallel comb circuit. feedback -> delay is the loop; combFeedback below 1
+  // is what makes it decay instead of ringing forever.
+  presence.connect(delay);
+  delay.connect(feedback);
+  feedback.connect(delay);
+  delay.connect(combMix);
+  combMix.connect(trim);
+
+  trim.connect(destinationNode);
+
+  return [bassBoost, presence, delay, feedback, combMix, trim];
+}
+
+/**
  * @param {() => AudioContext | null} getAudioContext
  * @returns {import('./NarrationSource').NarrationSource & { kind: string }}
  */
@@ -46,6 +119,7 @@ export function createAudioFileSource(getAudioContext) {
 
   let analyser = null;
   let gain = null;
+  let personaId = DEFAULT_PERSONA;
   let current = null;
   let rafId = 0;
   let endCallback = null;
@@ -89,6 +163,16 @@ export function createAudioFileSource(getAudioContext) {
   return {
     kind: SOURCE_KIND.audio,
 
+    /**
+     * Selects the DSP routing for clips played from here on (Optimus §4.2).
+     * Elements already wired keep their chain — see the routing comment in
+     * play() for why that is safe.
+     * @param {string} nextPersonaId
+     */
+    setPersona(nextPersonaId) {
+      personaId = nextPersonaId;
+    },
+
     isAvailable() {
       return (
         typeof window !== 'undefined' &&
@@ -131,7 +215,14 @@ export function createAudioFileSource(getAudioContext) {
         if (!node) {
           try {
             node = ctx.createMediaElementSource(el);
-            node.connect(analyser);
+            // Optimus spec §4.2. Routed once, at creation: the element is
+            // cached per URL and the URLs are per-persona, so an element never
+            // outlives the persona that owns it and never needs rewiring.
+            if (personaId === 'optimus' && OPTIMUS_DSP.enabled) {
+              applyOptimusDSP(ctx, node, analyser);
+            } else {
+              node.connect(analyser);
+            }
             nodes.set(el, node);
           } catch {
             cb.onEnd(false);

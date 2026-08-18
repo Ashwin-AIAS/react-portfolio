@@ -12,6 +12,7 @@
  * straight to a CSS custom property (--vg-level) instead, which is also what
  * §6.1 asks for.
  */
+import { DEFAULT_PERSONA } from './config';
 
 /**
  * @typedef {Object} VoiceGuideSnapshot
@@ -20,15 +21,24 @@
  * @property {string}  machine   narrationEngine STATE value
  * @property {{sectionId: string, text: string, clipIndex: number, total: number} | null} caption
  * @property {string | null} sourceKind
+ * @property {string}  persona   active narration persona id
  */
 
-/** @type {VoiceGuideSnapshot} */
+/**
+ * Seeded with the compile-time default rather than a localStorage read: this
+ * module is eager (the avatar bubble imports it), and reading storage at module
+ * scope would run before the provider has decided anything. The provider pushes
+ * the persisted value the moment the engine exists.
+ *
+ * @type {VoiceGuideSnapshot}
+ */
 let snapshot = {
   ready: false,
   enabled: false,
   machine: 'disabled',
   caption: null,
   sourceKind: null,
+  persona: DEFAULT_PERSONA,
 };
 
 const listeners = new Set();
@@ -38,6 +48,9 @@ let actions = {
   enable: async () => {},
   disable: async () => {},
   toggle: async () => {},
+  // No-op until the engine installs the real one — the persona control renders
+  // from the eager side and may be clicked before the lazy chunk has landed.
+  setPersona: async () => {},
 };
 
 function emit() {

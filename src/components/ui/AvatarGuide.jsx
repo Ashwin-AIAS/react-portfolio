@@ -26,15 +26,10 @@ const emotionAnimations = {
   bye: { rotate: [0, -25, 25, -25, 25, -25, 25, 0], y: [0, -10, 0], scale: [1, 1.1, 1], transition: { duration: 1.2 } },
 };
 
-const emotionFilters = {
-  wave: "drop-shadow(0 0 12px rgba(59,130,246,0.9))",
-  nod: "drop-shadow(0 0 10px rgba(99,102,241,0.8))",
-  flex: "drop-shadow(0 0 14px rgba(234,179,8,0.9))",
-  excited: "drop-shadow(0 0 16px rgba(239,68,68,0.9))",
-  think: "drop-shadow(0 0 10px rgba(148,163,184,0.7))",
-  proud: "drop-shadow(0 0 14px rgba(34,197,94,0.9))",
-  bye: "drop-shadow(0 0 12px rgba(251,146,60,0.9))",
-};
+// Seven emotions used to mean seven glow colours — blue, indigo, yellow,
+// red, slate, green, orange — on a page with one accent. The motion still
+// differs per emotion; the light no longer does.
+const AVATAR_GLOW = 'drop-shadow(0 0 12px var(--accent-line))';
 
 const getScreenConfig = () => {
   const W = typeof window !== 'undefined' ? window.innerWidth : 1024;
@@ -157,16 +152,17 @@ export const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             style={{
-                                pointerEvents: 'auto', background: 'white', 
+                                pointerEvents: 'auto',
+                                background: 'var(--surface-1)',
+                                border: '1px solid var(--rule-strong)',
                                 ...(isMobile ? {
                                     position: 'fixed', bottom: '16px', left: '8px', right: '8px', top: 'auto', width: 'auto'
                                 } : {
                                     position: 'absolute', bottom: '100%', ...(isRightSide ? { right: 0 } : { left: 0 }),
                                     width: '260px'
                                 }),
-                                borderRadius: '16px', padding: '12px 16px', marginBottom: '8px',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                                fontSize: isMobile ? '12px' : '13px', color: '#1f2937', fontWeight: 500,
+                                borderRadius: 'var(--r-md)', padding: '12px 14px', marginBottom: '8px',
+                                fontSize: isMobile ? '12px' : '13px', color: 'var(--text)', fontWeight: 400,
                             }}
                         >
                             <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>
@@ -175,12 +171,12 @@ export const AvatarGuide = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                                 <div style={{ display: 'flex', gap: '4px' }}>
                                     {tourSteps.map((_, i) => (
-                                        <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: i === currentStep ? '#2563eb' : '#cbd5e1', transition: 'background 0.3s' }} />
+                                        <div key={i} style={{ width: 5, height: 5, background: i === currentStep ? 'var(--accent)' : 'var(--rule-strong)', transition: 'background 0.3s' }} />
                                     ))}
                                 </div>
-                                <button onClick={(e) => { e.stopPropagation(); dismissAll(); }} style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0, fontWeight: 'bold' }} aria-label="Dismiss and stop narration">✕</button>
+                                <button onClick={(e) => { e.stopPropagation(); dismissAll(); }} style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }} aria-label="Dismiss and stop narration">✕</button>
                             </div>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>scroll to explore ↓</p>
+                            <p className="label" style={{ textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>scroll to explore ↓</p>
                         </motion.div>
                     ) : (!tourActive && isHovered) ? (
                         <motion.div
@@ -189,11 +185,14 @@ export const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             style={{
-                                pointerEvents: 'auto', background: 'white', borderRadius: '12px',
-                                padding: '8px 12px', marginBottom: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                                fontSize: '12px', color: '#1f2937', fontWeight: 600, whiteSpace: 'nowrap'
+                                pointerEvents: 'auto',
+                                background: 'var(--surface-1)',
+                                border: '1px solid var(--rule-strong)',
+                                borderRadius: 'var(--r-md)',
+                                padding: '8px 12px', marginBottom: '8px',
+                                fontSize: '12px', color: 'var(--text)', whiteSpace: 'nowrap'
                             }}
-                        >Click to restart 👆</motion.div>
+                        >Click to restart</motion.div>
                     ) : null}
                 </AnimatePresence>
 
@@ -203,6 +202,11 @@ export const AvatarGuide = () => {
                 <motion.div
                     key={`avatar-${currentStep}`}
                     className={`vg-avatar-wrap${voice.enabled && !voice.isSpeaking ? ' vg-idle' : ''}`}
+                    /* Optimus spec §5.2 — the only hook the persona visual mode
+                       needs. The aura recolours in CSS off this attribute; the
+                       intensity stays driven by --vg-level, so nothing here
+                       re-renders per frame. */
+                    data-vg-persona={voice.persona}
                     animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
                     onClick={handleAvatarClick}
                     style={{
@@ -216,7 +220,7 @@ export const AvatarGuide = () => {
                         alt=""
                         style={{
                             width: '130px', height: '130px',
-                            objectFit: 'contain', filter: emotionFilters[tourSteps[currentStep].emotion],
+                            objectFit: 'contain', filter: AVATAR_GLOW,
                             display: 'block',
                         }}
                         onError={(e) => console.log('Avatar load error:', e)}

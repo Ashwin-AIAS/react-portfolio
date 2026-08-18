@@ -66,11 +66,150 @@ export const ENVELOPE_FLOOR = 0.1;
 /** Fallback word duration when onboundary gives us nothing to go on. */
 export const ESTIMATED_WORD_MS = 320;
 
+// --- Personas (Optimus spec §2, §4.1, §5) ------------------------------------
+/**
+ * Persona *metadata* lives here rather than in data/narrationScript.js on
+ * purpose. CaptionBubble.jsx is imported eagerly by AvatarGuide.jsx, so any
+ * module it touches lands in the initial bundle. config.js is pure constants;
+ * the narration scripts are not. Keeping the badge text and speech profiles
+ * here lets the eager caption render a persona badge without dragging all
+ * three scripts out of the lazy chunk (§8).
+ */
+export const PERSONA_IDS = ['optimus', 'ashwin', 'jarvis'];
+
+/** Optimus spec §2 marks this as the new default. */
+export const DEFAULT_PERSONA = 'optimus';
+
+export const PERSONA_META = {
+  optimus: {
+    id: 'optimus',
+    name: 'Optimus Prime',
+    short: 'OPTIMUS PRIME',
+    tagline: 'Autobot commander',
+    icon: '🤖',
+    badge: '[ TRANSMISSION // OPTIMUS PRIME ]',
+  },
+  ashwin: {
+    id: 'ashwin',
+    name: 'Ashwin',
+    short: 'ASHWIN',
+    tagline: 'The creator, first person',
+    icon: '🎙️',
+    badge: '[ TRANSMISSION // ASHWIN ]',
+  },
+  jarvis: {
+    id: 'jarvis',
+    name: 'JARVIS',
+    short: 'JARVIS',
+    tagline: 'Tactical system diagnostics',
+    icon: '⚡',
+    badge: '[ JARVIS // TACTICAL TELEMETRY ]',
+  },
+};
+
+/**
+ * Per-persona speechSynthesis tuning (Optimus spec §4.1).
+ *
+ * `preferredVoices` is matched against voice.name before any lang fallback:
+ * pitch alone does not make a baritone, so the underlying voice has to be a
+ * deep male one to begin with. The names are the common Chrome/Edge/macOS
+ * identifiers; whichever is present wins, and the lang preference catches
+ * everything else.
+ */
+export const SPEECH_PROFILES = {
+  optimus: {
+    rate: 0.85,
+    pitch: 0.65,
+    volume: 1.0,
+    preferredVoices: [
+      'Google UK English Male',
+      'Microsoft David',
+      'Microsoft George',
+      'Daniel',
+      'Arthur',
+      'en-US-Neural2-D',
+      'en-US-Neural2-J',
+    ],
+    langPreference: ['en-GB', 'en-US', 'en'],
+  },
+  ashwin: {
+    rate: SPEECH_RATE,
+    pitch: SPEECH_PITCH,
+    volume: 1.0,
+    preferredVoices: [],
+    langPreference: VOICE_PREFERENCE,
+  },
+  jarvis: {
+    // Crisp and synthetic rather than deep — slightly quick, slightly bright.
+    rate: 1.02,
+    pitch: 1.1,
+    volume: 1.0,
+    preferredVoices: ['Google UK English Male', 'Microsoft George', 'Daniel', 'Arthur'],
+    langPreference: ['en-GB', 'en'],
+  },
+};
+
+/**
+ * Web Audio DSP for the Optimus persona (Optimus spec §4.2).
+ *
+ * Only ever reaches recorded audio: speechSynthesis output cannot be routed
+ * through Web Audio, so the TTS fallback takes its character from
+ * SPEECH_PROFILES instead.
+ *
+ * OFF, because the clips in /public/audio/narration/optimus/ are ALREADY
+ * processed. scripts/generate_optimus_audio.py bakes its own chain in at
+ * render time — bass=g=9:f=120, treble=g=3:f=3000, flanger — before it writes
+ * the mp3. Verified by re-rendering hero-1 raw from Edge-TTS and applying that
+ * filter: the result matches the shipped file exactly (RMS -21.87, sub-200 Hz
+ * -24.07, 161464 bps).
+ *
+ * Running this chain on top of that would stack ~+17 dB of cumulative low
+ * shelf and a second comb against the baked flanger — measured at +2.9 dB more
+ * sub-200 Hz on an already bass-heavy render. Muddy and phasey, not commanding.
+ *
+ * Turn it back on only for RAW narration audio: neutral TTS or a plain deep
+ * male recording with no processing of its own. If you re-render the clips,
+ * drop the ffmpeg filter from the generator first, then flip this to true.
+ *
+ * outputTrim is then not cosmetic. Measured on hero-1.mp3, the chain without
+ * it peaks at 0.0 dBFS — clipping, which on a voice reads as buzz rather than
+ * bass. At 0.72 the same file peaks at -2.8 dBFS.
+ */
+export const OPTIMUS_DSP = {
+  enabled: false,
+  /** Low-shelf chest rumble. */
+  bassFrequency: 140, // Hz
+  bassGain: 8.0, // dB
+  /** Peaking presence for metal articulation. */
+  presenceFrequency: 2800, // Hz
+  presenceGain: 3.5, // dB
+  presenceQ: 1.2,
+  /** Metallic slapback. */
+  combDelaySeconds: 0.015,
+  combFeedback: 0.25,
+  /** How much of the comb is summed back in. Spec ran it at unity, which
+      buries the dry signal; this keeps it as a sheen. */
+  combMix: 0.35,
+  /** Headroom for the boosts above, so a normalised file cannot clip. */
+  outputTrim: 0.72,
+};
+
+/** @returns {typeof SPEECH_PROFILES.optimus} never undefined */
+export function getSpeechProfile(personaId) {
+  return SPEECH_PROFILES[personaId] ?? SPEECH_PROFILES[DEFAULT_PERSONA];
+}
+
+/** @returns {typeof PERSONA_META.optimus} never undefined */
+export function getPersonaMeta(personaId) {
+  return PERSONA_META[personaId] ?? PERSONA_META[DEFAULT_PERSONA];
+}
+
 // --- Storage keys (§7) -------------------------------------------------------
 export const STORAGE_KEYS = {
   enabled: 'vg:enabled', // localStorage
   pulseSeen: 'vg:pulse-seen', // localStorage
   visits: 'vg:visits', // sessionStorage
+  persona: 'vg:persona', // localStorage (Optimus spec §2)
 };
 
 // --- Debug -------------------------------------------------------------------

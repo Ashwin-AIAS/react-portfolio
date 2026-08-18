@@ -4,6 +4,32 @@ import React, { useEffect, useRef } from 'react';
 // fading trail, faint range rings, and scattered points that light up as the
 // beam passes over them. Pauses when off-screen and renders nothing under
 // prefers-reduced-motion.
+//
+// Every colour is read off the live design tokens each frame, so the sweep
+// follows whichever palette is active without the component remounting.
+
+// Custom properties come back as authored — '#00f2fe', not 'rgb(...)' — so the
+// trail and beam, which need per-segment alpha, have to parse the hex first.
+const toRGB = (value) => {
+    const v = value.trim();
+    const hex = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (hex) {
+        const d = hex[1];
+        const full = d.length === 3 ? d[0] + d[0] + d[1] + d[1] + d[2] + d[2] : d;
+        return [
+            parseInt(full.slice(0, 2), 16),
+            parseInt(full.slice(2, 4), 16),
+            parseInt(full.slice(4, 6), 16),
+        ];
+    }
+    if (v.toLowerCase().startsWith('rgb')) {
+        const inner = v.slice(v.indexOf('(') + 1, v.lastIndexOf(')'));
+        const parts = inner.split(',').map((n) => parseFloat(n));
+        if (parts.length >= 3 && parts.slice(0, 3).every(Number.isFinite)) return parts.slice(0, 3);
+    }
+    return null;
+};
+
 export const LidarSweep = () => {
     const canvasRef = useRef(null);
 
@@ -20,6 +46,12 @@ export const LidarSweep = () => {
         let sweep = 0;
         let w, h, cx, cy, maxR;
         let points = [];
+        // Parsing hex 60x/s is wasted work — the palette only changes on click,
+        // so cache the parse and redo it when the raw token value differs.
+        let lastAccent = '';
+        let accentRGB = [0, 242, 254];
+        let lastAccentStrong = '';
+        let accentStrongRGB = [56, 189, 248];
 
         const resize = () => {
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -46,8 +78,24 @@ export const LidarSweep = () => {
 
             ctx.clearRect(0, 0, w, h);
 
+            const computedStyle = getComputedStyle(canvas);
+            const accentColor = computedStyle.getPropertyValue('--accent').trim() || '#00f2fe';
+            const accentWash = computedStyle.getPropertyValue('--accent-wash').trim() || 'rgba(0,242,254,0.1)';
+            const accentStrong = computedStyle.getPropertyValue('--accent-strong').trim() || accentColor;
+
+            if (accentColor !== lastAccent) {
+                lastAccent = accentColor;
+                accentRGB = toRGB(accentColor) || [0, 242, 254];
+            }
+            if (accentStrong !== lastAccentStrong) {
+                lastAccentStrong = accentStrong;
+                accentStrongRGB = toRGB(accentStrong) || accentRGB;
+            }
+            const [ar, ag, ab] = accentRGB;
+            const [sr, sg, sb] = accentStrongRGB;
+
             // Range rings
-            ctx.strokeStyle = 'rgba(59,130,246,0.05)';
+            ctx.strokeStyle = accentWash;
             ctx.lineWidth = 1;
             for (const f of [0.22, 0.42, 0.62, 0.82]) {
                 ctx.beginPath();
@@ -63,7 +111,7 @@ export const LidarSweep = () => {
                 ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, maxR, a, a + 0.011);
                 ctx.closePath();
-                ctx.fillStyle = `rgba(59,130,246,${0.09 * (1 - i / SEGMENTS)})`;
+                ctx.fillStyle = `rgba(${ar},${ag},${ab},${0.10 * (1 - i / SEGMENTS)})`;
                 ctx.fill();
             }
 
@@ -71,14 +119,14 @@ export const LidarSweep = () => {
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.lineTo(cx + Math.cos(sweep) * maxR, cy + Math.sin(sweep) * maxR);
-            ctx.strokeStyle = 'rgba(96,165,250,0.30)';
+            ctx.strokeStyle = `rgba(${sr},${sg},${sb},0.32)`;
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
             // Center hub
             ctx.beginPath();
             ctx.arc(cx, cy, 2.5, 0, TWO_PI);
-            ctx.fillStyle = 'rgba(96,165,250,0.4)';
+            ctx.fillStyle = `rgba(${sr},${sg},${sb},0.45)`;
             ctx.fill();
 
             // Detected points: flash when the beam passes, then decay
@@ -90,17 +138,16 @@ export const LidarSweep = () => {
 
                 const px = cx + Math.cos(p.angle) * p.dist;
                 const py = cy + Math.sin(p.angle) * p.dist;
-                const alpha = 0.08 + p.glow * 0.6;
 
                 if (p.glow > 0.4) {
                     ctx.beginPath();
                     ctx.arc(px, py, p.size * 3, 0, TWO_PI);
-                    ctx.fillStyle = `rgba(34,211,238,${p.glow * 0.12})`;
+                    ctx.fillStyle = `rgba(${ar},${ag},${ab},${p.glow * 0.14})`;
                     ctx.fill();
                 }
                 ctx.beginPath();
                 ctx.arc(px, py, p.size, 0, TWO_PI);
-                ctx.fillStyle = `rgba(125,211,252,${alpha})`;
+                ctx.fillStyle = p.glow > 0.05 ? accentColor : 'rgba(255,255,255,0.2)';
                 ctx.fill();
             }
 
