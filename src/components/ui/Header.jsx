@@ -6,6 +6,7 @@ import { portfolioData } from '../../data/portfolioData';
 // For now, we'll keep the context dependency injection pattern used in the original code,
 // but we will import it from App.jsx once App is orchestrator.
 import { ThemeContext } from '../../App';
+import { ThemePaletteSelector } from './ThemePaletteSelector';
 
 // Replaces the emoji theme toggle (🌙/☀️) — OS-rendered emoji clashed with
 // the SVG icon set used everywhere else.
@@ -77,6 +78,7 @@ export const Header = ({ activeSection, lang, t, toggleLang }) => {
                         </a>
                     ))}
                     <div className="flex items-center gap-2.5 border-l border-rule pl-5">
+                        <ThemePaletteSelector />
                         <LangToggle lang={lang} toggleLang={toggleLang} />
                         <button
                             onClick={() => setIsDark(!isDark)}
@@ -89,6 +91,7 @@ export const Header = ({ activeSection, lang, t, toggleLang }) => {
                 </div>
 
                 <div className="flex items-center gap-2 md:hidden">
+                    <ThemePaletteSelector compact />
                     <LangToggle lang={lang} toggleLang={toggleLang} compact />
                     <button
                         onClick={() => setIsDark(!isDark)}

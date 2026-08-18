@@ -23,7 +23,12 @@ import { AIAssistantSection } from './components/sections/AIAssistantSection';
 import { CertificationsSection } from './components/sections/CertificationsSection';
 import { ContactSection } from './components/sections/ContactSection';
 
-export const ThemeContext = createContext({ isDark: true, setIsDark: () => {} });
+export const ThemeContext = createContext({
+    isDark: true,
+    setIsDark: () => {},
+    palette: 'cyan',
+    setPalette: () => {}
+});
 
 // Boot readout. Replaces a 2.5s screen that ran 8 concurrent animation
 // tracks in a monospace/conic-gradient/green palette used nowhere else on
@@ -103,7 +108,15 @@ const SplashScreen = ({ onComplete }) => {
 };
 
 export default function App() {
-    const [isDark, setIsDark] = useState(true);
+    const [isDark, setIsDark] = useState(() => {
+        const saved = localStorage.getItem('theme-mode');
+        return saved !== null ? saved === 'dark' : true;
+    });
+
+    const [palette, setPalette] = useState(() => {
+        const saved = localStorage.getItem('theme-palette');
+        return saved || 'cyan';
+    });
     const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('splashSeen') === '1');
     const activeSection = useActiveSection();
     const { lang, t, toggleLang } = useLang();
@@ -135,14 +148,25 @@ export default function App() {
         const root = document.documentElement;
         root.classList.toggle('theme-light', !isDark);
         root.classList.toggle('theme-dark', isDark);
+        localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
     }, [isDark]);
 
+    // The palette class rides on the same <html> element as the mode class,
+    // so the .theme-light.palette-x rules can out-specify the dark defaults.
+    useEffect(() => {
+        const root = document.documentElement;
+        const allPalettes = ['palette-cyan', 'palette-amber', 'palette-indigo', 'palette-emerald', 'palette-crimson'];
+        allPalettes.forEach(cls => root.classList.remove(cls));
+        root.classList.add(`palette-${palette}`);
+        localStorage.setItem('theme-palette', palette);
+    }, [palette]);
+
     return (
-        <ThemeContext.Provider value={{ isDark, setIsDark }}>
+        <ThemeContext.Provider value={{ isDark, setIsDark, palette, setPalette }}>
             <AnimatePresence>
                 {!splashDone && <SplashScreen key="splash" onComplete={() => { sessionStorage.setItem('splashSeen', '1'); setSplashDone(true); }} />}
             </AnimatePresence>
-            <div className={`${isDark ? 'theme-dark' : 'theme-light'} min-h-screen font-sans transition-colors duration-500 relative`}>
+            <div className={`${isDark ? 'theme-dark' : 'theme-light'} palette-${palette} min-h-screen font-sans transition-colors duration-500 relative`}>
 <Header activeSection={activeSection} lang={lang} t={t} toggleLang={toggleLang} />
                 
                 <main>

@@ -3,96 +3,255 @@
 @tailwind utilities;
 
 /* ===================================================================
-   INSTRUMENT PANEL — DESIGN TOKENS
-   One accent. A real elevation ladder. Hairlines instead of glass.
-   Both themes define the same names, so no per-class !important
-   overrides are needed anywhere.
+   INSTRUMENT PANEL — DESIGN TOKENS & MULTI-THEME PALETTES
    =================================================================== */
 
-:root {
-  /* Surfaces — a genuine elevation ladder, not white-at-3%-on-black */
+/* Default / Cyber-Optic Cyan (Dark) */
+:root,
+.palette-cyan {
+  --bg: #05080f;
+  --surface-1: #0a101d;
+  --surface-2: #0f182a;
+  --surface-3: #152238;
+  --rule: #1b293d;
+  --rule-strong: #283b54;
+  --text: #e6f1fc;
+  --text-muted: #8da0b6;
+  --text-dim: #596c82;
+  --accent: #00f2fe;
+  --on-accent: #05080f;
+  --accent-strong: #38bdf8;
+  --accent-dim: #0284c7;
+  --accent-wash: rgba(0, 242, 254, 0.1);
+  --accent-line: rgba(0, 242, 254, 0.35);
+  --ok: #35d6a0;
+  --ok-wash: rgba(53, 214, 160, 0.1);
+  --err: #ff6b5e;
+  --heat-0: #0f182a;
+  --heat-1: rgba(0, 242, 254, 0.22);
+  --heat-2: rgba(0, 242, 254, 0.45);
+  --heat-3: rgba(0, 242, 254, 0.7);
+  --heat-4: #00f2fe;
+  --r-sm: 2px;
+  --r-md: 4px;
+  --r-lg: 6px;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color-scheme: dark;
+}
+
+/* Light / Cyber-Optic Cyan */
+.theme-light,
+.theme-light.palette-cyan {
+  --bg: #f0f4f9;
+  --surface-1: #ffffff;
+  --surface-2: #e8eff6;
+  --surface-3: #dbe5f0;
+  --rule: #cbd8e6;
+  --rule-strong: #a8bccf;
+  --text: #0b131e;
+  --text-muted: #48596c;
+  --text-dim: #687a8f;
+  --accent: #0284c7;
+  --on-accent: #ffffff;
+  --accent-strong: #0369a1;
+  --accent-dim: #38bdf8;
+  --accent-wash: rgba(2, 132, 199, 0.08);
+  --accent-line: rgba(2, 132, 199, 0.3);
+  --ok: #0f7a56;
+  --ok-wash: rgba(15, 122, 86, 0.1);
+  --err: #b3261e;
+  --heat-0: #dbe5f0;
+  --heat-1: rgba(2, 132, 199, 0.22);
+  --heat-2: rgba(2, 132, 199, 0.45);
+  --heat-3: rgba(2, 132, 199, 0.7);
+  --heat-4: #0284c7;
+  color-scheme: light;
+}
+
+/* Amber — Signal Telemetry */
+.palette-amber {
   --bg: #06080b;
   --surface-1: #0b0e13;
   --surface-2: #10151c;
   --surface-3: #161d26;
-
-  /* Hairlines — the primary structural device */
   --rule: #1c242e;
   --rule-strong: #2a3542;
-
-  /* Text ramp — real values, so contrast is predictable */
   --text: #e7ecf3;
   --text-muted: #93a0b1;
   --text-dim: #5d6a7a;
-
-  /* THE accent. Signal amber. Nothing else competes with it. */
   --accent: #ff9f1c;
-  /* Text drawn *on* the accent. Near-black clears 10:1 on bright amber,
-     but only 3.3:1 on the darker amber the light theme needs — so the
-     light theme flips it to white rather than keeping one value. */
   --on-accent: #0a0a0a;
   --accent-strong: #ffb54d;
   --accent-dim: #a86a10;
   --accent-wash: rgba(255, 159, 28, 0.1);
   --accent-line: rgba(255, 159, 28, 0.35);
-
-  /* Status only — never decorative */
-  --ok: #35d6a0;
-  --ok-wash: rgba(53, 214, 160, 0.1);
-  --err: #ff6b5e;
-
-  /* Contribution heatmap ramp — the accent, stepped. Was GitHub's green. */
   --heat-0: #131a22;
   --heat-1: rgba(255, 159, 28, 0.22);
   --heat-2: rgba(255, 159, 28, 0.45);
   --heat-3: rgba(255, 159, 28, 0.7);
   --heat-4: #ff9f1c;
-
-  /* Geometry — instruments are sharp */
-  --r-sm: 2px;
-  --r-md: 4px;
-  --r-lg: 6px;
-
-  /* Type */
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  color-scheme: dark;
 }
-
-.theme-light {
+.theme-light.palette-amber {
   --bg: #f4f6f8;
   --surface-1: #ffffff;
   --surface-2: #eef1f5;
   --surface-3: #e4e9ef;
-
   --rule: #d8dee6;
   --rule-strong: #b6c0cc;
-
   --text: #10161d;
   --text-muted: #4d5a68;
   --text-dim: #667080;
-
-  /* Amber needs to darken substantially to stay legible on light */
   --accent: #b25e00;
   --on-accent: #ffffff;
   --accent-strong: #8f4b00;
   --accent-dim: #d9922f;
   --accent-wash: rgba(178, 94, 0, 0.08);
   --accent-line: rgba(178, 94, 0, 0.3);
-
-  --ok: #0f7a56;
-  --ok-wash: rgba(15, 122, 86, 0.1);
-  --err: #b3261e;
-
   --heat-0: #e4e9ef;
   --heat-1: rgba(178, 94, 0, 0.22);
   --heat-2: rgba(178, 94, 0, 0.45);
   --heat-3: rgba(178, 94, 0, 0.7);
   --heat-4: #b25e00;
+}
 
-  color-scheme: light;
+/* Indigo — Neural Titanium */
+.palette-indigo {
+  --bg: #08090f;
+  --surface-1: #0e101b;
+  --surface-2: #141726;
+  --surface-3: #1c2033;
+  --rule: #22273e;
+  --rule-strong: #333b5c;
+  --text: #edf0fc;
+  --text-muted: #969ec0;
+  --text-dim: #606887;
+  --accent: #6366f1;
+  --on-accent: #ffffff;
+  --accent-strong: #818cf8;
+  --accent-dim: #4338ca;
+  --accent-wash: rgba(99, 102, 241, 0.12);
+  --accent-line: rgba(99, 102, 241, 0.35);
+  --heat-0: #141726;
+  --heat-1: rgba(99, 102, 241, 0.22);
+  --heat-2: rgba(99, 102, 241, 0.45);
+  --heat-3: rgba(99, 102, 241, 0.7);
+  --heat-4: #6366f1;
+}
+.theme-light.palette-indigo {
+  --bg: #f4f6fc;
+  --surface-1: #ffffff;
+  --surface-2: #edf0f9;
+  --surface-3: #dfe4f4;
+  --rule: #cfd6eb;
+  --rule-strong: #aab6d8;
+  --text: #0e1222;
+  --text-muted: #4a5372;
+  --text-dim: #6d7696;
+  --accent: #4338ca;
+  --on-accent: #ffffff;
+  --accent-strong: #3730a3;
+  --accent-dim: #6366f1;
+  --accent-wash: rgba(67, 56, 202, 0.08);
+  --accent-line: rgba(67, 56, 202, 0.3);
+  --heat-0: #dfe4f4;
+  --heat-1: rgba(67, 56, 202, 0.22);
+  --heat-2: rgba(67, 56, 202, 0.45);
+  --heat-3: rgba(67, 56, 202, 0.7);
+  --heat-4: #4338ca;
+}
+
+/* Emerald — CUDA Matrix */
+.palette-emerald {
+  --bg: #040806;
+  --surface-1: #08120c;
+  --surface-2: #0e1c13;
+  --surface-3: #14281b;
+  --rule: #1b3524;
+  --rule-strong: #274f36;
+  --text: #e7f7ed;
+  --text-muted: #8ebda0;
+  --text-dim: #59856a;
+  --accent: #00ff87;
+  --on-accent: #040806;
+  --accent-strong: #34d399;
+  --accent-dim: #059669;
+  --accent-wash: rgba(0, 255, 135, 0.1);
+  --accent-line: rgba(0, 255, 135, 0.35);
+  --heat-0: #0e1c13;
+  --heat-1: rgba(0, 255, 135, 0.22);
+  --heat-2: rgba(0, 255, 135, 0.45);
+  --heat-3: rgba(0, 255, 135, 0.7);
+  --heat-4: #00ff87;
+}
+.theme-light.palette-emerald {
+  --bg: #f0f8f4;
+  --surface-1: #ffffff;
+  --surface-2: #e6f3ec;
+  --surface-3: #d5e9df;
+  --rule: #c2dfcf;
+  --rule-strong: #9dc6af;
+  --text: #08180e;
+  --text-muted: #43614e;
+  --text-dim: #658371;
+  --accent: #047857;
+  --on-accent: #ffffff;
+  --accent-strong: #065f46;
+  --accent-dim: #10b981;
+  --accent-wash: rgba(4, 120, 87, 0.08);
+  --accent-line: rgba(4, 120, 87, 0.3);
+  --heat-0: #d5e9df;
+  --heat-1: rgba(4, 120, 87, 0.22);
+  --heat-2: rgba(4, 120, 87, 0.45);
+  --heat-3: rgba(4, 120, 87, 0.7);
+  --heat-4: #047857;
+}
+
+/* Crimson — Aerospace HUD */
+.palette-crimson {
+  --bg: #0b0708;
+  --surface-1: #130c0e;
+  --surface-2: #1d1215;
+  --surface-3: #27181d;
+  --rule: #362127;
+  --rule-strong: #50303a;
+  --text: #fce8eb;
+  --text-muted: #c28f98;
+  --text-dim: #875f66;
+  --accent: #ff3366;
+  --on-accent: #ffffff;
+  --accent-strong: #fb7185;
+  --accent-dim: #be123c;
+  --accent-wash: rgba(255, 51, 102, 0.12);
+  --accent-line: rgba(255, 51, 102, 0.35);
+  --heat-0: #1d1215;
+  --heat-1: rgba(255, 51, 102, 0.22);
+  --heat-2: rgba(255, 51, 102, 0.45);
+  --heat-3: rgba(255, 51, 102, 0.7);
+  --heat-4: #ff3366;
+}
+.theme-light.palette-crimson {
+  --bg: #fcf2f4;
+  --surface-1: #ffffff;
+  --surface-2: #f7e6e9;
+  --surface-3: #ebd5d9;
+  --rule: #dfc0c6;
+  --rule-strong: #c49ba4;
+  --text: #1e0a0e;
+  --text-muted: #6e444c;
+  --text-dim: #8e636b;
+  --accent: #be123c;
+  --on-accent: #ffffff;
+  --accent-strong: #9f1239;
+  --accent-dim: #f43f5e;
+  --accent-wash: rgba(190, 18, 60, 0.08);
+  --accent-line: rgba(190, 18, 60, 0.3);
+  --heat-0: #ebd5d9;
+  --heat-1: rgba(190, 18, 60, 0.22);
+  --heat-2: rgba(190, 18, 60, 0.45);
+  --heat-3: rgba(190, 18, 60, 0.7);
+  --heat-4: #be123c;
 }
 
 /* ===== BASE ===== */
