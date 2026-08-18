@@ -153,18 +153,30 @@ export const SPEECH_PROFILES = {
  * Web Audio DSP for the Optimus persona (Optimus spec §4.2).
  *
  * Only ever reaches recorded audio: speechSynthesis output cannot be routed
- * through Web Audio, so with no mp3s under /public/audio/narration/optimus/
- * this whole block is inert and the voice comes from SPEECH_PROFILES instead.
+ * through Web Audio, so the TTS fallback takes its character from
+ * SPEECH_PROFILES instead.
  *
- * `enabled` is the switch that matters. The chain assumes a NEUTRAL recording
- * — Edge-TTS, or any deep-but-plain male voice — and gives it the Cybertronian
- * weight. Studio audio that is already the character (an ElevenLabs "Optimus
- * Prime" render, per spec §6) arrives pre-processed, and stacking +8 dB of
- * shelf and a comb on top of it muddies the result. Generate that kind of
- * audio and set `enabled: false`.
+ * OFF, because the clips in /public/audio/narration/optimus/ are ALREADY
+ * processed. scripts/generate_optimus_audio.py bakes its own chain in at
+ * render time — bass=g=9:f=120, treble=g=3:f=3000, flanger — before it writes
+ * the mp3. Verified by re-rendering hero-1 raw from Edge-TTS and applying that
+ * filter: the result matches the shipped file exactly (RMS -21.87, sub-200 Hz
+ * -24.07, 161464 bps).
+ *
+ * Running this chain on top of that would stack ~+17 dB of cumulative low
+ * shelf and a second comb against the baked flanger — measured at +2.9 dB more
+ * sub-200 Hz on an already bass-heavy render. Muddy and phasey, not commanding.
+ *
+ * Turn it back on only for RAW narration audio: neutral TTS or a plain deep
+ * male recording with no processing of its own. If you re-render the clips,
+ * drop the ffmpeg filter from the generator first, then flip this to true.
+ *
+ * outputTrim is then not cosmetic. Measured on hero-1.mp3, the chain without
+ * it peaks at 0.0 dBFS — clipping, which on a voice reads as buzz rather than
+ * bass. At 0.72 the same file peaks at -2.8 dBFS.
  */
 export const OPTIMUS_DSP = {
-  enabled: true,
+  enabled: false,
   /** Low-shelf chest rumble. */
   bassFrequency: 140, // Hz
   bassGain: 8.0, // dB
