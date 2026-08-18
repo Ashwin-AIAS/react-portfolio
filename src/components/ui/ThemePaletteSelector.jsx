@@ -102,7 +102,11 @@ export const ThemePaletteSelector = ({ compact = false }) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.96 }}
                         transition={{ duration: 0.18, ease: 'easeOut' }}
-                        className="absolute right-0 top-full mt-2 w-56 p-1.5 rounded-md border border-rule-strong shadow-2xl z-50 backdrop-blur-md"
+                        /* Below sm the trigger sits too far left for a right-anchored
+                           224px panel to fit — it hangs 17px off a 390px viewport and
+                           ~55px off a 320px one. Pin it to the viewport gutters there
+                           and only switch to the anchored panel once there is room. */
+                        className="fixed inset-x-3 top-[4.25rem] w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-56 p-1.5 rounded-md border border-rule-strong shadow-2xl z-50 backdrop-blur-md"
                         style={{ background: 'var(--surface-2)' }}
                     >
                         <div className="px-2.5 py-1.5 border-b border-rule mb-1 flex items-center justify-between">
