@@ -155,7 +155,17 @@ export default function App() {
     // so the .theme-light.palette-x rules can out-specify the dark defaults.
     useEffect(() => {
         const root = document.documentElement;
-        const allPalettes = ['palette-cyan', 'palette-amber', 'palette-indigo', 'palette-emerald', 'palette-crimson'];
+        const allPalettes = [
+            'palette-cyan',
+            'palette-amber',
+            'palette-indigo',
+            'palette-emerald',
+            'palette-crimson',
+            'palette-ironman',
+            'palette-vibranium',
+            'palette-batman',
+            'palette-cyberpunk'
+        ];
         allPalettes.forEach(cls => root.classList.remove(cls));
         root.classList.add(`palette-${palette}`);
         localStorage.setItem('theme-palette', palette);

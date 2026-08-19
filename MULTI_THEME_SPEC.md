@@ -283,6 +283,126 @@ export interface ThemeOption {
 
 ---
 
+#### Theme 6: `ironman` — Stark Arc-Reactor (Marvel)
+- **Dark Mode (`.palette-ironman`):**
+  - `--bg`: `#080406` (Titanium Charcoal)
+  - `--surface-1`: `#12090d`
+  - `--surface-2`: `#1c0d13`
+  - `--surface-3`: `#26121a`
+  - `--rule`: `#3d1a24`
+  - `--rule-strong`: `#592333`
+  - `--text`: `#fef2f2`
+  - `--text-muted`: `#e2a8a8`
+  - `--text-dim`: `#995e68`
+  - `--accent`: `#e63946` (Hot-Rod Crimson)
+  - `--on-accent`: `#ffffff`
+  - `--accent-strong`: `#ff5964`
+  - `--accent-dim`: `#ba1826`
+  - `--accent-wash`: `rgba(230, 57, 70, 0.12)`
+  - `--accent-line`: `rgba(230, 57, 70, 0.4)`
+  - `--ok`: `#ffb703` (Arc-Reactor Gold)
+- **Light Mode (`.theme-light.palette-ironman`):**
+  - `--bg`: `#faf5f5`
+  - `--surface-1`: `#ffffff`
+  - `--surface-2`: `#f5ebeb`
+  - `--surface-3`: `#ebd5d5`
+  - `--rule`: `#dec0c0`
+  - `--rule-strong`: `#c99b9b`
+  - `--text`: `#1a0507`
+  - `--text-muted`: `#6e4347`
+  - `--text-dim`: `#8c5d62`
+  - `--accent`: `#b91c1c`
+  - `--on-accent`: `#ffffff`
+
+---
+
+#### Theme 7: `vibranium` — Wakanda Royal Energy
+- **Dark Mode (`.palette-vibranium`):**
+  - `--bg`: `#06040a` (Obsidian Black)
+  - `--surface-1`: `#0d0917`
+  - `--surface-2`: `#140e24`
+  - `--surface-3`: `#1e1536`
+  - `--rule`: `#2c1e4f`
+  - `--rule-strong`: `#422c75`
+  - `--text`: `#f5f3ff`
+  - `--text-muted`: `#b8a9db`
+  - `--text-dim`: `#7c6a9e`
+  - `--accent`: `#a855f7` (Kinetic Vibranium Purple)
+  - `--on-accent`: `#ffffff`
+  - `--accent-strong`: `#c084fc`
+  - `--accent-dim`: `#7e22ce`
+  - `--accent-wash`: `rgba(168, 85, 247, 0.12)`
+  - `--accent-line`: `rgba(168, 85, 247, 0.4)`
+- **Light Mode (`.theme-light.palette-vibranium`):**
+  - `--bg`: `#f7f4fb`
+  - `--surface-1`: `#ffffff`
+  - `--surface-2`: `#eee8f6`
+  - `--surface-3`: `#e1d6ee`
+  - `--rule`: `#d0c0e3`
+  - `--rule-strong`: `#b49ccf`
+  - `--text`: `#11091d`
+  - `--accent`: `#7e22ce`
+
+---
+
+#### Theme 8: `batman` — Gotham Tactical (WayneTech)
+- **Dark Mode (`.palette-batman`):**
+  - `--bg`: `#060708` (Carbon Stealth)
+  - `--surface-1`: `#0c0d10`
+  - `--surface-2`: `#121418`
+  - `--surface-3`: `#191c22`
+  - `--rule`: `#242830`
+  - `--rule-strong`: `#363c48`
+  - `--text`: `#f3f4f6`
+  - `--text-muted`: `#9ca3af`
+  - `--text-dim`: `#6b7280`
+  - `--accent`: `#eab308` (Bat-Signal Tactical Gold)
+  - `--on-accent`: `#060708`
+  - `--accent-strong`: `#facc15`
+  - `--accent-dim`: `#a16207`
+  - `--accent-wash`: `rgba(234, 179, 8, 0.12)`
+  - `--accent-line`: `rgba(234, 179, 8, 0.38)`
+- **Light Mode (`.theme-light.palette-batman`):**
+  - `--bg`: `#f3f4f6`
+  - `--surface-1`: `#ffffff`
+  - `--surface-2`: `#e5e7eb`
+  - `--surface-3`: `#d1d5db`
+  - `--rule`: `#9ca3af`
+  - `--rule-strong`: `#6b7280`
+  - `--text`: `#111827`
+  - `--accent`: `#ca8a04`
+
+---
+
+#### Theme 9: `cyberpunk` — Neo Tokyo Synthwave
+- **Dark Mode (`.palette-cyberpunk`):**
+  - `--bg`: `#07030e` (Midnight Synthwave)
+  - `--surface-1`: `#0f071e`
+  - `--surface-2`: `#170b2e`
+  - `--surface-3`: `#221042`
+  - `--rule`: `#351863`
+  - `--rule-strong`: `#512596`
+  - `--text`: `#fdf4ff`
+  - `--text-muted`: `#dfa8eb`
+  - `--text-dim`: `#985ba6`
+  - `--accent`: `#ff007f` (Laser Neon Magenta)
+  - `--on-accent`: `#ffffff`
+  - `--accent-strong`: `#ff3898`
+  - `--accent-dim`: `#c20061`
+  - `--accent-wash`: `rgba(255, 0, 127, 0.14)`
+  - `--accent-line`: `rgba(255, 0, 127, 0.42)`
+- **Light Mode (`.theme-light.palette-cyberpunk`):**
+  - `--bg`: `#fdf2f8`
+  - `--surface-1`: `#ffffff`
+  - `--surface-2`: `#fce7f3`
+  - `--surface-3`: `#fbcfe8`
+  - `--rule`: `#f472b6`
+  - `--rule-strong`: `#db2777`
+  - `--text`: `#1e031b`
+  - `--accent`: `#db2777`
+
+---
+
 ## 3. Implementation Steps & Code Changes
 
 ### Step 1: Update `src/index.css`

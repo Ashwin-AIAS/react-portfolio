@@ -6,13 +6,14 @@ import { PersonaAvatar } from '../../voice-guide/components/PersonaAvatar';
 import { CaptionText, AgentControls } from '../../voice-guide/components/CaptionBubble';
 
 const tourSteps = [
-  { section: 'hero',           emotion: 'wave',    message: "👋 Hey! I'm Ashwin — welcome! Let me show you around." ,           x: '38vw', y: '-60vh' },
-  { section: 'roadmap',        emotion: 'nod',     message: "📚 Here's my journey — B.Tech in India to AI Engineering in Germany!", x: '10vw', y: '-45vh' },
-  { section: 'skills',         emotion: 'flex',    message: "⚡ My core stack — PyTorch, OpenCV, LangChain, RAG systems and more.",         x: '60vw', y: '-50vh' },
-  { section: 'projects',       emotion: 'excited', message: "🚀 These are my projects — from LiDAR fusion to full-stack RAG!",           x: '15vw', y: '-35vh' },
-  { section: 'assistant',      emotion: 'think',   message: "🤖 Try my AI assistant — paste a job description and see how I match!", x: '55vw', y: '-55vh' },
-  { section: 'certifications', emotion: 'proud',   message: "🎓 Certified by Anthropic, NVIDIA, Kaggle and more.",                  x: '25vw', y: '-40vh' },
-  { section: 'contact',        emotion: 'bye',     message: "📬 Like what you see? I'm open to opportunities — let's connect!",     x: '42vw', y: '-30vh' },
+  { section: 'hero',           emotion: 'wave',    message: "👋 Hey! I'm Ashwin — welcome! Let me show you around." },
+  { section: 'assistant',      emotion: 'think',   message: "🤖 Try my AI assistant — paste a job description and see how I match!" },
+  { section: 'roadmap',        emotion: 'nod',     message: "📚 Here's my journey — B.Tech in India to AI Engineering in Germany!" },
+  { section: 'skills',         emotion: 'flex',    message: "⚡ My core stack — PyTorch, OpenCV, LangChain, RAG systems and more." },
+  { section: 'github',         emotion: 'flex',    message: "💻 Here's my live GitHub activity — open source contributions and commits." },
+  { section: 'projects',       emotion: 'excited', message: "🚀 These are my projects — from LiDAR fusion to full-stack RAG!" },
+  { section: 'certifications', emotion: 'proud',   message: "🎓 Certified by Anthropic, NVIDIA, Kaggle and more." },
+  { section: 'contact',        emotion: 'bye',     message: "📬 Like what you see? I'm open to opportunities — let's connect!" },
 ];
 
 const emotionAnimations = {
@@ -87,26 +88,28 @@ export const AvatarGuide = () => {
         const H = window.innerHeight;
         const isMobile = W < 640;
         const avatarW = isMobile ? 80 : 130;
-        const rightEdge = W - avatarW - 16;
-        const leftEdge  = 16;
+        const rightEdge = W - avatarW - 24;
+        const leftEdge  = 24;
+        const minY = 350; // Minimum vertical offset to guarantee docked bubble never clips top edge
 
         return [
-            { x: rightEdge,      y: H * 0.30 },
-            { x: leftEdge,       y: H * 0.38 },
-            { x: rightEdge,      y: H * 0.45 },
-            { x: leftEdge,       y: H * 0.50 },
-            { x: rightEdge,      y: H * 0.28 },
-            { x: leftEdge,       y: H * 0.35 },
-            { x: rightEdge,      y: H * 0.55 },
+            { x: rightEdge,      y: Math.max(H * 0.52, minY) },
+            { x: leftEdge,       y: Math.max(H * 0.50, minY) },
+            { x: rightEdge,      y: Math.max(H * 0.54, minY) },
+            { x: leftEdge,       y: Math.max(H * 0.50, minY) },
+            { x: rightEdge,      y: Math.max(H * 0.52, minY) },
+            { x: leftEdge,       y: Math.max(H * 0.48, minY) },
+            { x: rightEdge,      y: Math.max(H * 0.52, minY) },
+            { x: leftEdge,       y: Math.max(H * 0.50, minY) },
         ];
     };
 
     const avatarPx = screenConfig.isMobile ? 80 : 144;
-    const bubbleH = 140;
+    const bubbleH = 340; // Full height with docked persona selector, unmute button and status
     const pos = getPositions()[currentStep] || getPositions()[0];
     const safePos = {
-        x: Math.min(Math.max(pos.x, 10), window.innerWidth - avatarPx - 10),
-        y: Math.min(Math.max(pos.y, bubbleH), window.innerHeight - avatarPx - bubbleH),
+        x: Math.min(Math.max(pos.x, 16), Math.max(16, window.innerWidth - avatarPx - 16)),
+        y: Math.min(Math.max(pos.y, bubbleH + 20), Math.max(window.innerHeight - avatarPx - 20, bubbleH + 20)),
     };
 
     const isRightSide = safePos.x > window.innerWidth / 2;
@@ -167,10 +170,13 @@ export const AvatarGuide = () => {
                                     position: 'fixed', bottom: '16px', left: '8px', right: '8px', top: 'auto', width: 'auto'
                                 } : {
                                     position: 'absolute', bottom: '100%', ...(isRightSide ? { right: 0 } : { left: 0 }),
-                                    width: '260px'
+                                    width: '264px',
+                                    maxHeight: 'calc(100vh - 200px)',
+                                    overflowY: 'auto',
                                 }),
                                 borderRadius: 'var(--r-md)', padding: '12px 14px', marginBottom: '8px',
                                 fontSize: isMobile ? '12px' : '13px', color: 'var(--text)', fontWeight: 400,
+                                boxShadow: '0 12px 32px rgba(0, 0, 0, 0.45)',
                             }}
                         >
                             <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>

@@ -254,6 +254,192 @@
   --heat-4: #be123c;
 }
 
+/* Ironman — Stark Arc-Reactor (Marvel) */
+.palette-ironman {
+  --bg: #080406;
+  --surface-1: #12090d;
+  --surface-2: #1c0d13;
+  --surface-3: #26121a;
+  --rule: #3d1a24;
+  --rule-strong: #592333;
+  --text: #fef2f2;
+  --text-muted: #e2a8a8;
+  --text-dim: #995e68;
+  --accent: #e63946;
+  --on-accent: #ffffff;
+  --accent-strong: #ff5964;
+  --accent-dim: #ba1826;
+  --accent-wash: rgba(230, 57, 70, 0.12);
+  --accent-line: rgba(230, 57, 70, 0.4);
+  --ok: #ffb703;
+  --ok-wash: rgba(255, 183, 3, 0.12);
+  --heat-0: #1c0d13;
+  --heat-1: rgba(230, 57, 70, 0.22);
+  --heat-2: rgba(230, 57, 70, 0.45);
+  --heat-3: rgba(255, 183, 3, 0.7);
+  --heat-4: #ffb703;
+}
+.theme-light.palette-ironman {
+  --bg: #faf5f5;
+  --surface-1: #ffffff;
+  --surface-2: #f5ebeb;
+  --surface-3: #ebd5d5;
+  --rule: #dec0c0;
+  --rule-strong: #c99b9b;
+  --text: #1a0507;
+  --text-muted: #6e4347;
+  --text-dim: #8c5d62;
+  --accent: #b91c1c;
+  --on-accent: #ffffff;
+  --accent-strong: #991b1b;
+  --accent-dim: #dc2626;
+  --accent-wash: rgba(185, 28, 28, 0.08);
+  --accent-line: rgba(185, 28, 28, 0.3);
+  --heat-0: #ebd5d5;
+  --heat-1: rgba(185, 28, 28, 0.22);
+  --heat-2: rgba(185, 28, 28, 0.45);
+  --heat-3: rgba(185, 28, 28, 0.7);
+  --heat-4: #b91c1c;
+}
+
+/* Vibranium — Wakanda Royal Energy */
+.palette-vibranium {
+  --bg: #06040a;
+  --surface-1: #0d0917;
+  --surface-2: #140e24;
+  --surface-3: #1e1536;
+  --rule: #2c1e4f;
+  --rule-strong: #422c75;
+  --text: #f5f3ff;
+  --text-muted: #b8a9db;
+  --text-dim: #7c6a9e;
+  --accent: #a855f7;
+  --on-accent: #ffffff;
+  --accent-strong: #c084fc;
+  --accent-dim: #7e22ce;
+  --accent-wash: rgba(168, 85, 247, 0.12);
+  --accent-line: rgba(168, 85, 247, 0.4);
+  --heat-0: #140e24;
+  --heat-1: rgba(168, 85, 247, 0.22);
+  --heat-2: rgba(168, 85, 247, 0.45);
+  --heat-3: rgba(168, 85, 247, 0.7);
+  --heat-4: #a855f7;
+}
+.theme-light.palette-vibranium {
+  --bg: #f7f4fb;
+  --surface-1: #ffffff;
+  --surface-2: #eee8f6;
+  --surface-3: #e1d6ee;
+  --rule: #d0c0e3;
+  --rule-strong: #b49ccf;
+  --text: #11091d;
+  --text-muted: #57476c;
+  --text-dim: #76648e;
+  --accent: #7e22ce;
+  --on-accent: #ffffff;
+  --accent-strong: #6b21a8;
+  --accent-dim: #a855f7;
+  --accent-wash: rgba(126, 34, 206, 0.08);
+  --accent-line: rgba(126, 34, 206, 0.3);
+  --heat-0: #e1d6ee;
+  --heat-1: rgba(126, 34, 206, 0.22);
+  --heat-2: rgba(126, 34, 206, 0.45);
+  --heat-3: rgba(126, 34, 206, 0.7);
+  --heat-4: #7e22ce;
+}
+
+/* Batman — Gotham Tactical (WayneTech) */
+.palette-batman {
+  --bg: #060708;
+  --surface-1: #0c0d10;
+  --surface-2: #121418;
+  --surface-3: #191c22;
+  --rule: #242830;
+  --rule-strong: #363c48;
+  --text: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+  --accent: #eab308;
+  --on-accent: #060708;
+  --accent-strong: #facc15;
+  --accent-dim: #a16207;
+  --accent-wash: rgba(234, 179, 8, 0.12);
+  --accent-line: rgba(234, 179, 8, 0.38);
+  --heat-0: #121418;
+  --heat-1: rgba(234, 179, 8, 0.22);
+  --heat-2: rgba(234, 179, 8, 0.45);
+  --heat-3: rgba(234, 179, 8, 0.7);
+  --heat-4: #eab308;
+}
+.theme-light.palette-batman {
+  --bg: #f3f4f6;
+  --surface-1: #ffffff;
+  --surface-2: #e5e7eb;
+  --surface-3: #d1d5db;
+  --rule: #9ca3af;
+  --rule-strong: #6b7280;
+  --text: #111827;
+  --text-muted: #4b5563;
+  --text-dim: #6b7280;
+  --accent: #ca8a04;
+  --on-accent: #ffffff;
+  --accent-strong: #a16207;
+  --accent-dim: #eab308;
+  --accent-wash: rgba(202, 138, 4, 0.08);
+  --accent-line: rgba(202, 138, 4, 0.3);
+  --heat-0: #d1d5db;
+  --heat-1: rgba(202, 138, 4, 0.22);
+  --heat-2: rgba(202, 138, 4, 0.45);
+  --heat-3: rgba(202, 138, 4, 0.7);
+  --heat-4: #ca8a04;
+}
+
+/* Cyberpunk — Neo Tokyo Synthwave */
+.palette-cyberpunk {
+  --bg: #07030e;
+  --surface-1: #0f071e;
+  --surface-2: #170b2e;
+  --surface-3: #221042;
+  --rule: #351863;
+  --rule-strong: #512596;
+  --text: #fdf4ff;
+  --text-muted: #dfa8eb;
+  --text-dim: #985ba6;
+  --accent: #ff007f;
+  --on-accent: #ffffff;
+  --accent-strong: #ff3898;
+  --accent-dim: #c20061;
+  --accent-wash: rgba(255, 0, 127, 0.14);
+  --accent-line: rgba(255, 0, 127, 0.42);
+  --heat-0: #170b2e;
+  --heat-1: rgba(255, 0, 127, 0.22);
+  --heat-2: rgba(255, 0, 127, 0.45);
+  --heat-3: rgba(255, 0, 127, 0.7);
+  --heat-4: #ff007f;
+}
+.theme-light.palette-cyberpunk {
+  --bg: #fdf2f8;
+  --surface-1: #ffffff;
+  --surface-2: #fce7f3;
+  --surface-3: #fbcfe8;
+  --rule: #f472b6;
+  --rule-strong: #db2777;
+  --text: #1e031b;
+  --text-muted: #701a75;
+  --text-dim: #86198f;
+  --accent: #db2777;
+  --on-accent: #ffffff;
+  --accent-strong: #be185d;
+  --accent-dim: #f472b6;
+  --accent-wash: rgba(219, 39, 119, 0.08);
+  --accent-line: rgba(219, 39, 119, 0.3);
+  --heat-0: #fbcfe8;
+  --heat-1: rgba(219, 39, 119, 0.22);
+  --heat-2: rgba(219, 39, 119, 0.45);
+  --heat-3: rgba(219, 39, 119, 0.7);
+  --heat-4: #db2777;
+}
+
 /* ===== BASE ===== */
 
 @layer base {

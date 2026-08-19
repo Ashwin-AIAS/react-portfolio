@@ -37,6 +37,34 @@ export const THEMES = [
         label: 'Telemetry',
         color: '#ff3366',
         dotClass: 'bg-[#ff3366]'
+    },
+    {
+        id: 'ironman',
+        name: 'Stark Arc-Reactor',
+        label: 'Marvel / Armor',
+        color: '#e63946',
+        dotClass: 'bg-[#e63946]'
+    },
+    {
+        id: 'vibranium',
+        name: 'Wakanda Vibranium',
+        label: 'Kinetic Purple',
+        color: '#a855f7',
+        dotClass: 'bg-[#a855f7]'
+    },
+    {
+        id: 'batman',
+        name: 'Gotham Tactical',
+        label: 'WayneTech HUD',
+        color: '#eab308',
+        dotClass: 'bg-[#eab308]'
+    },
+    {
+        id: 'cyberpunk',
+        name: 'Neo Cyberpunk',
+        label: 'Laser Magenta',
+        color: '#ff007f',
+        dotClass: 'bg-[#ff007f]'
     }
 ];
 
@@ -106,15 +134,15 @@ export const ThemePaletteSelector = ({ compact = false }) => {
                            224px panel to fit — it hangs 17px off a 390px viewport and
                            ~55px off a 320px one. Pin it to the viewport gutters there
                            and only switch to the anchored panel once there is room. */
-                        className="fixed inset-x-3 top-[4.25rem] w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-56 p-1.5 rounded-md border border-rule-strong shadow-2xl z-50 backdrop-blur-md"
+                        className="fixed inset-x-3 top-[4.25rem] w-auto sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-60 max-h-[75vh] overflow-y-auto p-1.5 rounded-md border border-rule-strong shadow-2xl z-50 backdrop-blur-md custom-scrollbar"
                         style={{ background: 'var(--surface-2)' }}
                     >
-                        <div className="px-2.5 py-1.5 border-b border-rule mb-1 flex items-center justify-between">
+                        <div className="px-2.5 py-1.5 border-b border-rule mb-1 flex items-center justify-between sticky top-0 bg-[var(--surface-2)] z-10">
                             <span className="font-mono text-[10px] uppercase tracking-label text-ink-dim">
                                 Color Palette
                             </span>
                             <span className="font-mono text-[10px] text-accent">
-                                5 Themes
+                                {THEMES.length} Themes
                             </span>
                         </div>
 

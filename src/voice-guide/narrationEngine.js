@@ -92,7 +92,8 @@ export function createNarrationEngine(handlers) {
   // which is what stops two voices talking over each other.
   let playToken = 0;
 
-  let committedSectionId = null;
+  // Default to 'hero' if at top of page so unmuting before scroll immediately plays hero
+  let committedSectionId = typeof window !== 'undefined' && window.scrollY < 250 ? 'hero' : null;
   let speakingSectionId = null;
   /**
    * Whether we have already acted on the *current* commit of
@@ -123,6 +124,20 @@ export function createNarrationEngine(handlers) {
   // the speech voice (§4.1) and the recorded-audio DSP routing (§4.2).
   speechSource.setPersona(getActivePersona());
   audioSource.setPersona(getActivePersona());
+
+  // Prime the initial caption for the top of the page
+  if (committedSectionId === 'hero') {
+    const heroSection = getSection('hero');
+    const firstClip = heroSection?.intro?.[0];
+    if (firstClip) {
+      onCaption({
+        sectionId: 'hero',
+        text: firstClip.text,
+        clipIndex: 0,
+        total: heroSection.intro?.length ?? 1,
+      });
+    }
+  }
 
   const setState = (next) => {
     if (state === next) return;
@@ -346,6 +361,9 @@ export function createNarrationEngine(handlers) {
 
       setEnabled(true);
       setState(STATE.armed);
+      if (!committedSectionId) {
+        committedSectionId = (typeof window !== 'undefined' && window.scrollY > 250) ? null : 'hero';
+      }
       // Unlocking is an explicit request to hear the current section, even if
       // it was already handled while muted (§4.5).
       sectionHandled = false;
