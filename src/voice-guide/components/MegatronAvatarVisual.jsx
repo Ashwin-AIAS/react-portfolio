@@ -1,53 +1,39 @@
 /**
- * Megatron avatar — the Decepticon counterpart to OptimusAvatarVisual.
+ * Megatron avatar — Dark Energon Gladiator Overlord & Fusion Cannon Reticle.
  *
- * The Decepticon insignia rendered as a helmet: the angular crest, two glowing
- * red optics, and a segmented mouthguard whose bars rise and fall with the
- * voice. Everything reactive reads --vg-level, the 0..1 custom property the
- * engine writes to <html> each frame (store.js), so this component never
- * re-renders while speaking.
+ * A multi-layered Decepticon battle crest featuring:
+ * - Multi-faceted obsidian & gunmetal armor chassis with metallic violet bevels
+ * - Rotating outer Fusion Cannon targeting reticle ring with plasma charge nodes
+ * - Piercing crimson glowing laser optics with sinister brow glare
+ * - Forehead Dark Energon Spark Core
+ * - Segmented mechanical vocoder grille with glowing Dark Energon exhaust vents (lip sync)
  *
- * Same split as the other three: shape and colour are inline because
- * AvatarGuide.jsx is eager while voice-guide.css only lands with the lazy
- * chunk (§8), so anything essential to the silhouette has to travel with the
- * markup. Only keyframed motion lives in the stylesheet, where arriving a few
- * hundred ms late costs nothing. Every var() therefore carries a fallback.
- *
- * The violet and the red are literals, not --accent — the same reasoning as
- * the Autobot amber and the arc-reactor cyan next door. A Decepticon crest in
- * whatever accent the visitor picked in the theme switcher is not a Decepticon
- * crest. The glow intensities still come from --vg-level, so it belongs to the
- * same system as the rest.
+ * Everything reactive reads --vg-level (0..1) written to <html> by store.js,
+ * so this component never re-renders while speaking.
  */
 import React from 'react';
 
 const DECEPTICON_VIOLET = '#a855f7';
-const DECEPTICON_DEEP = '#4c1d95';
-const OPTIC_RED = '#ff2d2d';
+const DECEPTICON_BRIGHT = '#c084fc';
+const DECEPTICON_DARK = '#3b0764';
+const OPTIC_CRIMSON = '#ff0033';
+const OPTIC_FLARE = '#ff4d6d';
 
 /**
- * The insignia outline: horns out to the top corners, a central peak between
- * them, flared cheek plates, and a converging chin.
- */
-const CREST_POINTS = '8,20 30,33 50,18 70,33 92,20 80,46 88,55 60,74 50,92 40,74 12,55 20,46';
-
-/**
- * Segmented mouthguard, five bars across the jaw. `f` scales how far each bar
- * travels: the centre opens widest and the outer pair barely move, which is
- * what makes the row read as a mouth rather than a level meter.
+ * Segmented vocoder mouthguard, 5 bars across the jaw.
+ * `f` scales travel: center moves widest, outer pair stays subtle.
  */
 const MOUTH_BARS = [
-  { x: 33.5, f: 0.55 },
-  { x: 40.5, f: 0.8 },
-  { x: 47.5, f: 1.0 },
-  { x: 54.5, f: 0.8 },
-  { x: 61.5, f: 0.55 },
+  { x: 34, f: 0.55 },
+  { x: 41, f: 0.8 },
+  { x: 48, f: 1.0 },
+  { x: 55, f: 0.8 },
+  { x: 62, f: 0.55 },
 ];
 
-const BAR_WIDTH = 5;
-/** Bars hang from this line and grow downward, the way a jaw drops. */
+const BAR_WIDTH = 4.5;
 const BAR_TOP = 58;
-const BAR_HEIGHT = 12;
+const BAR_HEIGHT = 14;
 
 /**
  * @param {Object} props
@@ -60,12 +46,12 @@ export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
     style={{ width: size, height: size }}
     aria-hidden="true"
   >
-    {/* Dark-energon aura. Scales with the voice. */}
+    {/* Dark-Energon vortex aura. Scales with voice amplitude. */}
     <div
       className="vg-megatron-aura"
-      style={{ transform: 'scale(calc(1 + var(--vg-level, 0) * 0.45))' }}
+      style={{ transform: 'scale(calc(1 + var(--vg-level, 0) * 0.5))' }}
     />
-    {/* Containment ring, on its own timer — see voice-guide.css. */}
+    {/* Decepticon containment ring */}
     <div className="vg-megatron-ring" />
 
     <svg
@@ -73,49 +59,145 @@ export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
       className="vg-megatron-svg"
       fill="none"
       focusable="false"
-      style={{ filter: `drop-shadow(0 0 15px ${DECEPTICON_VIOLET}66)` }}
+      style={{ filter: `drop-shadow(0 0 18px ${DECEPTICON_VIOLET}88)` }}
     >
-      {/* Decepticon insignia */}
+      <defs>
+        {/* Obsidian Armor Metallic Gradient */}
+        <linearGradient id="meg-armor" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1e1b4b" />
+          <stop offset="50%" stopColor="#0f0e1a" />
+          <stop offset="100%" stopColor="#030014" />
+        </linearGradient>
+
+        {/* Decepticon Violet Edge Bevel Gradient */}
+        <linearGradient id="meg-violet" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={DECEPTICON_BRIGHT} />
+          <stop offset="50%" stopColor={DECEPTICON_VIOLET} />
+          <stop offset="100%" stopColor={DECEPTICON_DARK} />
+        </linearGradient>
+
+        {/* Dark Energon Spark Core Glow */}
+        <radialGradient id="meg-spark-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="35%" stopColor={DECEPTICON_BRIGHT} />
+          <stop offset="75%" stopColor={DECEPTICON_VIOLET} />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+      </defs>
+
+      {/* --- LAYER 1: Rotating Fusion Cannon Targeting Reticle --- */}
+      <g className="vg-megatron-reticle">
+        {/* Segmented targeting dial */}
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          stroke={DECEPTICON_VIOLET}
+          strokeWidth="1.2"
+          strokeDasharray="6 14 18 14"
+          opacity="0.6"
+        />
+        {/* Crosshair plasma markers at 45 degree diagonals */}
+        {[45, 135, 225, 315].map((deg) => {
+          const rad = (deg * Math.PI) / 180;
+          const cx = 50 + 45 * Math.cos(rad);
+          const cy = 50 + 45 * Math.sin(rad);
+          return (
+            <circle
+              key={deg}
+              cx={cx.toFixed(2)}
+              cy={cy.toFixed(2)}
+              r="2"
+              fill={OPTIC_CRIMSON}
+              style={{
+                filter: `drop-shadow(0 0 4px ${OPTIC_CRIMSON})`,
+                opacity: 'calc(0.65 + var(--vg-level, 0) * 0.35)',
+              }}
+            />
+          );
+        })}
+      </g>
+
+      {/* --- LAYER 2: Main Decepticon Crown & Spiked Armor Chassis --- */}
+      {/* Outer Spiked Crown & Cheek Guards */}
       <polygon
-        points={CREST_POINTS}
-        fill={DECEPTICON_DEEP}
-        fillOpacity="0.9"
-        stroke={DECEPTICON_VIOLET}
-        strokeWidth="3"
+        points="6,18 28,32 50,14 72,32 94,18 82,46 90,56 60,76 50,94 40,76 10,56 18,46"
+        fill="url(#meg-armor)"
+        stroke="url(#meg-violet)"
+        strokeWidth="2.6"
         strokeLinejoin="round"
       />
 
-      {/* Brow bar, tying the two horns together above the optics */}
+      {/* Inner chamfered armor contours */}
+      <polygon
+        points="12,24 30,35 50,20 70,35 88,24 78,46 84,54 58,72 50,88 42,72 16,54 22,46"
+        fill="none"
+        stroke={DECEPTICON_BRIGHT}
+        strokeWidth="0.8"
+        strokeDasharray="4 3"
+        opacity="0.45"
+      />
+
+      {/* --- LAYER 3: Dark Energon Forehead Spark Core & Brow Spire --- */}
+      {/* Sinister Brow Bar */}
       <path
-        d="M26 38 L50 30 L74 38"
-        stroke={DECEPTICON_VIOLET}
-        strokeWidth="2.5"
+        d="M24 38 L50 28 L76 38"
+        stroke={DECEPTICON_BRIGHT}
+        strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity="0.85"
       />
 
-      {/* Optics. Bloom and opacity both track the amplitude, so the stare
-          intensifies on every stressed syllable. */}
-      {[
-        { points: '31,44 45,42 43,50 32,49' },
-        { points: '69,44 55,42 57,50 68,49' },
-      ].map((eye) => (
-        <polygon
-          key={eye.points}
-          points={eye.points}
-          fill={OPTIC_RED}
-          style={{
-            filter: `drop-shadow(0 0 calc(5px + var(--vg-level, 0) * 12px) ${OPTIC_RED})`,
-            opacity: 'calc(0.72 + var(--vg-level, 0) * 0.28)',
-          }}
-        />
-      ))}
+      {/* Central Dark Energon Spark Diamond */}
+      <polygon
+        points="50,22 55,28 50,34 45,28"
+        fill="url(#meg-spark-glow)"
+        style={{
+          filter: `drop-shadow(0 0 calc(3px + var(--vg-level, 0) * 10px) ${DECEPTICON_BRIGHT})`,
+          opacity: 'calc(0.75 + var(--vg-level, 0) * 0.25)',
+        }}
+      />
 
-      {/* Segmented mouthguard — this is the Megatron persona's lip sync.
-          Each bar hangs from BAR_TOP and drops on its own factor. 0.16 is the
-          closed floor (MOUTH_MIN_SCALE in config.js), so the guard never fully
-          disappears between words. */}
+      {/* --- LAYER 4: Piercing Crimson Glowing Laser Optics --- */}
+      {/* Eye Socket Shadow Plates */}
+      <polygon points="28,42 47,40 45,52 30,51" fill="#020108" stroke="#3b0764" strokeWidth="1" />
+      <polygon points="72,42 53,40 55,52 70,51" fill="#020108" stroke="#3b0764" strokeWidth="1" />
+
+      {/* Left Glowing Crimson Optic */}
+      <polygon
+        points="30,44 45,42 43,50 31,49"
+        fill={OPTIC_CRIMSON}
+        style={{
+          filter: `drop-shadow(0 0 calc(5px + var(--vg-level, 0) * 14px) ${OPTIC_CRIMSON})`,
+          opacity: 'calc(0.8 + var(--vg-level, 0) * 0.2)',
+        }}
+      />
+      {/* Left Pupil Lens Flare */}
+      <line x1="31" y1="46" x2="44" y2="45" stroke={OPTIC_FLARE} strokeWidth="1.2" opacity="0.9" />
+
+      {/* Right Glowing Crimson Optic */}
+      <polygon
+        points="70,44 55,42 57,50 69,49"
+        fill={OPTIC_CRIMSON}
+        style={{
+          filter: `drop-shadow(0 0 calc(5px + var(--vg-level, 0) * 14px) ${OPTIC_CRIMSON})`,
+          opacity: 'calc(0.8 + var(--vg-level, 0) * 0.2)',
+        }}
+      />
+      {/* Right Pupil Lens Flare */}
+      <line x1="69" y1="46" x2="56" y2="45" stroke={OPTIC_FLARE} strokeWidth="1.2" opacity="0.9" />
+
+      {/* --- LAYER 5: Segmented Mechanical Vocoder Grille (Lip-Sync) --- */}
+      {/* Mouth Guard Housing Frame */}
+      <path
+        d="M30 56 L70 56 L58 76 L50 82 L42 76 Z"
+        fill="#080314"
+        stroke={DECEPTICON_VIOLET}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+
+      {/* Dark Energon Plasma Exhaust Vents that scale vertically with speech amplitude */}
       <g className="vg-megatron-mouth">
         {MOUTH_BARS.map((bar) => (
           <rect
@@ -124,13 +206,14 @@ export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
             y={BAR_TOP}
             width={BAR_WIDTH}
             height={BAR_HEIGHT}
-            rx="1"
-            fill={DECEPTICON_VIOLET}
+            rx="1.5"
+            fill={DECEPTICON_BRIGHT}
             style={{
-              transform: `scaleY(calc(0.16 + var(--vg-level, 0) * ${bar.f * 0.84}))`,
+              transform: `scaleY(calc(0.18 + var(--vg-level, 0) * ${bar.f * 0.82}))`,
               transformOrigin: '50% 0%',
               transformBox: 'fill-box',
-              opacity: `calc(0.6 + var(--vg-level, 0) * ${bar.f * 0.4})`,
+              opacity: `calc(0.65 + var(--vg-level, 0) * ${bar.f * 0.35})`,
+              filter: `drop-shadow(0 0 calc(2px + var(--vg-level, 0) * 6px) ${DECEPTICON_VIOLET})`,
             }}
           />
         ))}

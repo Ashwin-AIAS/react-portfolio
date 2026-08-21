@@ -255,6 +255,12 @@
   }
 }
 
+.vg-megatron-reticle {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: vg-spin 26s linear infinite;
+}
+
 /* A slow charge sweep across the mouthguard while a clip is playing. The bars
    are already scaled by --vg-level inline; this only rides their brightness,
    so lip sync survives if the stylesheet is late (§8). */
@@ -678,6 +684,7 @@
 
   .vg-jarvis-spin,
   .vg-jarvis-spin-rev,
+  .vg-megatron-reticle,
   .vg-megatron-live .vg-megatron-mouth,
   .vg-agent-cta-pulse,
   .vg-pill-btn-pulse {

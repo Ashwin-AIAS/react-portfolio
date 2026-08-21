@@ -1,16 +1,15 @@
 /**
- * Optimus Prime avatar — personas spec §3.1.
+ * Optimus Prime avatar — Next-Gen Cybertronian Command Matrix & Battle Armor.
  *
- * A holographic Autobot crest that stands in for the memoji while the Optimus
- * persona is narrating. Everything that reacts to the voice reads --vg-level,
- * the 0..1 custom property the engine writes to <html> each frame (store.js),
+ * A multi-layered Cybertronian battle crest featuring:
+ * - Multi-stage beveled titanium battle plates with metallic depth
+ * - Iconic antenna fins & chamfered forehead crown
+ * - Dual-mode glowing laser optics with scanline reticle and amplitude flare
+ * - Matrix of Leadership collar core with glowing energy resonance
+ * - Hydraulic articulated battle mask that articulates to --vg-level
+ *
+ * Everything reactive reads --vg-level (0..1) written to <html> by store.js,
  * so this component never re-renders while speaking.
- *
- * The reactive values are inline rather than in voice-guide.css on purpose:
- * AvatarGuide.jsx is eager but voice-guide.css only lands with the lazy chunk
- * (§8), so anything essential to the shape or colour has to travel with the
- * markup. Only the keyframed motion lives in the stylesheet, where arriving a
- * few hundred ms late costs nothing. Every var() therefore carries a fallback.
  */
 import React from 'react';
 
@@ -25,14 +24,12 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
     style={{ width: size, height: size }}
     aria-hidden="true"
   >
-    {/* Cybertronian energy aura. Scales with the voice. */}
+    {/* Cybertronian energy aura. Scales with the voice amplitude. */}
     <div
       className="vg-optimus-aura"
-      style={{ transform: 'scale(calc(1 + var(--vg-level, 0) * 0.4))' }}
+      style={{ transform: 'scale(calc(1 + var(--vg-level, 0) * 0.45))' }}
     />
-    {/* Matrix-of-Leadership ring. Amber is a literal, like the aura pair it
-        replaces: it is the Autobot half of the palette and must not follow the
-        accent the visitor picked in the theme switcher. The cyan half does. */}
+    {/* Matrix-of-Leadership resonance ring */}
     <div className="vg-optimus-ring" />
 
     <svg
@@ -40,65 +37,185 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
       className="vg-optimus-svg"
       fill="none"
       focusable="false"
-      style={{ filter: 'drop-shadow(0 0 15px var(--accent-line, rgba(0,242,254,0.35)))' }}
+      style={{ filter: 'drop-shadow(0 0 16px var(--accent-line, rgba(0,242,254,0.4)))' }}
     >
-      {/* Outer armour plates */}
+      <defs>
+        {/* Metallic armor gradient */}
+        <linearGradient id="opt-armor" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1e293b" />
+          <stop offset="50%" stopColor="#0f172a" />
+          <stop offset="100%" stopColor="#020617" />
+        </linearGradient>
+
+        {/* Cobalt blue Cybertronian plate gradient */}
+        <linearGradient id="opt-cobalt" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="40%" stopColor="#0284c7" />
+          <stop offset="100%" stopColor="#1e3a8a" />
+        </linearGradient>
+
+        {/* Silver titanium bevel highlight */}
+        <linearGradient id="opt-silver" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#e2e8f0" />
+          <stop offset="50%" stopColor="#94a3b8" />
+          <stop offset="100%" stopColor="#475569" />
+        </linearGradient>
+
+        {/* Matrix of Leadership core glow */}
+        <radialGradient id="opt-matrix-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="40%" stopColor="#38bdf8" />
+          <stop offset="80%" stopColor="#0284c7" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+      </defs>
+
+      {/* --- LAYER 1: Cybertronian Head Antenna Fins (Left & Right) --- */}
       <path
-        d="M50 8 L85 24 L85 58 L72 88 L50 94 L28 88 L15 58 L15 24 Z"
+        d="M18 42 L11 20 L20 28 L23 48 Z"
+        fill="url(#opt-silver)"
         stroke="var(--accent, #00f2fe)"
-        strokeWidth="3"
-        fill="var(--surface-2, #0f182a)"
-        fillOpacity="0.85"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M82 42 L89 20 L80 28 L77 48 Z"
+        fill="url(#opt-silver)"
+        stroke="var(--accent, #00f2fe)"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
       />
 
-      {/* Brow and forehead crest */}
-      <path
-        d="M32 24 L50 14 L68 24 L62 38 L38 38 Z"
-        fill="var(--accent, #00f2fe)"
-        fillOpacity="0.3"
-        stroke="var(--accent, #00f2fe)"
-        strokeWidth="2"
-      />
-
-      {/* Central Matrix V-plates */}
-      <path
-        d="M50 38 L50 72 M40 46 L28 54 M60 46 L72 54 M36 68 L28 78 M64 68 L72 78"
+      {/* --- LAYER 2: Main Helmet Base & Outer Beveled Armor --- */}
+      <polygon
+        points="50,6 84,20 84,56 72,86 50,95 28,86 16,56 16,20"
+        fill="url(#opt-armor)"
         stroke="var(--accent, #00f2fe)"
         strokeWidth="2.5"
-        strokeLinecap="round"
+        strokeLinejoin="round"
       />
 
-      {/* Laser eyes. Bloom and opacity both track the amplitude. */}
+      {/* Inner contour armor bevels */}
       <polygon
-        points="34,44 45,44 42,50 32,48"
-        fill="var(--accent-strong, #38bdf8)"
-        style={{
-          filter:
-            'drop-shadow(0 0 calc(4px + var(--vg-level, 0) * 10px) var(--accent-strong, #38bdf8))',
-          opacity: 'calc(0.7 + var(--vg-level, 0) * 0.3)',
-        }}
-      />
-      <polygon
-        points="66,44 55,44 58,50 68,48"
-        fill="var(--accent-strong, #38bdf8)"
-        style={{
-          filter:
-            'drop-shadow(0 0 calc(4px + var(--vg-level, 0) * 10px) var(--accent-strong, #38bdf8))',
-          opacity: 'calc(0.7 + var(--vg-level, 0) * 0.3)',
-        }}
-      />
-
-      {/* Mouth guard. Opens with the voice, the way AvatarMouth does for the
-          memoji — this is the Optimus persona's lip sync. */}
-      <path
-        d="M42 64 L58 64 M44 70 L56 70 M46 76 L54 76"
+        points="50,11 79,23 79,53 68,81 50,89 32,81 21,53 21,23"
+        fill="none"
         stroke="var(--accent, #00f2fe)"
-        strokeWidth="2"
+        strokeWidth="0.8"
+        strokeDasharray="4 2"
+        opacity="0.4"
+      />
+
+      {/* --- LAYER 3: Forehead Crest & Autobot Command Crown --- */}
+      <path
+        d="M34 22 L50 10 L66 22 L60 36 L40 36 Z"
+        fill="url(#opt-cobalt)"
+        stroke="var(--accent, #00f2fe)"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      {/* Central crest ridge */}
+      <line
+        x1="50"
+        y1="10"
+        x2="50"
+        y2="36"
+        stroke="#ffffff"
+        strokeWidth="1.5"
         strokeLinecap="round"
+        opacity="0.8"
+      />
+      <circle cx="50" cy="18" r="2" fill="var(--accent, #00f2fe)" />
+
+      {/* --- LAYER 4: Cheek Flutes & Temple Shielding --- */}
+      <path
+        d="M23 38 L36 42 L34 56 L20 52 Z"
+        fill="#1e293b"
+        stroke="var(--accent, #00f2fe)"
+        strokeWidth="1.2"
+      />
+      <path
+        d="M77 38 L64 42 L66 56 L80 52 Z"
+        fill="#1e293b"
+        stroke="var(--accent, #00f2fe)"
+        strokeWidth="1.2"
+      />
+
+      {/* --- LAYER 5: Glowing Laser Optics with Scanline Reticle --- */}
+      {/* Eye brow shadow visor plate */}
+      <path
+        d="M32 41 L50 44 L68 41 L66 45 L50 48 L34 45 Z"
+        fill="#020617"
+        stroke="var(--accent, #00f2fe)"
+        strokeWidth="1"
+      />
+
+      {/* Left Laser Optic */}
+      <polygon
+        points="34,46 45,46 42,52 32,50"
+        fill="var(--accent-strong, #38bdf8)"
         style={{
-          transform: 'scaleY(calc(1 + var(--vg-level, 0) * 0.8))',
-          transformOrigin: '50% 70%',
+          filter:
+            'drop-shadow(0 0 calc(4px + var(--vg-level, 0) * 12px) var(--accent-strong, #38bdf8))',
+          opacity: 'calc(0.75 + var(--vg-level, 0) * 0.25)',
+        }}
+      />
+      <line x1="33" y1="48" x2="44" y2="48" stroke="#ffffff" strokeWidth="1" opacity="0.9" />
+
+      {/* Right Laser Optic */}
+      <polygon
+        points="66,46 55,46 58,52 68,50"
+        fill="var(--accent-strong, #38bdf8)"
+        style={{
+          filter:
+            'drop-shadow(0 0 calc(4px + var(--vg-level, 0) * 12px) var(--accent-strong, #38bdf8))',
+          opacity: 'calc(0.75 + var(--vg-level, 0) * 0.25)',
+        }}
+      />
+      <line x1="67" y1="48" x2="56" y2="48" stroke="#ffffff" strokeWidth="1" opacity="0.9" />
+
+      {/* --- LAYER 6: Hydraulic Articulated Battle Mask (Lip-Sync) --- */}
+      {/* Upper nose & bridge connector */}
+      <polygon points="50,47 45,56 55,56" fill="#334155" stroke="var(--accent, #00f2fe)" strokeWidth="1" />
+
+      {/* Articulating Faceplate / Grille that scales with voice amplitude */}
+      <g
+        className="vg-optimus-mask"
+        style={{
+          transform: 'scaleY(calc(1 + var(--vg-level, 0) * 0.75))',
+          transformOrigin: '50% 68%',
           transformBox: 'view-box',
+        }}
+      >
+        {/* Main mask plate */}
+        <path
+          d="M38 58 L62 58 L58 78 L50 82 L42 78 Z"
+          fill="url(#opt-silver)"
+          stroke="var(--accent, #00f2fe)"
+          strokeWidth="1.8"
+          strokeLinejoin="round"
+        />
+        {/* Horizontal intake flutes */}
+        <line x1="42" y1="63" x2="58" y2="63" stroke="#0f172a" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="44" y1="68" x2="56" y2="68" stroke="#0f172a" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="46" y1="73" x2="54" y2="73" stroke="#0f172a" strokeWidth="1.4" strokeLinecap="round" />
+      </g>
+
+      {/* --- LAYER 7: Matrix of Leadership Collar Core --- */}
+      {/* Collar V-mount */}
+      <path
+        d="M34 84 L50 78 L66 84 L50 93 Z"
+        fill="#0f172a"
+        stroke="rgba(255, 176, 32, 0.75)"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      {/* Glowing Matrix Crystal at the base */}
+      <polygon
+        points="50,80 54,85 50,90 46,85"
+        fill="url(#opt-matrix-glow)"
+        style={{
+          filter: 'drop-shadow(0 0 calc(3px + var(--vg-level, 0) * 8px) #38bdf8)',
+          opacity: 'calc(0.7 + var(--vg-level, 0) * 0.3)',
         }}
       />
     </svg>
