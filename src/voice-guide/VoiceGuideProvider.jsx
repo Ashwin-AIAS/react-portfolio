@@ -14,6 +14,7 @@ import { createNarrationEngine, STATE } from './narrationEngine';
 import { installSpeechCleanup } from './sources/SpeechSynthesisSource';
 import { setState, setActions, setLevel } from './store';
 import { getEnabled, isSaveData, isDebugEnabled } from './utils/storage';
+import { isAudioUnlocked } from './audioUnlock';
 import { smoothAmplitude } from './utils/amplitude';
 import { DebugOverlay } from './components/DebugOverlay';
 
@@ -174,6 +175,13 @@ export const VoiceGuideProvider = ({ children }) => {
       done = true;
       cleanup();
     }
+
+    // The splash spent a real gesture on our behalf before handing over, so
+    // there is nothing left to wait for — start the hero clip with the page
+    // instead of with whatever the visitor happens to touch next. This is the
+    // path that runs when the lazy chunk lands AFTER the visitor clicked
+    // through; when it lands before, the listeners below catch that same click.
+    if (isAudioUnlocked()) arm();
 
     for (const type of EVENTS) {
       window.addEventListener(type, arm, { passive: true });

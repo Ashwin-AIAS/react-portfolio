@@ -32,6 +32,7 @@ import {
 import { createSpeechSynthesisSource } from './sources/SpeechSynthesisSource';
 import { createAudioFileSource, audioFileExists } from './sources/AudioFileSource';
 import { createCaptionOnlySource } from './sources/NarrationSource';
+import { getSharedAudioContext } from './audioUnlock';
 
 export const STATE = {
   disabled: 'disabled',
@@ -87,6 +88,8 @@ export function createNarrationEngine(handlers) {
 
   let state = STATE.disabled;
   let audioContext = null;
+  /** False when audioContext is the shared one from ./audioUnlock — see destroy(). */
+  let ownsAudioContext = false;
 
   // Monotonic guard (§5.4). Any callback carrying a stale token is discarded,
   // which is what stops two voices talking over each other.
@@ -341,21 +344,33 @@ export function createNarrationEngine(handlers) {
      */
     async enable() {
       if (destroyed) return;
-      if (typeof window !== 'undefined') {
-        const Ctor = window.AudioContext || window.webkitAudioContext;
-        if (Ctor && !audioContext) {
-          try {
-            audioContext = new Ctor();
-          } catch {
-            audioContext = null; // TTS path doesn't need it
+      if (typeof window !== 'undefined' && !audioContext) {
+        // Prefer the context the splash already unlocked from a real gesture.
+        // It is running before we ask, so the first clip does not have to wait
+        // on a resume() that may not be granted — and on a browser that has
+        // since dropped its activation flag, this is the only context that
+        // will produce sound at all.
+        const shared = getSharedAudioContext();
+        if (shared) {
+          audioContext = shared;
+          ownsAudioContext = false;
+        } else {
+          const Ctor = window.AudioContext || window.webkitAudioContext;
+          if (Ctor) {
+            try {
+              audioContext = new Ctor();
+              ownsAudioContext = true;
+            } catch {
+              audioContext = null; // TTS path doesn't need it
+            }
           }
         }
-        if (audioContext?.state === 'suspended') {
-          try {
-            await audioContext.resume();
-          } catch {
-            /* stays suspended; TTS still works */
-          }
+      }
+      if (audioContext?.state === 'suspended') {
+        try {
+          await audioContext.resume();
+        } catch {
+          /* stays suspended; TTS still works */
         }
       }
 
@@ -515,14 +530,19 @@ export function createNarrationEngine(handlers) {
       playToken++;
       if (settleTimer) clearTimeout(settleTimer);
       stopActive(0);
-      if (audioContext) {
+      // Close only what this engine made. The shared context belongs to
+      // ./audioUnlock and outlives every mount — closing it would silence the
+      // tour for the rest of the session, which React StrictMode's
+      // mount/unmount/remount in development would trigger every single time.
+      if (audioContext && ownsAudioContext) {
         try {
           audioContext.close();
         } catch {
           /* already closed */
         }
-        audioContext = null;
       }
+      audioContext = null;
+      ownsAudioContext = false;
     },
 
     _getAudioContext: getAudioContext,
