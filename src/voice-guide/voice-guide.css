@@ -7,8 +7,8 @@
  * Everything visual is driven off one custom property, --vg-level (0..1),
  * written each frame by the engine. No React re-render is involved.
  *
- * The persona visuals (OptimusAvatarVisual, JarvisAvatarVisual) ship their
- * shape and colour inline instead of here: AvatarGuide.jsx is eager, so it can
+ * The persona visuals (OptimusAvatarVisual, JarvisAvatarVisual,
+ * MegatronAvatarVisual) ship their shape and colour inline instead of here: AvatarGuide.jsx is eager, so it can
  * paint an avatar before this file has downloaded. Only their keyframed motion
  * lives here, where arriving a few hundred ms late costs nothing.
  */
@@ -119,7 +119,8 @@
 /* ----------------------------------------- persona visuals (§3.1, §3.2) --- */
 
 .vg-optimus,
-.vg-jarvis {
+.vg-jarvis,
+.vg-megatron {
   position: relative;
   display: flex;
   align-items: center;
@@ -127,7 +128,8 @@
 }
 
 .vg-optimus-svg,
-.vg-jarvis-svg {
+.vg-jarvis-svg,
+.vg-megatron-svg {
   width: 100%;
   height: 100%;
   overflow: visible;
@@ -206,6 +208,67 @@
 @keyframes vg-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* --- Megatron: dark-energon aura + containment ring --- */
+/*
+ * Violet is a literal here for the same reason the Autobot amber and the
+ * arc-reactor cyan are: the Decepticon crest must not follow whichever accent
+ * the visitor picked in the theme switcher. Neither layer has a colour that
+ * belongs to the theme, so unlike the Optimus pair this one is violet on both
+ * halves — the red stays in the optics, where it means "speaking".
+ *
+ * Both layers stay multiplied by --vg-level, which is what confines the pulse
+ * to "when speaking" (§5.2) with no JS.
+ */
+.vg-megatron-aura {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, #a855f7 0%, #4c1d95 55%, transparent 75%);
+  filter: blur(14px);
+  opacity: calc(0.2 + var(--vg-level) * 0.45);
+  transition: opacity 90ms linear;
+}
+
+.vg-megatron-ring {
+  position: absolute;
+  inset: -4%;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 1px solid rgba(168, 85, 247, 0.55);
+  opacity: calc(0.12 + var(--vg-level) * 0.5);
+  animation: vg-megatron-ring 2.6s ease-in-out infinite;
+}
+
+/* Contracts rather than expanding — the inverse of vg-optimus-ring, so the two
+   commanders never read as the same animation in a different colour. */
+@keyframes vg-megatron-ring {
+  0%,
+  100% {
+    transform: scale(1.06);
+  }
+  60% {
+    transform: scale(0.93);
+  }
+}
+
+/* A slow charge sweep across the mouthguard while a clip is playing. The bars
+   are already scaled by --vg-level inline; this only rides their brightness,
+   so lip sync survives if the stylesheet is late (§8). */
+.vg-megatron-live .vg-megatron-mouth {
+  animation: vg-megatron-charge 1.8s ease-in-out infinite;
+}
+
+@keyframes vg-megatron-charge {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 7px rgba(168, 85, 247, 0.95));
   }
 }
 
@@ -607,12 +670,15 @@
   .vg-avatar-glow,
   .vg-optimus-aura,
   .vg-optimus-ring,
-  .vg-jarvis-aura {
+  .vg-jarvis-aura,
+  .vg-megatron-aura,
+  .vg-megatron-ring {
     display: none !important;
   }
 
   .vg-jarvis-spin,
   .vg-jarvis-spin-rev,
+  .vg-megatron-live .vg-megatron-mouth,
   .vg-agent-cta-pulse,
   .vg-pill-btn-pulse {
     animation: none !important;

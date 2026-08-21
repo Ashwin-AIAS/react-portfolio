@@ -19,6 +19,7 @@ export { CaptionText, AgentControls } from './components/CaptionBubble';
 export { PersonaAvatar } from './components/PersonaAvatar';
 export { OptimusAvatarVisual } from './components/OptimusAvatarVisual';
 export { JarvisAvatarVisual } from './components/JarvisAvatarVisual';
+export { MegatronAvatarVisual } from './components/MegatronAvatarVisual';
 export { MobileVoicePill } from './components/MobileVoicePill';
 export { DebugOverlay } from './components/DebugOverlay';
 

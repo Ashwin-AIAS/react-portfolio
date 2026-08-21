@@ -75,7 +75,7 @@ export const ESTIMATED_WORD_MS = 320;
  * here lets the eager caption render a persona badge without dragging all
  * three scripts out of the lazy chunk (§8).
  */
-export const PERSONA_IDS = ['optimus', 'ashwin', 'jarvis'];
+export const PERSONA_IDS = ['optimus', 'ashwin', 'jarvis', 'megatron'];
 
 /** Optimus spec §2 marks this as the new default. */
 export const DEFAULT_PERSONA = 'optimus';
@@ -104,6 +104,14 @@ export const PERSONA_META = {
     tagline: 'Tactical system diagnostics',
     icon: '⚡',
     badge: '[ JARVIS // TACTICAL TELEMETRY ]',
+  },
+  megatron: {
+    id: 'megatron',
+    name: 'Megatron',
+    short: 'MEGATRON',
+    tagline: 'Decepticon leader',
+    icon: '🟣',
+    badge: '[ DECEPTICON COMMAND // MEGATRON ]',
   },
 };
 
@@ -146,6 +154,26 @@ export const SPEECH_PROFILES = {
     volume: 1.0,
     preferredVoices: ['Google UK English Male', 'Microsoft George', 'Daniel', 'Arthur'],
     langPreference: ['en-GB', 'en'],
+  },
+  megatron: {
+    // Lower and slower than Optimus on both axes — the fallback cannot reach
+    // for the flanger the recorded clips are rendered with, so the only lever
+    // left for "tyrant" over "commander" is pitch. 0.5 is the floor the Web
+    // Speech API clamps to; sitting just above it keeps the voice intelligible
+    // on engines that degrade badly at the extreme.
+    rate: 0.8,
+    pitch: 0.55,
+    volume: 1.0,
+    preferredVoices: [
+      'Microsoft David',
+      'Google UK English Male',
+      'Microsoft George',
+      'Daniel',
+      'Arthur',
+      'en-US-Neural2-D',
+      'en-US-Neural2-J',
+    ],
+    langPreference: ['en-US', 'en-GB', 'en'],
   },
 };
 

@@ -1,9 +1,10 @@
 /**
  * Persona-aware avatar — personas spec §3.3.
  *
- * One switch for the three narrators: the Autobot crest, the arc-reactor HUD,
- * or the original memoji. Only the memoji branch uses AvatarMouth — the other
- * two carry their own amplitude-driven "mouth" (the grille, the reactor core).
+ * One switch for the four narrators: the Autobot crest, the arc-reactor HUD,
+ * the Decepticon insignia, or the original memoji. Only the memoji branch uses
+ * AvatarMouth — the other three carry their own amplitude-driven "mouth" (the
+ * grille, the reactor core, the mouthguard).
  *
  * Eager: AvatarGuide.jsx imports this directly, so nothing here may reach the
  * engine, the sources or the narration scripts (§8). ../config is pure
@@ -14,6 +15,7 @@ import avatarEmoji from '/avatar-emoji.png';
 import { DEFAULT_PERSONA } from '../config';
 import { OptimusAvatarVisual } from './OptimusAvatarVisual';
 import { JarvisAvatarVisual } from './JarvisAvatarVisual';
+import { MegatronAvatarVisual } from './MegatronAvatarVisual';
 import { AvatarMouth } from './AvatarMouth';
 
 /** Seven emotions used to mean seven glow colours. One accent now. */
@@ -21,7 +23,7 @@ const AVATAR_GLOW = 'drop-shadow(0 0 12px var(--accent-line))';
 
 /**
  * @param {Object} props
- * @param {string}  [props.persona]  'optimus' | 'jarvis' | 'ashwin'
+ * @param {string}  [props.persona]  'optimus' | 'jarvis' | 'megatron' | 'ashwin'
  * @param {number}  [props.size]     px, square
  * @param {boolean} [props.speaking] a clip is currently playing
  */
@@ -31,6 +33,9 @@ export const PersonaAvatar = ({ persona = DEFAULT_PERSONA, size = 130, speaking 
   }
   if (persona === 'jarvis') {
     return <JarvisAvatarVisual size={size} speaking={speaking} />;
+  }
+  if (persona === 'megatron') {
+    return <MegatronAvatarVisual size={size} speaking={speaking} />;
   }
 
   // The creator, first person — keeps the original cartoon memoji and its

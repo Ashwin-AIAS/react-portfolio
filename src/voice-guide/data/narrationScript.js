@@ -33,6 +33,7 @@ import {
 } from '../utils/storage';
 import { OPTIMUS_NARRATION } from './optimusScript';
 import { JARVIS_NARRATION } from './jarvisScript';
+import { MEGATRON_NARRATION } from './megatronScript';
 
 /** @type {NarratedSection[]} */
 export const NARRATION = [
@@ -215,7 +216,7 @@ export const NARRATION = [
 /* ===========================================================================
    PERSONAS — OPTIMUS_PRIME_VOICE_SPEC.md §2
    ===========================================================================
-   The script above is the `ashwin` persona. Two more sit alongside it, each in
+   The script above is the `ashwin` persona. Three more sit alongside it, each in
    its own module, each covering the SAME section ids in the SAME order. That
    invariant is what lets the engine, useActiveSection and the debug overlay
    stay persona-agnostic — switching voice swaps the copy, never the structure.
@@ -223,13 +224,14 @@ export const NARRATION = [
    Display metadata (names, badges, speech profiles) deliberately lives in
    ../config.js instead of here: CaptionBubble.jsx is imported eagerly by
    AvatarGuide.jsx, and anything it reaches gets pulled out of the lazy chunk
-   (§8). config.js is pure constants; this module imports three scripts.
+   (§8). config.js is pure constants; this module imports the other scripts.
    =========================================================================== */
 /** @type {Record<string, NarratedSection[]>} */
 export const PERSONA_SCRIPTS = {
   optimus: OPTIMUS_NARRATION,
   ashwin: NARRATION,
   jarvis: JARVIS_NARRATION,
+  megatron: MEGATRON_NARRATION,
 };
 
 /**
