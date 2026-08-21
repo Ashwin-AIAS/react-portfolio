@@ -23,7 +23,9 @@
  * @property {number} order          Document order, 0-based.
  * @property {string} label          Human name, for the debug overlay.
  * @property {NarrationClip[]} intro Played on first meaningful entry.
- * @property {NarrationClip} [revisit] Short line on 2nd entry. 3rd+ is silent.
+ * @property {NarrationClip} [revisit] Short line played on EVERY return to the
+ *   section, not just the second — this is what carries a visitor scrolling
+ *   back up the page. Omit it and the section replays its full intro instead.
  */
 
 import { PERSONA_IDS, DEFAULT_PERSONA } from '../config';

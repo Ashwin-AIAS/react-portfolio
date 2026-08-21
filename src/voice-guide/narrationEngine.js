@@ -46,6 +46,17 @@ export const STATE = {
  * Decides what a section should say, given its visit history (§4.4).
  * Pure — exported so the behaviour is inspectable and testable.
  *
+ * Every visit speaks. The old policy went quiet from the third visit onward,
+ * which broke the thing the tour is for: scrolling back UP the page is a
+ * revisit of every section at once, so a visitor retracing their steps walked
+ * through a silent version of a guide that had been talking the whole way
+ * down. Backwards now matches forwards.
+ *
+ * What still keeps it from becoming a loop is `sectionHandled` in the engine —
+ * a section acts once per *commit*, so standing still never re-triggers it, and
+ * only leaving and coming back does. FAST_SCROLL still suppresses everything,
+ * so skimming past six sections does not fire six clips.
+ *
  * @param {string} sectionId
  * @param {Record<string, {count:number,status:string}>} visits
  * @param {number} velocity
@@ -64,15 +75,14 @@ export function decideNarration(sectionId, visits, velocity) {
     return { action: 'intro', clips: section.intro ?? [] };
   }
 
-  // Heard it through once: short revisit line if there is one.
-  if (record.status === 'completed' && record.count === 1) {
-    return section.revisit
-      ? { action: 'revisit', clips: [section.revisit] }
-      : { action: 'silent', clips: [] };
+  // Heard it through: the short revisit line, on this and every later return.
+  if (section.revisit) {
+    return { action: 'revisit', clips: [section.revisit] };
   }
 
-  // Third time onward: captions only.
-  return { action: 'silent', clips: [] };
+  // No revisit line written for this section, so the intro is all it has.
+  // Better a repeat than a silent gap in the middle of a tour.
+  return { action: 'intro', clips: section.intro ?? [] };
 }
 
 /**
