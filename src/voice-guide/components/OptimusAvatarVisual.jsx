@@ -10,6 +10,26 @@
  *
  * Everything reactive reads --vg-level (0..1) written to <html> by store.js,
  * so this component never re-renders while speaking.
+ *
+ * COLOUR RULE (theme-adaptive, MULTI_THEME_SPEC): there are no palette literals
+ * left in here. Every colour resolves from the active theme through one of two
+ * families, and the split is what keeps the crest readable in all nine palettes
+ * and in both light and dark:
+ *
+ *   - Anything that EMITS light — the crown plate, the optics, the Matrix
+ *     crystal — comes from the accent trio: --accent (hottest), --accent-strong
+ *     (mid), --accent-dim (falloff).
+ *   - Anything STRUCTURAL — the chassis, the eye sockets, the collar — comes
+ *     from --surface-1 / --surface-2, so the armour sits on the page instead of
+ *     floating on top of it.
+ *   - Engraved detail (the crest ridge, the intake flutes, the lens seams) is
+ *     --surface-1 on purpose: against an accent plate it inverts with the
+ *     theme, cutting dark in dark mode and bright in light mode, which is what
+ *     an incised line does in both.
+ *
+ * Every var() keeps its original literal as the fallback, so an engine that
+ * cannot resolve a custom property inside an SVG presentation attribute still
+ * renders the crest it always did.
  */
 import React from 'react';
 
@@ -40,32 +60,34 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
       style={{ filter: 'drop-shadow(0 0 16px var(--accent-line, rgba(0,242,254,0.4)))' }}
     >
       <defs>
-        {/* Metallic armor gradient */}
+        {/* Chassis armour — the theme's own surfaces, so the helmet reads as
+            the same material as the panels behind it. */}
         <linearGradient id="opt-armor" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1e293b" />
-          <stop offset="50%" stopColor="#0f172a" />
-          <stop offset="100%" stopColor="#020617" />
+          <stop offset="0%" stopColor="var(--surface-2, #1e293b)" />
+          <stop offset="50%" stopColor="var(--surface-1, #0f172a)" />
+          <stop offset="100%" stopColor="var(--surface-1, #020617)" />
         </linearGradient>
 
-        {/* Cobalt blue Cybertronian plate gradient */}
+        {/* Command crown — the saturated plate, hottest accent falling to dim. */}
         <linearGradient id="opt-cobalt" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="40%" stopColor="#0284c7" />
-          <stop offset="100%" stopColor="#1e3a8a" />
+          <stop offset="0%" stopColor="var(--accent, #38bdf8)" />
+          <stop offset="40%" stopColor="var(--accent-strong, #0284c7)" />
+          <stop offset="100%" stopColor="var(--accent-dim, #1e3a8a)" />
         </linearGradient>
 
-        {/* Silver titanium bevel highlight */}
+        {/* Brushed bevel — the same accent walked down into the chassis, so the
+            fins and faceplate read as tinted metal rather than a second lamp. */}
         <linearGradient id="opt-silver" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#e2e8f0" />
-          <stop offset="50%" stopColor="#94a3b8" />
-          <stop offset="100%" stopColor="#475569" />
+          <stop offset="0%" stopColor="var(--accent-strong, #e2e8f0)" />
+          <stop offset="50%" stopColor="var(--accent-dim, #94a3b8)" />
+          <stop offset="100%" stopColor="var(--surface-2, #475569)" />
         </linearGradient>
 
         {/* Matrix of Leadership core glow */}
         <radialGradient id="opt-matrix-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="40%" stopColor="#38bdf8" />
-          <stop offset="80%" stopColor="#0284c7" />
+          <stop offset="0%" stopColor="var(--accent, #ffffff)" />
+          <stop offset="40%" stopColor="var(--accent-strong, #38bdf8)" />
+          <stop offset="80%" stopColor="var(--accent-dim, #0284c7)" />
           <stop offset="100%" stopColor="transparent" />
         </radialGradient>
       </defs>
@@ -119,7 +141,7 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
         y1="10"
         x2="50"
         y2="36"
-        stroke="#ffffff"
+        stroke="var(--surface-1, #ffffff)"
         strokeWidth="1.5"
         strokeLinecap="round"
         opacity="0.8"
@@ -129,13 +151,13 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
       {/* --- LAYER 4: Cheek Flutes & Temple Shielding --- */}
       <path
         d="M23 38 L36 42 L34 56 L20 52 Z"
-        fill="#1e293b"
+        fill="var(--surface-2, #1e293b)"
         stroke="var(--accent, #00f2fe)"
         strokeWidth="1.2"
       />
       <path
         d="M77 38 L64 42 L66 56 L80 52 Z"
-        fill="#1e293b"
+        fill="var(--surface-2, #1e293b)"
         stroke="var(--accent, #00f2fe)"
         strokeWidth="1.2"
       />
@@ -144,7 +166,7 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
       {/* Eye brow shadow visor plate */}
       <path
         d="M32 41 L50 44 L68 41 L66 45 L50 48 L34 45 Z"
-        fill="#020617"
+        fill="var(--surface-1, #020617)"
         stroke="var(--accent, #00f2fe)"
         strokeWidth="1"
       />
@@ -159,7 +181,7 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
           opacity: 'calc(0.75 + var(--vg-level, 0) * 0.25)',
         }}
       />
-      <line x1="33" y1="48" x2="44" y2="48" stroke="#ffffff" strokeWidth="1" opacity="0.9" />
+      <line x1="33" y1="48" x2="44" y2="48" stroke="var(--surface-1, #ffffff)" strokeWidth="1" opacity="0.9" />
 
       {/* Right Laser Optic */}
       <polygon
@@ -171,11 +193,11 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
           opacity: 'calc(0.75 + var(--vg-level, 0) * 0.25)',
         }}
       />
-      <line x1="67" y1="48" x2="56" y2="48" stroke="#ffffff" strokeWidth="1" opacity="0.9" />
+      <line x1="67" y1="48" x2="56" y2="48" stroke="var(--surface-1, #ffffff)" strokeWidth="1" opacity="0.9" />
 
       {/* --- LAYER 6: Hydraulic Articulated Battle Mask (Lip-Sync) --- */}
       {/* Upper nose & bridge connector */}
-      <polygon points="50,47 45,56 55,56" fill="#334155" stroke="var(--accent, #00f2fe)" strokeWidth="1" />
+      <polygon points="50,47 45,56 55,56" fill="var(--surface-2, #334155)" stroke="var(--accent, #00f2fe)" strokeWidth="1" />
 
       {/* Articulating Faceplate / Grille that scales with voice amplitude */}
       <g
@@ -195,17 +217,17 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
           strokeLinejoin="round"
         />
         {/* Horizontal intake flutes */}
-        <line x1="42" y1="63" x2="58" y2="63" stroke="#0f172a" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="44" y1="68" x2="56" y2="68" stroke="#0f172a" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="46" y1="73" x2="54" y2="73" stroke="#0f172a" strokeWidth="1.4" strokeLinecap="round" />
+        <line x1="42" y1="63" x2="58" y2="63" stroke="var(--surface-1, #0f172a)" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="44" y1="68" x2="56" y2="68" stroke="var(--surface-1, #0f172a)" strokeWidth="1.6" strokeLinecap="round" />
+        <line x1="46" y1="73" x2="54" y2="73" stroke="var(--surface-1, #0f172a)" strokeWidth="1.4" strokeLinecap="round" />
       </g>
 
       {/* --- LAYER 7: Matrix of Leadership Collar Core --- */}
       {/* Collar V-mount */}
       <path
         d="M34 84 L50 78 L66 84 L50 93 Z"
-        fill="#0f172a"
-        stroke="rgba(255, 176, 32, 0.75)"
+        fill="var(--surface-1, #0f172a)"
+        stroke="var(--accent-line, rgba(255, 176, 32, 0.75))"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
@@ -214,7 +236,8 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
         points="50,80 54,85 50,90 46,85"
         fill="url(#opt-matrix-glow)"
         style={{
-          filter: 'drop-shadow(0 0 calc(3px + var(--vg-level, 0) * 8px) #38bdf8)',
+          filter:
+            'drop-shadow(0 0 calc(3px + var(--vg-level, 0) * 8px) var(--accent, #38bdf8))',
           opacity: 'calc(0.7 + var(--vg-level, 0) * 0.3)',
         }}
       />

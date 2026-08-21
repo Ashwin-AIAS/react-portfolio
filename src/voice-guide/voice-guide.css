@@ -137,10 +137,11 @@
 
 /* --- Optimus: Cybertronian aura + Matrix of Leadership ring --- */
 /*
- * The amber is a literal on purpose, inherited from the aura pair this
- * replaces: it is the Autobot half of the palette and must not follow whichever
- * accent the visitor picked in the theme switcher. The cyan half does follow
- * it, so the crest still belongs to the active theme.
+ * Fully theme-adaptive. The Autobot amber that used to be pinned here is gone:
+ * a crest that keeps its own palette while the page changes around it reads as
+ * a foreign object, so both layers now follow whichever accent the visitor
+ * picked in the theme switcher. Depth comes from the two accent tiers instead
+ * of from two unrelated hues.
  *
  * Both layers stay multiplied by --vg-level, which is what confines the pulse
  * to "when speaking" (§5.2) with no JS.
@@ -150,7 +151,12 @@
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    var(--accent) 0%,
+    var(--accent-strong) 45%,
+    transparent 70%
+  );
   filter: blur(12px);
   opacity: calc(0.22 + var(--vg-level) * 0.45);
   transition: opacity 90ms linear;
@@ -161,7 +167,7 @@
   inset: -4%;
   border-radius: 50%;
   pointer-events: none;
-  border: 1px solid rgba(255, 176, 32, 0.55);
+  border: 1px solid var(--accent-line);
   opacity: calc(0.12 + var(--vg-level) * 0.5);
   animation: vg-optimus-ring 2.2s ease-out infinite;
 }
@@ -177,12 +183,19 @@
 }
 
 /* --- JARVIS: arc glow + counter-rotating HUD rings --- */
+/* The cyan/indigo pair the arc reactor was built on is now the theme's own
+   two accent tiers, so the reactor lights the page in its current colour. */
 .vg-jarvis-aura {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, #38bdf8 0%, #6366f1 50%, transparent 75%);
+  background: radial-gradient(
+    circle,
+    var(--accent) 0%,
+    var(--accent-strong) 50%,
+    transparent 75%
+  );
   filter: blur(16px);
   opacity: calc(0.18 + var(--vg-level) * 0.4);
   transition: opacity 90ms linear;
@@ -213,11 +226,9 @@
 
 /* --- Megatron: dark-energon aura + containment ring --- */
 /*
- * Violet is a literal here for the same reason the Autobot amber and the
- * arc-reactor cyan are: the Decepticon crest must not follow whichever accent
- * the visitor picked in the theme switcher. Neither layer has a colour that
- * belongs to the theme, so unlike the Optimus pair this one is violet on both
- * halves — the red stays in the optics, where it means "speaking".
+ * Fully theme-adaptive, like the other two. The pinned Decepticon violet is
+ * gone: what makes this crest read as hostile is the CONTRACTING ring below and
+ * the value contrast in the SVG, not a hue the rest of the page never uses.
  *
  * Both layers stay multiplied by --vg-level, which is what confines the pulse
  * to "when speaking" (§5.2) with no JS.
@@ -227,7 +238,12 @@
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, #a855f7 0%, #4c1d95 55%, transparent 75%);
+  background: radial-gradient(
+    circle,
+    var(--accent) 0%,
+    var(--accent-strong) 55%,
+    transparent 75%
+  );
   filter: blur(14px);
   opacity: calc(0.2 + var(--vg-level) * 0.45);
   transition: opacity 90ms linear;
@@ -238,7 +254,7 @@
   inset: -4%;
   border-radius: 50%;
   pointer-events: none;
-  border: 1px solid rgba(168, 85, 247, 0.55);
+  border: 1px solid var(--accent-line);
   opacity: calc(0.12 + var(--vg-level) * 0.5);
   animation: vg-megatron-ring 2.6s ease-in-out infinite;
 }
@@ -271,10 +287,10 @@
 @keyframes vg-megatron-charge {
   0%,
   100% {
-    filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.5));
+    filter: drop-shadow(0 0 2px var(--accent-line));
   }
   50% {
-    filter: drop-shadow(0 0 7px rgba(168, 85, 247, 0.95));
+    filter: drop-shadow(0 0 7px var(--accent));
   }
 }
 
