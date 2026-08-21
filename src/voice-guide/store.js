@@ -25,10 +25,11 @@ import { DEFAULT_PERSONA } from './config';
  */
 
 /**
- * Seeded with the compile-time default rather than a localStorage read: this
- * module is eager (the avatar bubble imports it), and reading storage at module
- * scope would run before the provider has decided anything. The provider pushes
- * the persisted value the moment the engine exists.
+ * Seeded with the compile-time default (DEFAULT_PERSONA, 'ashwin') rather than
+ * a localStorage read: this module is eager (the avatar bubble imports it), and
+ * reading storage at module scope would run before the provider has decided
+ * anything. So the first crest painted is always the creator's, and the
+ * provider pushes the persisted value the moment the engine exists.
  *
  * @type {VoiceGuideSnapshot}
  */

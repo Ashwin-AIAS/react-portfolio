@@ -40,8 +40,9 @@ export function setEnabled(enabled) {
 
 /**
  * @returns {string} a persona id that definitely exists. An unknown or absent
- * value falls back to the default rather than leaving the engine with a script
- * it cannot resolve.
+ * value falls back to DEFAULT_PERSONA ('ashwin') rather than leaving the engine
+ * with a script it cannot resolve — so a first-time visitor, who has nothing
+ * stored under vg:persona, previews the creator's own voice.
  */
 export function getPersona() {
   const raw = safeGet('localStorage', STORAGE_KEYS.persona);

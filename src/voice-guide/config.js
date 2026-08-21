@@ -77,8 +77,13 @@ export const ESTIMATED_WORD_MS = 320;
  */
 export const PERSONA_IDS = ['optimus', 'ashwin', 'jarvis', 'megatron'];
 
-/** Optimus spec §2 marks this as the new default. */
-export const DEFAULT_PERSONA = 'optimus';
+/**
+ * The creator's own voice is the default preview: a first-time visitor should
+ * meet Ashwin before they meet a character. The Optimus/JARVIS/Megatron
+ * personas stay one click away in the persona menu, and whichever the visitor
+ * picks is remembered in vg:persona from then on (§7).
+ */
+export const DEFAULT_PERSONA = 'ashwin';
 
 export const PERSONA_META = {
   optimus: {
