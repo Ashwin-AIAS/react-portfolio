@@ -56,18 +56,18 @@ export const MEGATRON_NARRATION = [
       {
         text: 'I am Megatron, leader of the Decepticons. You have entered the domain of Ashwin Vignesh.',
         audio: '/audio/narration/megatron/hero-1.mp3',
-        estimatedMs: 7608,
+        estimatedMs: 7463,
       },
       {
         text: 'Do not mistake this for a courtesy. Scroll onward, and I will show you the machines he has built.',
         audio: '/audio/narration/megatron/hero-2.mp3',
-        estimatedMs: 7848,
+        estimatedMs: 7463,
       },
     ],
     revisit: {
       text: 'You return to the beginning. Predictable.',
       audio: '/audio/narration/megatron/hero-revisit.mp3',
-      estimatedMs: 4392,
+      estimatedMs: 4703,
     },
   },
   {
@@ -78,18 +78,18 @@ export const MEGATRON_NARRATION = [
       {
         text: 'Here stands a conversational intelligence, bound to his portfolio data and compelled to answer.',
         audio: '/audio/narration/megatron/assistant-1.mp3',
-        estimatedMs: 6912,
+        estimatedMs: 6647,
       },
       {
         text: 'Interrogate it. Or feed it a job description, and command it to measure him against your requirements.',
         audio: '/audio/narration/megatron/assistant-2.mp3',
-        estimatedMs: 8016,
+        estimatedMs: 7799,
       },
     ],
     revisit: {
       text: 'The interrogation channel remains open.',
       audio: '/audio/narration/megatron/assistant-revisit.mp3',
-      estimatedMs: 3624,
+      estimatedMs: 3503,
     },
   },
   {
@@ -100,18 +100,18 @@ export const MEGATRON_NARRATION = [
       {
         text: 'Study his ascent. Mechanical engineering, then enterprise ERP analysis, and now a Master’s in AI Engineering in Germany.',
         audio: '/audio/narration/megatron/roadmap-1.mp3',
-        estimatedMs: 10992,
+        estimatedMs: 10031,
       },
       {
         text: 'Three domains conquered, one purpose behind them — systems that survive outside the laboratory.',
         audio: '/audio/narration/megatron/roadmap-2.mp3',
-        estimatedMs: 7248,
+        estimatedMs: 6479,
       },
     ],
     revisit: {
       text: 'The record of his conquests.',
       audio: '/audio/narration/megatron/roadmap-revisit.mp3',
-      estimatedMs: 2904,
+      estimatedMs: 2927,
     },
   },
   {
@@ -122,13 +122,13 @@ export const MEGATRON_NARRATION = [
       {
         text: 'His arsenal: computer vision with YOLO and OpenCV, PyTorch architectures, and C++ inference engines forged for edge hardware.',
         audio: '/audio/narration/megatron/skills-1.mp3',
-        estimatedMs: 11040,
+        estimatedMs: 9335,
       },
     ],
     revisit: {
       text: 'The arsenal, laid bare.',
       audio: '/audio/narration/megatron/skills-revisit.mp3',
-      estimatedMs: 2904,
+      estimatedMs: 2807,
     },
   },
   {
@@ -139,13 +139,13 @@ export const MEGATRON_NARRATION = [
       {
         text: 'Raw evidence. Commit activity pulled live from his GitHub account, with nothing concealed.',
         audio: '/audio/narration/megatron/github-1.mp3',
-        estimatedMs: 7728,
+        estimatedMs: 7223,
       },
     ],
     revisit: {
       text: 'The evidence stands.',
       audio: '/audio/narration/megatron/github-revisit.mp3',
-      estimatedMs: 2544,
+      estimatedMs: 2567,
     },
   },
   {
@@ -156,18 +156,18 @@ export const MEGATRON_NARRATION = [
       {
         text: 'Behold his war machines. GymVision, tracking human motion in real time. A voice-controlled terminal agent. And a convolutional inference engine written in pure C++, with no frameworks at all.',
         audio: '/audio/narration/megatron/projects-1.mp3',
-        estimatedMs: 16752,
+        estimatedMs: 15815,
       },
       {
         text: 'Each one opens to reveal its stack and its source. Inspect them, if you dare.',
         audio: '/audio/narration/megatron/projects-2.mp3',
-        estimatedMs: 6984,
+        estimatedMs: 6719,
       },
     ],
     revisit: {
       text: 'The war machines await.',
       audio: '/audio/narration/megatron/projects-revisit.mp3',
-      estimatedMs: 2616,
+      estimatedMs: 2543,
     },
   },
   {
@@ -178,13 +178,13 @@ export const MEGATRON_NARRATION = [
       {
         text: 'Credentials, verified: deep learning, transformer language models, and agent engineering. Every entry links to its proof. I permit no unverified boasts.',
         audio: '/audio/narration/megatron/certifications-1.mp3',
-        estimatedMs: 14088,
+        estimatedMs: 12767,
       },
     ],
     revisit: {
       text: 'Proof, on demand.',
       audio: '/audio/narration/megatron/certifications-revisit.mp3',
-      estimatedMs: 2664,
+      estimatedMs: 2543,
     },
   },
   {
@@ -195,18 +195,18 @@ export const MEGATRON_NARRATION = [
       {
         text: 'The tour is complete. You have seen what he commands.',
         audio: '/audio/narration/megatron/contact-1.mp3',
-        estimatedMs: 5304,
+        estimatedMs: 5375,
       },
       {
         text: 'The channel below is open — his form, and his direct address. Use it, or be forgotten.',
         audio: '/audio/narration/megatron/contact-2.mp3',
-        estimatedMs: 8184,
+        estimatedMs: 7583,
       },
     ],
     revisit: {
       text: 'The channel remains open.',
       audio: '/audio/narration/megatron/contact-revisit.mp3',
-      estimatedMs: 2760,
+      estimatedMs: 2711,
     },
   },
 ];

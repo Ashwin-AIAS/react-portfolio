@@ -36,19 +36,21 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = ROOT_DIR / "public" / "audio" / "narration" / "megatron"
 
-# Edge-TTS tuning. -30Hz sits 5Hz below the Optimus render: Megatron speaks
-# lower and colder, and the flanger below supplies the rest of the metal.
-EDGE_VOICE = "en-US-ChristopherNeural"  # alt: en-US-GuyNeural
-EDGE_PITCH = "-30Hz"
-EDGE_RATE = "-10%"
+# Edge-TTS tuning: GuyNeural provides an aggressive, raspy, biting vocal tract
+# completely distinct from ChristopherNeural (used by Optimus Prime).
+EDGE_VOICE = "en-US-GuyNeural"
+EDGE_PITCH = "-35Hz"
+EDGE_RATE = "-8%"
 
-# Baked at render time, exactly like the Optimus generator. See OPTIMUS_DSP in
-# src/voice-guide/config.js for why nothing may stack a second chain on top of
-# these files at playback time.
+# Decepticon Dark Energon DSP chain:
+# Sub-bass chest rumble + razor high-mid metallic bite + heavy robotic flanger
+# + sinister dual-voice demonic chorus resonance.
 AUDIO_FILTER = (
-    "bass=g=11:f=110,"
-    "treble=g=3:f=3200,"
-    "flanger=delay=14:depth=2.2:regen=22:width=70:speed=0.35"
+    "bass=g=12:f=95,"
+    "treble=g=6:f=3600,"
+    "flanger=delay=8:depth=3.5:regen=30:width=85:speed=0.5,"
+    "chorus=0.7:0.9:45:0.4:0.25:2,"
+    "volume=1.05"
 )
 
 # Complete Megatron Narration Clips — 21 across the 8 canonical sections.
