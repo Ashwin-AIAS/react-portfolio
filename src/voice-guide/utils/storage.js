@@ -27,9 +27,19 @@ function safeSet(store, key, value) {
 
 // --- vg:enabled (localStorage) ----------------------------------------------
 
-/** @returns {boolean} — default false, per §1.6 "default state is muted". */
+/**
+ * @returns {boolean} — default TRUE. The tour is opt-out rather than opt-in:
+ * a visitor who has never touched the control gets narration, and only an
+ * explicit mute — which is the one thing that writes '0' — keeps them silent
+ * on the way back. So anything that is not a stored '0' counts as enabled,
+ * including the absent value a first-time visitor has.
+ *
+ * This is a *preference*, not permission to make noise. No audio starts until
+ * VoiceGuideProvider sees a real interaction: browsers require a user gesture
+ * before an AudioContext will run (§1.3), and this flag never bypasses that.
+ */
 export function getEnabled() {
-  return safeGet('localStorage', STORAGE_KEYS.enabled) === '1';
+  return safeGet('localStorage', STORAGE_KEYS.enabled) !== '0';
 }
 
 export function setEnabled(enabled) {

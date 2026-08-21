@@ -35,7 +35,11 @@ import { DEFAULT_PERSONA } from './config';
  */
 let snapshot = {
   ready: false,
-  enabled: false,
+  // Mirrors getEnabled()'s opt-out default, so the mute button reads "Mute
+  // tour" from the very first paint — before any gesture has unlocked audio,
+  // the tour is already *on*, just waiting. The provider corrects this the
+  // moment it can read localStorage.
+  enabled: true,
   machine: 'disabled',
   caption: null,
   sourceKind: null,
