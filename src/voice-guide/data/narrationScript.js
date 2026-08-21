@@ -43,21 +43,20 @@ export const NARRATION = [
     label: 'Hero',
     intro: [
       {
-        // Matches the existing welcome bubble copy in AvatarGuide.jsx.
-        text: "Hey, I'm Ashwin — welcome. Let me show you around.",
-        audio: '/audio/narration/hero-1.mp3',
-        estimatedMs: 3200,
+        text: "Hey, I'm Ashwin — welcome! Let me show you around.",
+        audio: '/audio/narration/ashwin/hero-1.mp3',
+        estimatedMs: 4488,
       },
       {
-        text: "Just scroll, and I'll walk you through it.",
-        audio: '/audio/narration/hero-2.mp3',
-        estimatedMs: 2600,
+        text: "Just scroll, and I'll walk you through my autonomous systems and AI engineering deployments.",
+        audio: '/audio/narration/ashwin/hero-2.mp3',
+        estimatedMs: 5304,
       },
     ],
     revisit: {
-      text: 'Back at the top.',
-      audio: '/audio/narration/hero-revisit.mp3',
-      estimatedMs: 1400,
+      text: 'Back at the top console.',
+      audio: '/audio/narration/ashwin/hero-revisit.mp3',
+      estimatedMs: 1824,
     },
   },
   {
@@ -66,21 +65,20 @@ export const NARRATION = [
     label: 'AI Assistant',
     intro: [
       {
-        // "Talk to my Portfolio" + its subtitle, both already on the page.
-        text: "This one's my favourite. It's a live AI assistant that knows my portfolio.",
-        audio: '/audio/narration/assistant-1.mp3',
-        estimatedMs: 4200,
+        text: "This is one of my favorite builds. It's a live, portfolio-aware conversational AI assistant.",
+        audio: '/audio/narration/ashwin/assistant-1.mp3',
+        estimatedMs: 6048,
       },
       {
-        text: 'Ask it anything about me, or paste a job description and see how I match. Go ahead, try it.',
-        audio: '/audio/narration/assistant-2.mp3',
-        estimatedMs: 5600,
+        text: 'Ask it anything about my architecture, or paste in a job description and test my skill match assessment.',
+        audio: '/audio/narration/ashwin/assistant-2.mp3',
+        estimatedMs: 6336,
       },
     ],
     revisit: {
-      text: "The assistant's still live if you want to try it.",
-      audio: '/audio/narration/assistant-revisit.mp3',
-      estimatedMs: 2600,
+      text: 'The portfolio assistant is still live and ready.',
+      audio: '/audio/narration/ashwin/assistant-revisit.mp3',
+      estimatedMs: 3168,
     },
   },
   {
@@ -89,22 +87,20 @@ export const NARRATION = [
     label: 'Career Roadmap',
     intro: [
       {
-        // Facts here come from portfolioData.personalInfo.bio + careerRoadmap entries.
-        text: 'Quick version of how I got here. Mechanical engineering first, then ERP work, now a master’s in AI Engineering in Germany.',
-        audio: '/audio/narration/roadmap-1.mp3',
-        estimatedMs: 6800,
+        text: "Here's the trajectory of how I got here: mechanical engineering first, then enterprise automation, and now a Master's in AI Engineering in Germany.",
+        audio: '/audio/narration/ashwin/roadmap-1.mp3',
+        estimatedMs: 8568,
       },
       {
-        // TODO: review — "the same thread" is an interpretation, not a stated fact.
-        text: 'Different fields, same thread: building things that actually run.',
-        audio: '/audio/narration/roadmap-2.mp3',
-        estimatedMs: 3400,
+        text: 'Across all three fields, one constant drive: building high-performance systems that thrive outside the lab.',
+        audio: '/audio/narration/ashwin/roadmap-2.mp3',
+        estimatedMs: 6744,
       },
     ],
     revisit: {
-      text: 'The roadmap.',
-      audio: '/audio/narration/roadmap-revisit.mp3',
-      estimatedMs: 1200,
+      text: 'The career trajectory roadmap.',
+      audio: '/audio/narration/ashwin/roadmap-revisit.mp3',
+      estimatedMs: 2280,
     },
   },
   {
@@ -113,17 +109,15 @@ export const NARRATION = [
     label: 'Skills',
     intro: [
       {
-        // Deliberately points at the chart rather than listing tools — the radar
-        // chart is already on screen and lists them properly.
-        text: "The stack I actually work in. Hover the chart if you want the detail.",
-        audio: '/audio/narration/skills-1.mp3',
-        estimatedMs: 3800,
+        text: 'Here is my core technical stack: real-time computer vision with YOLO and OpenCV, PyTorch neural architectures, and C++ inference optimized for edge hardware.',
+        audio: '/audio/narration/ashwin/skills-1.mp3',
+        estimatedMs: 10536,
       },
     ],
     revisit: {
-      text: 'Skills again.',
-      audio: '/audio/narration/skills-revisit.mp3',
-      estimatedMs: 1200,
+      text: 'The technical capability stack.',
+      audio: '/audio/narration/ashwin/skills-revisit.mp3',
+      estimatedMs: 2304,
     },
   },
   {
@@ -132,17 +126,15 @@ export const NARRATION = [
     label: 'GitHub Activity',
     intro: [
       {
-        // TODO: review — placeholder. Section subtitle is "Open source
-        // contributions & coding consistency"; no claim made about volume.
-        text: "And here's what that looks like day to day, straight from GitHub.",
-        audio: '/audio/narration/github-1.mp3',
-        estimatedMs: 3600,
+        text: 'And here is what relentless execution looks like day-to-day, pulled live from my GitHub telemetry.',
+        audio: '/audio/narration/ashwin/github-1.mp3',
+        estimatedMs: 6168,
       },
     ],
     revisit: {
-      text: 'The commit history.',
-      audio: '/audio/narration/github-revisit.mp3',
-      estimatedMs: 1300,
+      text: 'The live GitHub commit activity feed.',
+      audio: '/audio/narration/ashwin/github-revisit.mp3',
+      estimatedMs: 2808,
     },
   },
   {
@@ -151,22 +143,20 @@ export const NARRATION = [
     label: 'Projects',
     intro: [
       {
-        // TODO: review — "start with the first one" assumes the featured project
-        // stays first. Name it explicitly once Ashwin picks the hero project.
-        text: 'This is the part I’d look at first. Start with the featured one at the top.',
-        audio: '/audio/narration/projects-1.mp3',
-        estimatedMs: 4200,
+        text: 'Here are my flagship deployments: GymVision for real-time biomechanics; JARVIS, an autonomous voice agent; and zero-framework C++ CNN inference engines.',
+        audio: '/audio/narration/ashwin/projects-1.mp3',
+        estimatedMs: 11304,
       },
       {
-        text: 'Each one opens up with what it does and what I built it with.',
-        audio: '/audio/narration/projects-2.mp3',
-        estimatedMs: 3800,
+        text: 'Each project expands to show the architecture, tech stack, and source repository.',
+        audio: '/audio/narration/ashwin/projects-2.mp3',
+        estimatedMs: 5376,
       },
     ],
     revisit: {
-      text: 'More projects here.',
-      audio: '/audio/narration/projects-revisit.mp3',
-      estimatedMs: 1400,
+      text: 'The project deployment gallery.',
+      audio: '/audio/narration/ashwin/projects-revisit.mp3',
+      estimatedMs: 2232,
     },
   },
   {
@@ -175,17 +165,15 @@ export const NARRATION = [
     label: 'Certifications',
     intro: [
       {
-        // TODO: review — placeholder. No issuers named on purpose; the cards
-        // below already list them and they change.
-        text: 'Courses and certificates I’ve picked up along the way. Every one links out if you want to check it.',
-        audio: '/audio/narration/certifications-1.mp3',
-        estimatedMs: 5200,
+        text: 'Verified credentials across deep learning, transformer models, and autonomous AI agents. Every entry links out to its official verification.',
+        audio: '/audio/narration/ashwin/certifications-1.mp3',
+        estimatedMs: 9168,
       },
     ],
     revisit: {
-      text: 'The certificates.',
-      audio: '/audio/narration/certifications-revisit.mp3',
-      estimatedMs: 1300,
+      text: 'The verified certifications registry.',
+      audio: '/audio/narration/ashwin/certifications-revisit.mp3',
+      estimatedMs: 2880,
     },
   },
   {
@@ -194,21 +182,20 @@ export const NARRATION = [
     label: 'Contact',
     intro: [
       {
-        text: "That's the tour. Thanks for scrolling all the way down.",
-        audio: '/audio/narration/contact-1.mp3',
-        estimatedMs: 3400,
+        text: 'That wraps up the walkthrough! Thanks for exploring my portfolio.',
+        audio: '/audio/narration/ashwin/contact-1.mp3',
+        estimatedMs: 4464,
       },
       {
-        // TODO: review — "I'll get back to you" is a commitment; Ashwin's call.
-        text: "If you think there's a fit, the form's right here and my email's below. I'll get back to you.",
-        audio: '/audio/narration/contact-2.mp3',
-        estimatedMs: 5400,
+        text: "If you'd like to collaborate or have an exciting role, drop a message in the form or email me directly below. Let's connect!",
+        audio: '/audio/narration/ashwin/contact-2.mp3',
+        estimatedMs: 7392,
       },
     ],
     revisit: {
-      text: 'Get in touch here.',
-      audio: '/audio/narration/contact-revisit.mp3',
-      estimatedMs: 1400,
+      text: 'The communication channels are open.',
+      audio: '/audio/narration/ashwin/contact-revisit.mp3',
+      estimatedMs: 2352,
     },
   },
 ];

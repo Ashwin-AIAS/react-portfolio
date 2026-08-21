@@ -141,11 +141,19 @@ export const SPEECH_PROFILES = {
     langPreference: ['en-GB', 'en-US', 'en'],
   },
   ashwin: {
-    rate: SPEECH_RATE,
-    pitch: SPEECH_PITCH,
+    rate: 0.98,
+    pitch: 0.92,
     volume: 1.0,
-    preferredVoices: [],
-    langPreference: VOICE_PREFERENCE,
+    preferredVoices: [
+      'Microsoft Brian',
+      'Microsoft Andrew',
+      'Google US English',
+      'Google UK English Male',
+      'Microsoft David',
+      'en-US-Neural2-D',
+      'en-US-Neural2-J',
+    ],
+    langPreference: ['en-US', 'en-IN', 'en-GB', 'en'],
   },
   jarvis: {
     // Crisp and synthetic rather than deep — slightly quick, slightly bright.
