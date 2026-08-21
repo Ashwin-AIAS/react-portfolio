@@ -1,7 +1,47 @@
 import React from 'react';
 import { motion, useMotionValue } from 'framer-motion';
 
+/**
+ * Per-skill logo + colour. Keys must match the strings in portfolioData.skills
+ * exactly — an unknown key still renders, just grey and iconless (see the
+ * fallback in the component), so a typo degrades rather than breaks.
+ *
+ * `icon` is a simpleicons.org slug, fetched at render time and tinted with
+ * `color`. Slugs that do not exist 404 and the <img> hides itself, which is why
+ * concept skills with no vendor behind them ("Sensor Fusion", "Kalman
+ * Filtering") carry an explicit `icon: null` rather than a hopeful guess.
+ */
 const skillConfig = {
+  // ── Computer vision & perception ─────────────────────────────────────
+  OpenCV:                   { icon: 'opencv',                   color: '#7B68EE', bg: 'rgba(92,62,232,0.15)'  },
+  'YOLOv8 / YOLO26':        { icon: null,                       color: '#00E5FF', bg: 'rgba(0,229,255,0.10)'  },
+  '3D Reconstruction':      { icon: null,                       color: '#7DD3FC', bg: 'rgba(125,211,252,0.12)'},
+  'Pose Biomechanics':      { icon: null,                       color: '#5EEAD4', bg: 'rgba(94,234,212,0.12)' },
+  CNNs:                     { icon: null,                       color: '#F0A868', bg: 'rgba(240,168,104,0.12)'},
+  'Int8 Quantization':      { icon: null,                       color: '#B4A0E5', bg: 'rgba(180,160,229,0.12)'},
+  'Edge AI (C/C++)':        { icon: 'cplusplus',                color: '#6CB4E4', bg: 'rgba(0,89,156,0.15)'   },
+
+  // ── Generative AI, LLMs & autonomous agents ──────────────────────────
+  'LLMs (Claude / Gemini / GPT-4)': { icon: 'anthropic',        color: '#D4A27F', bg: 'rgba(212,162,127,0.14)'},
+  'Autonomous AI Agents':   { icon: null,                       color: '#A78BFA', bg: 'rgba(167,139,250,0.14)'},
+  'RAG & Graph RAG':        { icon: 'neo4j',                    color: '#4CAF82', bg: 'rgba(76,175,130,0.14)' },
+  'Vector DBs (pgvector, ChromaDB)': { icon: 'postgresql',      color: '#7099C8', bg: 'rgba(51,103,145,0.15)' },
+  // Simple Icons retired both 'openai' and 'chatgpt'; each 404s today, and
+  // 'openaigym' is a different product's mark. Text-only until a real one exists.
+  'OpenAI Whisper':         { icon: null,                       color: '#74AA9C', bg: 'rgba(116,170,156,0.14)'},
+
+  // ── Robotics & autonomous systems ────────────────────────────────────
+  'Sensor Fusion':          { icon: null,                       color: '#64B5F6', bg: 'rgba(100,181,246,0.12)'},
+  'LiDAR & RADAR':          { icon: null,                       color: '#4DD0E1', bg: 'rgba(77,208,225,0.12)' },
+  'SUMO Simulation':        { icon: null,                       color: '#8BC34A', bg: 'rgba(118,185,0,0.15)'  },
+  'ROS Kinematics':         { icon: 'ros',                      color: '#5A9FD4', bg: 'rgba(34,49,116,0.15)'  },
+  'Kalman Filtering':       { icon: null,                       color: '#9FA8DA', bg: 'rgba(159,168,218,0.12)'},
+
+  // ── Production core ──────────────────────────────────────────────────
+  Redis:                    { icon: 'redis',                    color: '#E5646E', bg: 'rgba(229,100,110,0.14)'},
+  Git:                      { icon: 'git',                      color: '#F1502F', bg: 'rgba(241,80,47,0.14)'  },
+
+  // ── Retained: still referenced by project tech lists and the radar ───
   Python:                   { icon: 'python',                   color: '#4B9CD3', bg: 'rgba(75,156,211,0.12)'  },
   'C/C++':                  { icon: 'cplusplus',                color: '#6CB4E4', bg: 'rgba(0,89,156,0.15)'   },
   SQL:                      { icon: 'postgresql',               color: '#6B9FD4', bg: 'rgba(68,121,161,0.15)' },
@@ -16,7 +56,6 @@ const skillConfig = {
   PyTorch:                  { icon: 'pytorch',                  color: '#EE6C4D', bg: 'rgba(238,76,44,0.15)'  },
   Keras:                    { icon: 'keras',                    color: '#E05252', bg: 'rgba(208,0,0,0.15)'    },
   TensorFlow:               { icon: 'tensorflow',               color: '#FF8F00', bg: 'rgba(255,111,0,0.15)'  },
-  OpenCV:                   { icon: 'opencv',                   color: '#7B68EE', bg: 'rgba(92,62,232,0.15)'  },
   YOLOv8:                   { icon: null,                       color: '#00E5FF', bg: 'rgba(0,229,255,0.10)'  },
   MediaPipe:                { icon: 'google',                   color: '#26C6DA', bg: 'rgba(0,151,167,0.15)'  },
   GANs:                     { icon: null,                       color: '#FFA040', bg: 'rgba(255,111,0,0.15)'  },

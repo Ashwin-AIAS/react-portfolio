@@ -8,12 +8,14 @@ import { SkillsRadarChart } from '../ui/SkillsRadarChart';
 // Was five competing accent colors (blue/purple/cyan/amber/emerald), five
 // emoji icons, and five corner glows pulsing forever on a 4s loop. Now the
 // only variable is the grid span — colour comes solely from the skill logos.
+// The spans carry the 60/40 weighting into the layout: vision opens on a full
+// row of its own, GenAI and robotics share the next one 2:1, and the production
+// stack closes on another full row. Anything unlisted falls back to one column.
 const categoryConfig = {
-  'Programming & Tools': { span: 'md:col-span-3' },
-  'AI/ML': { span: 'md:col-span-2' },
-  'Web & Backend': { span: 'md:col-span-1' },
-  'Data Analysis & Visualization': { span: 'md:col-span-1' },
-  Collaboration: { span: 'md:col-span-2' },
+  'Computer Vision & Perception': { span: 'md:col-span-3' },
+  'Generative AI & Autonomous Agents': { span: 'md:col-span-2' },
+  'Robotics & Autonomous Systems': { span: 'md:col-span-1' },
+  'Full-Stack & Production Core': { span: 'md:col-span-3' },
 };
 
 const SkillCard = ({ category, skills, index }) => {

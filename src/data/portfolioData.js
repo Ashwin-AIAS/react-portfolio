@@ -34,12 +34,15 @@ export const portfolioData = {
       details: "Relevant coursework: Machine Learning, Deep Learning, Data Engineering, Sensor Data and Fusion (automotive-focused)."
     }
   ],
+  // Weighted roughly 60% computer vision / perception, 40% generative AI,
+  // agents and robotics — the split the roadmap and the projects actually
+  // reflect. Ordering is deliberate: the section renders these keys in place,
+  // so vision leads and the production stack closes.
   skills: {
-    "Programming & Tools": ["Python", "C/C++", "SQL", "FastAPI", "Docker", "CMake", "Power Automate", "Simulink", "SUMO", "Pandas", "NumPy"],
-    "AI/ML": ["PyTorch", "Keras", "TensorFlow", "OpenCV", "YOLOv8", "MediaPipe", "GANs", "LangChain", "Gemini API", "Reinforcement Learning", "Prompt Engineering"],
-    "Web & Backend": ["React", "PostgreSQL", "pgvector", "Streamlit"],
-    "Data Analysis & Visualization": ["Power BI", "Excel", "Tableau"],
-    "Collaboration": ["SharePoint", "Confluence", "Jira", "GitHub", "N8N"],
+    "Computer Vision & Perception": ["OpenCV", "YOLOv8 / YOLO26", "MediaPipe", "3D Reconstruction", "Pose Biomechanics", "CNNs", "PyTorch", "Int8 Quantization", "Edge AI (C/C++)", "TensorFlow"],
+    "Generative AI & Autonomous Agents": ["LangChain", "LLMs (Claude / Gemini / GPT-4)", "Autonomous AI Agents", "RAG & Graph RAG", "Vector DBs (pgvector, ChromaDB)", "OpenAI Whisper", "Prompt Engineering"],
+    "Robotics & Autonomous Systems": ["Sensor Fusion", "LiDAR & RADAR", "SUMO Simulation", "Simulink", "ROS Kinematics", "Kalman Filtering"],
+    "Full-Stack & Production Core": ["FastAPI", "Python", "C/C++", "React", "PostgreSQL", "Docker", "CMake", "Redis", "Git", "N8N"],
   },
   projects: [
     {

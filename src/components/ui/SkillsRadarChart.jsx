@@ -5,13 +5,20 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 // Each area used to carry its own hue (blue/purple/pink/cyan/green/amber),
 // which put six more colours on a page that has one. The reading is the
 // polygon; hover is what singles an axis out.
+//
+// The six axes are the 60/40 split of portfolioData.skills read as a shape.
+// Vision and the deep-learning core it rests on are the two longest spokes —
+// that asymmetry IS the 60%, and it is the first thing the polygon says before
+// anyone reads a label. The remaining four cover the generative-AI, agent,
+// retrieval and robotics 40% at a deliberately tighter spread, so the chart
+// reads as one specialism with real breadth rather than six equal claims.
 const skillAreas = [
-  { label: 'Computer Vision',    short: 'CV',         value: 90, skills: ['OpenCV', 'YOLOv8', 'MediaPipe', 'CNNs', '3D Reconstruction'] },
-  { label: 'NLP & RAG',          short: 'NLP',        value: 85, skills: ['LangChain', 'pgvector', 'Gemini API', 'Prompt Engineering'] },
-  { label: 'AI / ML Core',       short: 'AI/ML',      value: 88, skills: ['PyTorch', 'TensorFlow', 'Keras', 'GANs', 'RL'] },
-  { label: 'Full-Stack Dev',     short: 'Full‑Stack', value: 78, skills: ['React', 'FastAPI', 'PostgreSQL', 'Streamlit'] },
-  { label: 'Autonomous Systems', short: 'Auto',       value: 82, skills: ['Sensor Fusion', 'LiDAR', 'SUMO', 'Simulink', 'RADAR'] },
-  { label: 'Tools & DevOps',     short: 'DevOps',     value: 75, skills: ['Docker', 'CMake', 'Git', 'N8N', 'Power BI'] },
+  { label: 'Computer Vision',       short: 'CV',      value: 94, skills: ['OpenCV', 'YOLOv8 / YOLO26', 'MediaPipe', '3D Reconstruction', 'Pose Biomechanics'] },
+  { label: 'GenAI & Agents',        short: 'GenAI',   value: 88, skills: ['LangChain', 'Claude / Gemini / GPT-4', 'Autonomous AI Agents', 'OpenAI Whisper', 'Prompt Engineering'] },
+  { label: 'RAG & Vector Retrieval', short: 'RAG',    value: 86, skills: ['RAG & Graph RAG', 'pgvector', 'ChromaDB', 'Neo4j', 'Cross-Encoder Reranking'] },
+  { label: 'Autonomous Systems',    short: 'Auto',    value: 82, skills: ['Sensor Fusion', 'LiDAR & RADAR', 'SUMO Simulation', 'Simulink', 'Kalman Filtering'] },
+  { label: 'Deep Learning',         short: 'DL',      value: 90, skills: ['PyTorch', 'TensorFlow', 'CNNs', 'GANs', 'Reinforcement Learning'] },
+  { label: 'Production & Edge Stack', short: 'Stack', value: 84, skills: ['FastAPI', 'Docker', 'PostgreSQL', 'Redis', 'Int8 Quantization', 'Edge AI (C/C++)'] },
 ];
 
 const LEVELS = 5;           // concentric rings
