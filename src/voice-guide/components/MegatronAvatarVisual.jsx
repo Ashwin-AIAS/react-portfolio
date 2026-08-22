@@ -4,6 +4,8 @@
  * A multi-layered Decepticon battle crest featuring:
  * - Multi-faceted obsidian & gunmetal armor chassis with metallic violet bevels
  * - Rotating outer Fusion Cannon targeting reticle ring with plasma charge nodes
+ * - A counter-rotating crosshair with four amplitude-lit plasma charge points
+ * - Dark Energon spark flares crackling off the forehead crystal on speech
  * - Piercing crimson glowing laser optics with sinister brow glare
  * - Forehead Dark Energon Spark Core
  * - Segmented mechanical vocoder grille with glowing Dark Energon exhaust vents (lip sync)
@@ -54,6 +56,12 @@ const MOUTH_BARS = [
 const BAR_WIDTH = 4.5;
 const BAR_TOP = 58;
 const BAR_HEIGHT = 14;
+
+/** Fusion-cannon crosshair arms, on the cardinals so they read as a reticle. */
+const CROSSHAIRS = [0, 90, 180, 270];
+
+/** Dark Energon flare spikes off the forehead spark, in degrees. */
+const SPARK_FLARES = [0, 45, 90, 135];
 
 /**
  * @param {Object} props
@@ -141,6 +149,49 @@ export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
         })}
       </g>
 
+      {/* --- LAYER 1b: Counter-Rotating Fusion Cannon Crosshair --- */}
+      {/* The dial above turns one way, the crosshair the other, which is what
+          makes the pair read as a weapon acquiring a lock rather than as two
+          rings drifting. Each arm is a bracketed tick with a charge point on
+          the rim that lights with the amplitude. */}
+      <g className="vg-megatron-crosshair">
+        {CROSSHAIRS.map((deg) => {
+          const rad = (deg * Math.PI) / 180;
+          const cos = Math.cos(rad);
+          const sin = Math.sin(rad);
+          const inner = { x: 50 + 34 * cos, y: 50 + 34 * sin };
+          const outer = { x: 50 + 48 * cos, y: 50 + 48 * sin };
+          const node = { x: 50 + 41 * cos, y: 50 + 41 * sin };
+          return (
+            <g key={deg}>
+              <line
+                x1={inner.x.toFixed(2)}
+                y1={inner.y.toFixed(2)}
+                x2={outer.x.toFixed(2)}
+                y2={outer.y.toFixed(2)}
+                stroke={DECEPTICON_EDGE}
+                strokeWidth="1"
+                strokeLinecap="round"
+                style={{ opacity: 'calc(0.4 + var(--vg-level, 0) * 0.6)' }}
+              />
+              {/* Plasma charge point riding the arm. */}
+              <rect
+                x={(node.x - 1.3).toFixed(2)}
+                y={(node.y - 1.3).toFixed(2)}
+                width="2.6"
+                height="2.6"
+                fill={DECEPTICON_HOT}
+                transform={`rotate(45 ${node.x.toFixed(2)} ${node.y.toFixed(2)})`}
+                style={{
+                  filter: `drop-shadow(0 0 calc(2px + var(--vg-level, 0) * 7px) ${DECEPTICON_HOT})`,
+                  opacity: 'calc(0.55 + var(--vg-level, 0) * 0.45)',
+                }}
+              />
+            </g>
+          );
+        })}
+      </g>
+
       {/* --- LAYER 2: Main Decepticon Crown & Spiked Armor Chassis --- */}
       {/* Outer Spiked Crown & Cheek Guards */}
       <polygon
@@ -170,6 +221,31 @@ export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
+      {/* Dark Energon spark flares — four crossed spikes off the forehead
+          crystal. The group's opacity is the amplitude gate and the flicker is
+          keyframed in voice-guide.css, so the crest crackles only on speech. */}
+      <g
+        className="vg-megatron-flare"
+        style={{ opacity: 'calc(var(--vg-level, 0) * 0.9)' }}
+      >
+        {SPARK_FLARES.map((deg) => (
+          <line
+            key={deg}
+            x1="50"
+            y1="14"
+            x2="50"
+            y2="42"
+            stroke={deg % 90 === 0 ? DECEPTICON_HOT : DECEPTICON_EDGE}
+            strokeWidth={deg % 90 === 0 ? '0.9' : '0.6'}
+            strokeLinecap="round"
+            transform={`rotate(${deg} 50 28)`}
+            style={{
+              filter: `drop-shadow(0 0 calc(2px + var(--vg-level, 0) * 8px) ${DECEPTICON_HOT})`,
+            }}
+          />
+        ))}
+      </g>
 
       {/* Central Dark Energon Spark Diamond */}
       <polygon

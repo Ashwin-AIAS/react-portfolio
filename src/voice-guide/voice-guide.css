@@ -711,3 +711,404 @@
     filter: none !important;
   }
 }
+
+/* ============================================================================
+   HOLOGRAPHIC TOUR AGENT — holo spec §2.1, §2.4
+   ============================================================================
+   The persona visuals still ship their SHAPE and COLOUR inline (AvatarGuide is
+   eager, this file is lazy), so everything below is motion and atmosphere only:
+   layers that are invisible rather than broken if the stylesheet lands late.
+
+   One rule runs through all of it: a layer never carries both a --vg-level
+   transform and a keyframe animation. Whichever needs both gets split into a
+   wrapper that reads the amplitude and a child that moves on its own timer,
+   because the animation would otherwise win the transform outright and the
+   avatar would stop reacting to the voice.
+   ------------------------------------------------------------------------- */
+
+/* ------------------------------------- Ashwin: projection rig (§2.1.1) --- */
+
+.vg-ashwin-holo {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+
+/* Soundwave orbital halo. The container breathes with the amplitude; the three
+   rings inside it spin, at different speeds and in both directions. */
+.vg-ashwin-halo {
+  border-radius: 50%;
+  transform: scale(calc(0.9 + var(--vg-level) * 0.24));
+  transition: transform 90ms linear;
+  will-change: transform;
+}
+
+.vg-ashwin-halo-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed var(--accent-line);
+  opacity: calc(0.18 + var(--vg-level) * 0.6);
+  animation: vg-spin 16s linear infinite;
+}
+
+.vg-ashwin-halo-ring-2 {
+  inset: 9%;
+  border-style: solid;
+  border-color: var(--accent-wash);
+  opacity: calc(0.22 + var(--vg-level) * 0.55);
+  animation: vg-spin 10s linear infinite reverse;
+}
+
+.vg-ashwin-halo-ring-3 {
+  inset: -9%;
+  border-style: dotted;
+  opacity: calc(0.1 + var(--vg-level) * 0.45);
+  animation: vg-spin 26s linear infinite;
+}
+
+/* Ambient particle glow: motes rising through the projection column. Pure
+   decoration, so they are cheap — one 3px dot each, transform + opacity only. */
+.vg-ashwin-motes {
+  overflow: hidden;
+}
+
+.vg-ashwin-mote {
+  position: absolute;
+  bottom: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+  opacity: 0;
+  animation: vg-mote-rise 6s ease-in-out infinite;
+}
+
+.vg-ashwin-mote:nth-child(1) { left: 12%; animation-duration: 5.5s; animation-delay: 0s; }
+.vg-ashwin-mote:nth-child(2) { left: 27%; animation-duration: 7s;   animation-delay: 0.9s; }
+.vg-ashwin-mote:nth-child(3) { left: 41%; animation-duration: 6.2s; animation-delay: 2.1s; }
+.vg-ashwin-mote:nth-child(4) { left: 56%; animation-duration: 8s;   animation-delay: 1.4s; }
+.vg-ashwin-mote:nth-child(5) { left: 68%; animation-duration: 5.8s; animation-delay: 3.2s; }
+.vg-ashwin-mote:nth-child(6) { left: 81%; animation-duration: 7.4s; animation-delay: 2.6s; }
+.vg-ashwin-mote:nth-child(7) { left: 92%; animation-duration: 6.6s; animation-delay: 4.1s; }
+
+@keyframes vg-mote-rise {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    opacity: calc(0.35 + var(--vg-level) * 0.65);
+  }
+  85% {
+    opacity: calc(0.12 + var(--vg-level) * 0.4);
+  }
+  100% {
+    transform: translateY(-120%) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Projection interference over the memoji. Screen-blended so it lights dark
+   palettes and disappears against light ones instead of dirtying them. */
+.vg-holo-scanlines {
+  border-radius: 12%;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--accent-wash) 0 1px,
+    transparent 1px 4px
+  );
+  mix-blend-mode: screen;
+  opacity: calc(0.18 + var(--vg-level) * 0.42);
+  animation: vg-holo-scanline 3.4s linear infinite;
+}
+
+@keyframes vg-holo-scanline {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 8px;
+  }
+}
+
+/* --- The pedestal: emitter, discs, and the cone of light --- */
+
+.vg-holo-pedestal {
+  perspective: 220px;
+}
+
+/* Cone, narrow at the emitter and opening upward into the avatar. */
+.vg-holo-beam {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  width: 96%;
+  height: 118%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to top,
+    var(--accent-line) 0%,
+    var(--accent-wash) 45%,
+    transparent 88%
+  );
+  clip-path: polygon(2% 0%, 98% 0%, 63% 100%, 37% 100%);
+  opacity: calc(0.3 + var(--vg-level) * 0.55);
+  filter: blur(0.5px);
+  overflow: hidden;
+}
+
+/* A band of light climbing the beam, the way a projector refresh would. */
+.vg-holo-beam::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    var(--accent-wash) 42%,
+    var(--accent-line) 50%,
+    var(--accent-wash) 58%,
+    transparent 100%
+  );
+  animation: vg-pedestal-sweep 3.6s ease-in-out infinite;
+}
+
+@keyframes vg-pedestal-sweep {
+  0% {
+    transform: translateY(70%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-90%);
+    opacity: 0;
+  }
+}
+
+/* Emitter plate seen in perspective: a flat ellipse, not a circle. */
+.vg-holo-disc {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: 58%;
+  height: 22%;
+  transform: translateX(-50%);
+  border: 1px solid var(--accent-line);
+  border-radius: 50%;
+  box-shadow:
+    0 0 calc(6px + var(--vg-level) * 18px) var(--accent-wash),
+    inset 0 0 10px var(--accent-wash);
+  opacity: calc(0.45 + var(--vg-level) * 0.55);
+}
+
+/* Second disc rides outward and fades — the pulse the emitter throws off. */
+.vg-holo-disc-2 {
+  animation: vg-pedestal-disc 2.8s ease-out infinite;
+}
+
+@keyframes vg-pedestal-disc {
+  0% {
+    transform: translateX(-50%) scale(0.7);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(-50%) scale(1.7);
+    opacity: 0;
+  }
+}
+
+.vg-holo-emitter {
+  position: absolute;
+  left: 50%;
+  bottom: 15%;
+  width: 26%;
+  height: 8%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 calc(8px + var(--vg-level) * 22px) var(--accent);
+  opacity: calc(0.55 + var(--vg-level) * 0.45);
+}
+
+/* --------------------------- Optimus: scanline rake + Matrix resonance --- */
+
+/* The rake drifts down the helmet and wraps. Travel matches the 8-unit line
+   spacing in OptimusAvatarVisual, so the loop is seamless. */
+.vg-optimus-scan {
+  transform-box: view-box;
+  animation: vg-scan-rake 3.2s linear infinite;
+}
+
+@keyframes vg-scan-rake {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(8px);
+  }
+}
+
+/* A flicker on the optics, so the lens flare never looks like a static decal.
+   Gated on vg-optimus-live: a silent Prime does not strobe. */
+.vg-optimus-live .vg-optimus-flare {
+  animation: vg-optic-flicker 2.6s steps(1, end) infinite;
+}
+
+@keyframes vg-optic-flicker {
+  0%, 46%, 52%, 100% {
+    filter: none;
+  }
+  48% {
+    filter: brightness(1.45);
+  }
+}
+
+/* Matrix of Leadership: two rings pushed out of the crystal, staggered. */
+.vg-optimus-matrix {
+  transform-box: view-box;
+  transform-origin: 50% 85%;
+  animation: vg-matrix-resonance 2.4s ease-out infinite;
+}
+
+.vg-optimus-matrix-2 {
+  animation-duration: 3.1s;
+  animation-delay: 0.8s;
+}
+
+@keyframes vg-matrix-resonance {
+  0% {
+    transform: scale(0.45);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* ------------------------ JARVIS: gyroscope cage + sonic shockwaves --- */
+
+/* Squashing a full circle on Y is how a flat SVG sells a ring tumbling in
+   depth: edge-on at the extremes, an ellipse in between. Three phases, so the
+   cage never resolves into one readable shape. */
+.vg-jarvis-gyro {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: vg-gyro-tumble 9s ease-in-out infinite;
+}
+
+.vg-jarvis-gyro-2 {
+  animation-duration: 12s;
+  animation-delay: -3s;
+}
+
+.vg-jarvis-gyro-3 {
+  animation-duration: 15s;
+  animation-delay: -7s;
+}
+
+@keyframes vg-gyro-tumble {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.12);
+  }
+}
+
+/* Shockwaves leave the core and die at the rim. The parent group carries the
+   amplitude gate, so a silent reactor throws nothing. */
+.vg-jarvis-shock {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: vg-shockwave 2.2s ease-out infinite;
+}
+
+.vg-jarvis-shock-2 {
+  animation-delay: 0.73s;
+}
+
+.vg-jarvis-shock-3 {
+  animation-delay: 1.46s;
+}
+
+@keyframes vg-shockwave {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* ------------------- Megatron: fusion-cannon lock + Energon crackle --- */
+
+/* Counter-rotating against .vg-megatron-reticle above, which is what makes the
+   pair read as a weapon acquiring a lock. */
+.vg-megatron-crosshair {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: vg-spin 11s linear infinite reverse;
+}
+
+/* Dark Energon is unstable — the spikes crackle rather than pulse. steps() on
+   purpose: a smooth fade would read as a glow, not as an arc. */
+.vg-megatron-flare {
+  animation: vg-energon-crackle 1.4s steps(2, end) infinite;
+}
+
+@keyframes vg-energon-crackle {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  30% {
+    filter: brightness(1.6);
+  }
+  55% {
+    filter: brightness(0.75);
+  }
+  80% {
+    filter: brightness(1.35);
+  }
+}
+
+/* ------------------------------------- reduced motion, holo layers --- */
+/*
+ * Same rule as the block above: anything carrying information stays, anything
+ * running on its own timer goes. The pedestal and the halo are atmosphere, so
+ * they are removed outright rather than frozen — a frozen light cone under the
+ * avatar reads as a rendering bug.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .vg-ashwin-halo,
+  .vg-ashwin-motes,
+  .vg-holo-pedestal,
+  .vg-holo-scanlines {
+    display: none !important;
+  }
+
+  .vg-optimus-scan,
+  .vg-optimus-live .vg-optimus-flare,
+  .vg-optimus-matrix,
+  .vg-jarvis-gyro,
+  .vg-jarvis-shock,
+  .vg-megatron-crosshair,
+  .vg-megatron-flare {
+    animation: none !important;
+  }
+
+  /* Without their keyframes these two are stacked duplicates sitting at their
+     start radius, so they are hidden instead of left as artefacts. */
+  .vg-optimus-matrix,
+  .vg-jarvis-shock {
+    display: none !important;
+  }
+}

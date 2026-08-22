@@ -3,6 +3,9 @@
  *
  * A multi-tiered Stark Industries tactical HUD featuring:
  * - 3-Tier gyroscopic telemetry rings with cardinal degree markers & micro-HUD tags
+ * - A 3-axis gyroscope cage that tumbles in depth behind the chassis
+ * - A 36-point nano-grid dial, majors long, so the rim reads as an instrument
+ * - Sonic shockwave rings thrown outward from the core on every syllable
  * - Counter-rotating segmented gold & titanium-blue magnetic flux coils
  * - 12 Radial laser containment pylons with amplitude-responsive nodes
  * - Vibranium prism core with radiating concentric audio equalizer wave rings
@@ -47,6 +50,29 @@ const CARDINAL_TICKS = [
   { deg: 90, label: '90°' },
   { deg: 180, label: '180°' },
   { deg: 270, label: '270°' },
+];
+
+/** Nano-grid: a tick every 10°, so the dial reads as an instrument. */
+const NANO_TICKS = Array.from({ length: 36 }, (_, i) => i * 10);
+
+/**
+ * Three shockwave rings, staggered by delay class, that the reactor throws
+ * outward while it talks. Radius stays constant here; the scale and the fade
+ * are keyframed in voice-guide.css, and the amplitude gate lives on the parent.
+ */
+const SHOCKWAVES = ['', ' vg-jarvis-shock-2', ' vg-jarvis-shock-3'];
+
+/**
+ * Gyroscopic telemetry rings. Each is a full circle mounted on its own axis and
+ * squashed on Y by a staggered keyframe, which is what sells a ring tumbling in
+ * depth on a flat SVG: at the extremes it is a line seen edge-on, in between it
+ * is an ellipse. Three axes, three phases, so the cage never resolves into a
+ * single readable shape.
+ */
+const GYRO_RINGS = [
+  { deg: 0, r: 41, cls: '' },
+  { deg: 60, r: 36, cls: ' vg-jarvis-gyro-2' },
+  { deg: 120, r: 44, cls: ' vg-jarvis-gyro-3' },
 ];
 
 /**
@@ -126,6 +152,52 @@ export const JarvisAvatarVisual = ({ size = 130, speaking = false }) => (
           );
         })}
 
+        {/* Cardinal degree tags. They ride the dial, so the reactor reads as a
+            bearing instrument rather than as a decorative ring. */}
+        {CARDINAL_TICKS.map(({ deg, label }) => {
+          const rad = (deg * Math.PI) / 180;
+          const x = 50 + 40 * Math.cos(rad);
+          const y = 50 + 40 * Math.sin(rad);
+          return (
+            <text
+              key={label}
+              x={x.toFixed(2)}
+              y={(y + 1).toFixed(2)}
+              fill={HUD_ACCENT}
+              fontSize="3.2"
+              fontFamily="monospace"
+              fontWeight="bold"
+              textAnchor="middle"
+              opacity="0.8"
+            >
+              {label}
+            </text>
+          );
+        })}
+
+        {/* Nano-grid ticks every 10°, long on the majors. */}
+        {NANO_TICKS.map((deg) => {
+          const rad = (deg * Math.PI) / 180;
+          const isMajor = deg % 30 === 0;
+          const r1 = isMajor ? 43.5 : 45;
+          const x1 = 50 + r1 * Math.cos(rad);
+          const y1 = 50 + r1 * Math.sin(rad);
+          const x2 = 50 + 47 * Math.cos(rad);
+          const y2 = 50 + 47 * Math.sin(rad);
+          return (
+            <line
+              key={`nano-${deg}`}
+              x1={x1.toFixed(2)}
+              y1={y1.toFixed(2)}
+              x2={x2.toFixed(2)}
+              y2={y2.toFixed(2)}
+              stroke={isMajor ? HUD_SOFT : HUD_DEEP}
+              strokeWidth={isMajor ? '0.7' : '0.45'}
+              opacity={isMajor ? '0.7' : '0.4'}
+            />
+          );
+        })}
+
         {/* Micro Telemetry HUD Labels */}
         <text
           x="50"
@@ -175,6 +247,23 @@ export const JarvisAvatarVisual = ({ size = 130, speaking = false }) => (
           strokeDasharray="4 3 8 3"
           opacity="0.7"
         />
+      </g>
+
+      {/* --- LAYER 2b: 3D Gyroscopic Telemetry Cage --- */}
+      <g style={{ opacity: 'calc(0.4 + var(--vg-level, 0) * 0.5)' }}>
+        {GYRO_RINGS.map(({ deg, r, cls }) => (
+          <g key={deg} transform={`rotate(${deg} 50 50)`}>
+            <circle
+              cx="50"
+              cy="50"
+              r={r}
+              className={`vg-jarvis-gyro${cls}`}
+              stroke={HUD_SOFT}
+              strokeWidth="0.8"
+              strokeDasharray="14 4 2 4"
+            />
+          </g>
+        ))}
       </g>
 
       {/* --- LAYER 3: Hexagonal Vibranium Containment Chassis --- */}
@@ -231,6 +320,24 @@ export const JarvisAvatarVisual = ({ size = 130, speaking = false }) => (
       })}
 
       {/* --- LAYER 5: Radiating Polar Equalizer Wave Rings (Audio Reactive) --- */}
+      {/* Sonic shockwaves. Three rings leave the core on a stagger and die at
+          the rim; the group's opacity is the amplitude gate, so nothing is
+          thrown while the reactor is silent. */}
+      <g style={{ opacity: 'calc(var(--vg-level, 0) * 0.75)' }}>
+        {SHOCKWAVES.map((cls) => (
+          <circle
+            key={cls || 'base'}
+            cx="50"
+            cy="50"
+            r="16"
+            className={`vg-jarvis-shock${cls}`}
+            stroke={HUD_ACCENT}
+            strokeWidth="0.9"
+            style={{ filter: `drop-shadow(0 0 5px ${HUD_LINE})` }}
+          />
+        ))}
+      </g>
+
       {/* Outer audio pulse shockwave */}
       <circle
         cx="50"
