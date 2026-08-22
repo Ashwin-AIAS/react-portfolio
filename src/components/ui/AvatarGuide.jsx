@@ -178,8 +178,12 @@ export const AvatarGuide = () => {
                 style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                animate={tourActive && hasStarted ? {} : { y: [0, -12, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                /* Anti-gravity levitation (holo spec §2.2.1). The guide is a
+                   projection now, so it never sits still — the float runs in
+                   every state instead of only between tours, on an asymmetric
+                   4-stop path so it never reads as a metronome. */
+                animate={{ y: [0, -10, 2, -8, 0], rotate: [0, -1.5, 1.5, 0] }}
+                transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
             >
                 <AnimatePresence mode="wait">
                     {showBubble ? (
@@ -271,6 +275,13 @@ export const AvatarGuide = () => {
                     ) : null}
                 </AnimatePresence>
 
+                {/* Second stage of the levitation, on its own timer and its own
+                    element: the wrapper above drifts the whole guide, this one
+                    lets the avatar bank against that drift, which is what makes
+                    the motion read as buoyancy rather than as a slide. Kept in
+                    CSS so it never has to share a transform with the emotion
+                    animation on the wrapper below. */}
+                <div className="vg-levitate">
                 {/* Avatar + mouth share one positioned wrapper so they scale together (§6.1).
                     The emotion animation moved from the <img> to this wrapper so the mouth
                     overlay stays aligned through it; PersonaAvatar keeps its own filters. */}
@@ -294,6 +305,7 @@ export const AvatarGuide = () => {
                         overlaid mouth — personas spec §3.3. */}
                     <PersonaAvatar persona={voice.persona} size={130} speaking={voice.isSpeaking} />
                 </motion.div>
+                </div>
             </motion.div>
         </motion.div>
     );

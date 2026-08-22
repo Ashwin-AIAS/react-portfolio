@@ -1337,3 +1337,174 @@
     display: none !important;
   }
 }
+
+/* ============================================================================
+   ANTI-GRAVITY LEVITATION & DYNAMIC ISLAND — holo spec §2.3, §2.4
+   ========================================================================= */
+
+/* Second stage of the float. AvatarGuide drifts the whole guide in framer, and
+   this banks the avatar against that drift on a different period, so the two
+   never line up and the motion reads as buoyancy instead of a slide.
+   Deliberately CSS: it must not share a transform with the emotion animation
+   that framer puts on .vg-avatar-wrap one level down. */
+.vg-levitate {
+  animation: vg-levitate 7.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes vg-levitate {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-6px) rotate(-1.1deg);
+  }
+  50% {
+    transform: translateY(2px) rotate(0.5deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(1.1deg);
+  }
+}
+
+/* ---------------------------------------- mobile dynamic island (§2.3) --- */
+
+/* The island now hosts an absolutely-positioned beam, so it needs a stacking
+   context and a clip. Its own children are lifted above the beam. */
+.vg-pill {
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.vg-pill > :not(.vg-pill-beam) {
+  position: relative;
+  z-index: 1;
+}
+
+.vg-pill-on {
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    0 0 calc(6px + var(--vg-level) * 18px) var(--accent-wash);
+}
+
+/* Perimeter beam. ::before is the light running the rim; ::after masks the
+   interior back to the island's own surface so only the rim shows. */
+.vg-pill-beam {
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: calc(0.35 + var(--vg-level) * 0.65);
+  transition: opacity 90ms linear;
+}
+
+.vg-pill-beam::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--accent-wash) 26deg,
+    var(--accent) 44deg,
+    var(--accent-wash) 62deg,
+    transparent 96deg,
+    transparent 360deg
+  );
+  animation: vg-spin 3.8s linear infinite;
+}
+
+.vg-pill-beam::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  border-radius: 9999px;
+  background: var(--surface-1);
+}
+
+/* Equaliser. The live heights are already driven by --vg-level above; these two
+   add the glow while speaking and a slow idle shimmer while armed and silent,
+   so an unlocked-but-quiet island still looks alive. */
+.vg-pill-eq-live .vg-pill-bar {
+  box-shadow: 0 0 calc(2px + var(--vg-level) * 6px) var(--accent);
+}
+
+.vg-pill-on .vg-pill-eq:not(.vg-pill-eq-live) .vg-pill-bar {
+  background: var(--accent-line);
+  animation: vg-eq-idle 1.8s ease-in-out infinite;
+}
+
+.vg-pill-on .vg-pill-eq:not(.vg-pill-eq-live) .vg-pill-bar:nth-child(2) { animation-delay: 0.15s; }
+.vg-pill-on .vg-pill-eq:not(.vg-pill-eq-live) .vg-pill-bar:nth-child(3) { animation-delay: 0.3s; }
+.vg-pill-on .vg-pill-eq:not(.vg-pill-eq-live) .vg-pill-bar:nth-child(4) { animation-delay: 0.45s; }
+
+@keyframes vg-eq-idle {
+  0%,
+  100% {
+    height: 3px;
+  }
+  50% {
+    height: 7px;
+  }
+}
+
+/* Persona switcher, matched to the HUD terminal: same frosted pane, same accent
+   hairline, so the phone and the desktop read as one instrument. */
+.vg-pill-sheet {
+  border-color: var(--accent-line);
+  background:
+    linear-gradient(155deg, var(--accent-wash) 0%, transparent 45%),
+    color-mix(in srgb, var(--surface-1) 86%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    0 0 18px var(--accent-wash);
+}
+
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+  .vg-pill-sheet {
+    background: var(--surface-1);
+  }
+}
+
+.vg-pill-sheet-item {
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.vg-pill-sheet-item-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-wash);
+}
+
+/* --------------------------------- reduced motion, levitation layers --- */
+@media (prefers-reduced-motion: reduce) {
+  .vg-levitate,
+  .vg-pill-beam::before,
+  .vg-pill-on .vg-pill-eq:not(.vg-pill-eq-live) .vg-pill-bar {
+    animation: none !important;
+  }
+
+  .vg-levitate {
+    transform: none !important;
+  }
+
+  /* Without its sweep the beam is a static ring of accent — quieter as a plain
+     border, which .vg-pill-on already provides. */
+  .vg-pill-beam {
+    display: none !important;
+  }
+}

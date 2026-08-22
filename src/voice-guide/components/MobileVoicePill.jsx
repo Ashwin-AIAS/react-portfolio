@@ -116,6 +116,12 @@ export const MobileVoicePill = () => {
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
         className={`vg-pill${enabled ? ' vg-pill-on' : ''}`}
       >
+        {/* Perimeter beam: a light running the rim of the island. It is one
+            element with two pseudo-layers (the sweep, and the mask that leaves
+            only the rim showing), so it costs no DOM and no re-render — the
+            brightness rides --vg-level like everything else. */}
+        <span className="vg-pill-beam" aria-hidden="true" />
+
         {/* Persona chip — also the sheet trigger. */}
         <button
           type="button"
