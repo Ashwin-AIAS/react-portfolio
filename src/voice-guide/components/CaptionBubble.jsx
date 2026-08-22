@@ -16,6 +16,22 @@ import { CAPTION_CROSSFADE_MS, PERSONA_IDS, getPersonaMeta } from '../config';
 import { useVoiceGuide } from '../useVoiceGuide';
 import { getPulseSeen, setPulseSeen } from '../utils/storage';
 
+/**
+ * Transmission header names — holo spec §2.2.2. The badge in config.js reads
+ * `[ TRANSMISSION // … ]`; on air the header says LIVE and takes the on-air
+ * name, which is not always the persona's display name (JARVIS AI, not JARVIS).
+ * Anything missing here falls back to the persona's own short name.
+ */
+const LIVE_LABEL = {
+  optimus: 'OPTIMUS PRIME',
+  jarvis: 'JARVIS AI',
+  megatron: 'MEGATRON',
+  ashwin: 'ASHWIN',
+};
+
+/** Five spectrum bars in the transmission header; heights are pure CSS. */
+const SPECTRUM_BARS = [0, 1, 2, 3, 4];
+
 const SpeakerMuted = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -51,9 +67,31 @@ export const PersonaBadge = ({ style }) => {
   const { ready, enabled, persona } = useVoiceGuide();
   if (!ready) return null;
 
+  const name = LIVE_LABEL[persona] || getPersonaMeta(persona).short;
+
   return (
-    <span className="vg-caption-badge" style={style}>
-      {enabled ? getPersonaMeta(persona).badge : '[ AUDIO BRIEFING READY ]'}
+    <span className="vg-caption-head" style={style}>
+      <span className={`vg-caption-badge${enabled ? ' vg-caption-badge-live' : ''}`}>
+        {enabled ? (
+          <>
+            {'[ '}
+            <i className="vg-live-dot" aria-hidden="true" />
+            {` LIVE TRANSMISSION // ${name} ]`}
+          </>
+        ) : (
+          '[ AUDIO BRIEFING READY ]'
+        )}
+      </span>
+
+      {/* Live spectrum. Bar heights come straight off --vg-level in CSS, so the
+          header moves with the voice without a single re-render (§6.1). */}
+      {enabled && (
+        <span className="vg-caption-spectrum" aria-hidden="true">
+          {SPECTRUM_BARS.map((i) => (
+            <i key={i} className="vg-spectrum-bar" />
+          ))}
+        </span>
+      )}
     </span>
   );
 };
@@ -167,12 +205,24 @@ export const AgentControls = () => {
               type="button"
               role="radio"
               aria-checked={isActive}
-              className={`vg-persona-pill ${isActive ? 'vg-persona-pill-active' : ''}`}
+              className={`vg-persona-pill ${isActive ? 'vg-persona-pill-active' : ''}${
+                isActive && enabled ? ' vg-persona-pill-live' : ''
+              }`}
               onClick={() => handlePersona(id)}
               title={meta.tagline}
             >
               <span aria-hidden="true">{meta.icon}</span>
               {meta.name}
+              {/* Sound indicator: only the pill that is actually on air gets
+                  one, so the neon border is never ambiguous about which voice
+                  is speaking. */}
+              {isActive && enabled && (
+                <span className="vg-pill-sound" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              )}
             </button>
           );
         })}
@@ -187,6 +237,9 @@ export const AgentControls = () => {
         aria-pressed={enabled}
         title={enabled ? 'Mute voice tour (Esc)' : 'Play voice tour'}
       >
+        {/* Soundwave ripple behind the muted CTA — the one control that has to
+            be found before anything else on this widget does anything. */}
+        {!enabled && <span className="vg-cta-ripple" aria-hidden="true" />}
         {enabled ? <SpeakerOn /> : <SpeakerMuted />}
         {enabled ? 'Mute tour' : 'Unmute tour'}
       </button>

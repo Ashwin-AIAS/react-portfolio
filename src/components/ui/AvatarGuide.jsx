@@ -26,6 +26,32 @@ const emotionAnimations = {
   bye: { rotate: [0, -25, 25, -25, 25, -25, 25, 0], y: [0, -10, 0], scale: [1, 1.1, 1], transition: { duration: 1.2 } },
 };
 
+/**
+ * Telemetry corner brackets on the HUD terminal — holo spec §2.2.1.
+ *
+ * Four ┌ ┐ └ ┘ arms drawn as two borders of an empty square, which is cheaper
+ * and crisper at any zoom than glyphs would be. Every value is inline: the card
+ * is rendered by this eager component, so the frame has to hold up before
+ * voice-guide.css lands. The class on each arm carries only the glow keyframes.
+ */
+const CORNER_ARM = 13;
+const CORNER_BORDER = '2px solid var(--accent)';
+const HUD_CORNERS = [
+    { key: 'tl', edges: { top: -1, left: -1, borderTop: CORNER_BORDER, borderLeft: CORNER_BORDER } },
+    { key: 'tr', edges: { top: -1, right: -1, borderTop: CORNER_BORDER, borderRight: CORNER_BORDER } },
+    { key: 'bl', edges: { bottom: -1, left: -1, borderBottom: CORNER_BORDER, borderLeft: CORNER_BORDER } },
+    { key: 'br', edges: { bottom: -1, right: -1, borderBottom: CORNER_BORDER, borderRight: CORNER_BORDER } },
+].map(({ key, edges }) => ({
+    key,
+    style: {
+        position: 'absolute',
+        width: CORNER_ARM,
+        height: CORNER_ARM,
+        pointerEvents: 'none',
+        ...edges,
+    },
+}));
+
 const getScreenConfig = () => {
   const W = typeof window !== 'undefined' ? window.innerWidth : 1024;
   const isMobile = W < 768;
@@ -162,39 +188,60 @@ export const AvatarGuide = () => {
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
+                            className="vg-hud-card"
                             style={{
                                 pointerEvents: 'auto',
+                                // Frosted glass. --surface-1 is opaque, so the
+                                // translucency is applied in voice-guide.css via
+                                // color-mix; until that lazy chunk lands this
+                                // solid fill is the fallback (§8).
                                 background: 'var(--surface-1)',
-                                border: '1px solid var(--rule-strong)',
+                                border: '1px solid var(--accent-line)',
+                                backdropFilter: 'blur(16px)',
+                                WebkitBackdropFilter: 'blur(16px)',
                                 ...(isMobile ? {
                                     position: 'fixed', bottom: '16px', left: '8px', right: '8px', top: 'auto', width: 'auto'
                                 } : {
                                     position: 'absolute', bottom: '100%', ...(isRightSide ? { right: 0 } : { left: 0 }),
                                     width: '264px',
                                     maxHeight: 'calc(100vh - 200px)',
-                                    overflowY: 'auto',
+                                    display: 'flex',
+                                    flexDirection: 'column',
                                 }),
                                 borderRadius: 'var(--r-md)', padding: '12px 14px', marginBottom: '8px',
                                 fontSize: isMobile ? '12px' : '13px', color: 'var(--text)', fontWeight: 400,
-                                boxShadow: '0 12px 32px rgba(0, 0, 0, 0.45)',
+                                boxShadow: '0 16px 40px rgba(0, 0, 0, 0.55), 0 0 20px var(--accent-wash)',
                             }}
                         >
-                            <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>
-                                <CaptionText text={voice.caption?.text} fallback={tourSteps[currentStep].message} />
-                            </p>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                                <div style={{ display: 'flex', gap: '4px' }}>
-                                    {tourSteps.map((_, i) => (
-                                        <div key={i} style={{ width: 5, height: 5, background: i === currentStep ? 'var(--accent)' : 'var(--rule-strong)', transition: 'background 0.3s' }} />
-                                    ))}
+                            {/* Telemetry corner brackets. Positioned inline rather
+                                than from the stylesheet so the HUD frame is intact
+                                even before the lazy CSS arrives; the class only
+                                carries the glow animation. */}
+                            {HUD_CORNERS.map(({ key, style }) => (
+                                <span key={key} className="vg-hud-corner" aria-hidden="true" style={style} />
+                            ))}
+
+                            {/* The card is the frame; this is what scrolls, so the
+                                brackets stay pinned to the corners instead of
+                                sliding away with the content. */}
+                            <div style={{ minHeight: 0, overflowY: isMobile ? 'visible' : 'auto' }}>
+                                <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>
+                                    <CaptionText text={voice.caption?.text} fallback={tourSteps[currentStep].message} />
+                                </p>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                        {tourSteps.map((_, i) => (
+                                            <div key={i} style={{ width: 5, height: 5, background: i === currentStep ? 'var(--accent)' : 'var(--rule-strong)', transition: 'background 0.3s' }} />
+                                        ))}
+                                    </div>
+                                    <button onClick={(e) => { e.stopPropagation(); dismissAll(); }} style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }} aria-label="Dismiss and stop narration">✕</button>
                                 </div>
-                                <button onClick={(e) => { e.stopPropagation(); dismissAll(); }} style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }} aria-label="Dismiss and stop narration">✕</button>
+                                {/* Unmute CTA, mute toggle and persona selector, docked here
+                                    rather than floating in their own box at bottom-left
+                                    (personas spec §3.5). Renders nothing until ready. */}
+                                <AgentControls />
+                                <p className="label" style={{ textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>scroll to explore ↓</p>
                             </div>
-                            {/* Unmute CTA, mute toggle and persona selector, docked here
-                                rather than floating in their own box at bottom-left
-                                (personas spec §3.5). Renders nothing until ready. */}
-                            <AgentControls />
-                            <p className="label" style={{ textAlign: 'center', marginTop: '6px', marginBottom: 0 }}>scroll to explore ↓</p>
                         </motion.div>
                     ) : ((!tourActive || dismissed) && isHovered) ? (
                         <motion.div
@@ -202,15 +249,25 @@ export const AvatarGuide = () => {
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
+                            className="vg-hud-card"
                             style={{
                                 pointerEvents: 'auto',
                                 background: 'var(--surface-1)',
-                                border: '1px solid var(--rule-strong)',
+                                border: '1px solid var(--accent-line)',
+                                backdropFilter: 'blur(16px)',
+                                WebkitBackdropFilter: 'blur(16px)',
                                 borderRadius: 'var(--r-md)',
                                 padding: '8px 12px', marginBottom: '8px',
-                                fontSize: '12px', color: 'var(--text)', whiteSpace: 'nowrap'
+                                fontSize: '12px', color: 'var(--text)', whiteSpace: 'nowrap',
+                                boxShadow: '0 16px 40px rgba(0, 0, 0, 0.55), 0 0 20px var(--accent-wash)',
+                                position: 'relative',
                             }}
-                        >Click to restart</motion.div>
+                        >
+                            {HUD_CORNERS.map(({ key, style }) => (
+                                <span key={key} className="vg-hud-corner" aria-hidden="true" style={style} />
+                            ))}
+                            Click to restart
+                        </motion.div>
                     ) : null}
                 </AnimatePresence>
 
