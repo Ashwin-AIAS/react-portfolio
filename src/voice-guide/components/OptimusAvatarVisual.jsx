@@ -1,56 +1,30 @@
 /**
- * Optimus Prime avatar — Next-Gen Cybertronian Command Matrix & Battle Armor.
+ * Optimus Prime avatar — Authentic Movie Transformers Battle Armor & Cybertronian Matrix.
  *
- * A multi-layered Cybertronian battle crest featuring:
- * - Multi-stage beveled titanium battle plates with metallic depth
- * - Iconic antenna fins & chamfered forehead crown
- * - Dual-mode glowing laser optics with scanline reticle and amplitude flare
- * - Anamorphic diffraction spikes that bloom out of the optics on speech
- * - Cybertronian holographic scanlines raked across the whole helmet
- * - Matrix of Leadership collar core with expanding resonance rings
- * - Hydraulic articulated battle mask that articulates to --vg-level
+ * True movie-accurate multi-tone aesthetics:
+ * - Peterbilt Cobalt Royal Blue crown, antenna fins & forehead battle crest
+ * - Flaming Autobot Crimson Red temple accents & shoulder bevel armor
+ * - Polished Titanium & Chrome Silver articulated battle mask (with audio-reactive intake flutes)
+ * - Piercing Energon / AllSpark Cyan glowing laser optics with anamorphic lens flares
+ * - Golden Brass Collar Housing holding the glowing Matrix of Leadership crystal
  *
- * Everything reactive reads --vg-level (0..1) written to <html> by store.js,
- * so this component never re-renders while speaking. The two layers that move
- * on their own timer (the scanline rake, the Matrix resonance) are keyframed in
- * voice-guide.css and gated on the amplitude through a wrapper group, so the
- * keyframe animation never fights a level-driven transform on one element.
- *
- * COLOUR RULE (theme-adaptive, MULTI_THEME_SPEC): there are no palette literals
- * left in here. Every colour resolves from the active theme through one of two
- * families, and the split is what keeps the crest readable in all nine palettes
- * and in both light and dark:
- *
- *   - Anything that EMITS light — the crown plate, the optics, the Matrix
- *     crystal — comes from the accent trio: --accent (hottest), --accent-strong
- *     (mid), --accent-dim (falloff).
- *   - Anything STRUCTURAL — the chassis, the eye sockets, the collar — comes
- *     from --surface-1 / --surface-2, so the armour sits on the page instead of
- *     floating on top of it.
- *   - Engraved detail (the crest ridge, the intake flutes, the lens seams) is
- *     --surface-1 on purpose: against an accent plate it inverts with the
- *     theme, cutting dark in dark mode and bright in light mode, which is what
- *     an incised line does in both.
- *
- * Every var() keeps its original literal as the fallback, so an engine that
- * cannot resolve a custom property inside an SVG presentation attribute still
- * renders the crest it always did.
+ * All animations & dynamic transforms read --vg-level (0..1) directly for 60fps performance.
  */
 import React from 'react';
 
-/** Laser optic centres — the anchor for both the glow and the flare spikes. */
+/** Laser optic centres — anchors for the glowing eyes and anamorphic flares. */
 const OPTICS = [
   { cx: 38.5, cy: 48 },
   { cx: 61.5, cy: 48 },
 ];
 
-/** Cybertronian scanline rake across the faceplate, in viewBox units. */
+/** Cybertronian scanline interference across the battle chassis. */
 const SCANLINES = [16, 24, 32, 40, 48, 56, 64, 72, 80, 88];
 
 /**
  * @param {Object} props
  * @param {number}  [props.size]     px, square
- * @param {boolean} [props.speaking] brightens the crest while a clip plays
+ * @param {boolean} [props.speaking] brightens the crest while speaking
  */
 export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
   <div
@@ -58,12 +32,12 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
     style={{ width: size, height: size }}
     aria-hidden="true"
   >
-    {/* Cybertronian energy aura. Scales with the voice amplitude. */}
+    {/* Energon / Cybertronian energy aura */}
     <div
       className="vg-optimus-aura"
       style={{ transform: 'scale(calc(1 + var(--vg-level, 0) * 0.45))' }}
     />
-    {/* Matrix-of-Leadership resonance ring */}
+    {/* Matrix of Leadership resonance ring */}
     <div className="vg-optimus-ring" />
 
     <svg
@@ -71,220 +45,207 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
       className="vg-optimus-svg"
       fill="none"
       focusable="false"
-      style={{ filter: 'drop-shadow(0 0 16px var(--accent-line, rgba(0,242,254,0.4)))' }}
+      style={{ filter: 'drop-shadow(0 0 18px rgba(0, 242, 254, 0.65)) drop-shadow(0 0 8px rgba(29, 78, 216, 0.7))' }}
     >
       <defs>
-        {/* Chassis armour — the theme's own surfaces, so the helmet reads as
-            the same material as the panels behind it. */}
-        <linearGradient id="opt-armor" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="var(--surface-2, #1e293b)" />
-          <stop offset="50%" stopColor="var(--surface-1, #0f172a)" />
-          <stop offset="100%" stopColor="var(--surface-1, #020617)" />
+        {/* Deep Cybertronian Cobalt Blue Armor */}
+        <linearGradient id="opt-cobalt-metal" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="25%" stopColor="#2563eb" />
+          <stop offset="65%" stopColor="#1d4ed8" />
+          <stop offset="100%" stopColor="#0c1e4a" />
         </linearGradient>
 
-        {/* Command crown — the saturated plate, hottest accent falling to dim. */}
-        <linearGradient id="opt-cobalt" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="var(--accent, #38bdf8)" />
-          <stop offset="40%" stopColor="var(--accent-strong, #0284c7)" />
-          <stop offset="100%" stopColor="var(--accent-dim, #1e3a8a)" />
+        {/* Autobot Flame Crimson Red Armor */}
+        <linearGradient id="opt-crimson-flame" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f87171" />
+          <stop offset="30%" stopColor="#ef4444" />
+          <stop offset="70%" stopColor="#b91c1c" />
+          <stop offset="100%" stopColor="#450a0a" />
         </linearGradient>
 
-        {/* Brushed bevel — the same accent walked down into the chassis, so the
-            fins and faceplate read as tinted metal rather than a second lamp. */}
-        <linearGradient id="opt-silver" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="var(--accent-strong, #e2e8f0)" />
-          <stop offset="50%" stopColor="var(--accent-dim, #94a3b8)" />
-          <stop offset="100%" stopColor="var(--surface-2, #475569)" />
+        {/* Polished Chrome & Titanium Silver Bevels */}
+        <linearGradient id="opt-chrome-silver" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="35%" stopColor="#cbd5e1" />
+          <stop offset="75%" stopColor="#64748b" />
+          <stop offset="100%" stopColor="#1e293b" />
         </linearGradient>
 
-        {/* Matrix of Leadership core glow */}
-        <radialGradient id="opt-matrix-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--accent, #ffffff)" />
-          <stop offset="40%" stopColor="var(--accent-strong, #38bdf8)" />
-          <stop offset="80%" stopColor="var(--accent-dim, #0284c7)" />
+        {/* Dark Gunmetal Chassis Base */}
+        <linearGradient id="opt-dark-chassis" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1e293b" />
+          <stop offset="50%" stopColor="#0f172a" />
+          <stop offset="100%" stopColor="#020617" />
+        </linearGradient>
+
+        {/* Matrix of Leadership Golden Housing */}
+        <linearGradient id="opt-matrix-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fef08a" />
+          <stop offset="40%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#92400e" />
+        </linearGradient>
+
+        {/* Energon / AllSpark Core Radial Glow */}
+        <radialGradient id="opt-energon-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="35%" stopColor="#67e8f9" />
+          <stop offset="70%" stopColor="#0284c7" />
           <stop offset="100%" stopColor="transparent" />
         </radialGradient>
 
-        {/* The scanline rake is clipped to the silhouette, so the hologram
-            interference stops at the edge of the armour instead of striping the
-            page behind it. */}
+        {/* Silhouette clip for holographic scanlines */}
         <clipPath id="opt-helmet-clip">
           <polygon points="50,6 84,20 84,56 72,86 50,95 28,86 16,56 16,20" />
         </clipPath>
       </defs>
 
-      {/* --- LAYER 1: Cybertronian Head Antenna Fins (Left & Right) --- */}
+      {/* --- LAYER 1: Titanium Ear Antenna Fins (Cobalt + Chrome bevels) --- */}
+      {/* Left Antenna */}
       <path
-        d="M18 42 L11 20 L20 28 L23 48 Z"
-        fill="url(#opt-silver)"
-        stroke="var(--accent, #00f2fe)"
+        d="M18 42 L10 18 L20 27 L23 48 Z"
+        fill="url(#opt-cobalt-metal)"
+        stroke="#38bdf8"
         strokeWidth="1.2"
         strokeLinejoin="round"
       />
       <path
-        d="M82 42 L89 20 L80 28 L77 48 Z"
-        fill="url(#opt-silver)"
-        stroke="var(--accent, #00f2fe)"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
+        d="M14 24 L11 19 L19 28 Z"
+        fill="url(#opt-chrome-silver)"
+        opacity="0.9"
       />
 
-      {/* --- LAYER 2: Main Helmet Base & Outer Beveled Armor --- */}
+      {/* Right Antenna */}
+      <path
+        d="M82 42 L90 18 L80 27 L77 48 Z"
+        fill="url(#opt-cobalt-metal)"
+        stroke="#38bdf8"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M86 24 L89 19 L81 28 Z"
+        fill="url(#opt-chrome-silver)"
+        opacity="0.9"
+      />
+
+      {/* --- LAYER 2: Main Helmet Base & Outer Armor (Dark Chassis + Cobalt Edge) --- */}
       <polygon
         points="50,6 84,20 84,56 72,86 50,95 28,86 16,56 16,20"
-        fill="url(#opt-armor)"
-        stroke="var(--accent, #00f2fe)"
-        strokeWidth="2.5"
+        fill="url(#opt-dark-chassis)"
+        stroke="#2563eb"
+        strokeWidth="2.4"
         strokeLinejoin="round"
       />
 
-      {/* Inner contour armor bevels */}
+      {/* Outer Autobot Red Flame Accent Trim */}
       <polygon
-        points="50,11 79,23 79,53 68,81 50,89 32,81 21,53 21,23"
+        points="50,9 81,22 81,54 70,83 50,92 30,83 19,54 19,22"
         fill="none"
-        stroke="var(--accent, #00f2fe)"
-        strokeWidth="0.8"
-        strokeDasharray="4 2"
-        opacity="0.4"
+        stroke="url(#opt-crimson-flame)"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
       />
 
-      {/* --- LAYER 3: Forehead Crest & Autobot Command Crown --- */}
+      {/* Inner contour telemetry line */}
+      <polygon
+        points="50,13 77,25 77,52 67,79 50,87 33,79 23,52 23,25"
+        fill="none"
+        stroke="#00f2fe"
+        strokeWidth="0.75"
+        strokeDasharray="4 2"
+        opacity="0.6"
+      />
+
+      {/* --- LAYER 3: Forehead Command Crown & Central Ridge (Cobalt + Chrome Ridge) --- */}
       <path
-        d="M34 22 L50 10 L66 22 L60 36 L40 36 Z"
-        fill="url(#opt-cobalt)"
-        stroke="var(--accent, #00f2fe)"
+        d="M34 22 L50 9 L66 22 L61 36 L39 36 Z"
+        fill="url(#opt-cobalt-metal)"
+        stroke="#38bdf8"
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
-      {/* Central crest ridge */}
-      <line
-        x1="50"
-        y1="10"
-        x2="50"
-        y2="36"
-        stroke="var(--surface-1, #ffffff)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        opacity="0.8"
+      {/* Central crest chrome ridge */}
+      <polygon
+        points="48,10 52,10 51,36 49,36"
+        fill="url(#opt-chrome-silver)"
+        stroke="#ffffff"
+        strokeWidth="0.5"
       />
-      <circle cx="50" cy="18" r="2" fill="var(--accent, #00f2fe)" />
+      <circle cx="50" cy="17" r="2.2" fill="#00f2fe" style={{ filter: 'drop-shadow(0 0 3px #00f2fe)' }} />
 
-      {/* --- LAYER 4: Cheek Flutes & Temple Shielding --- */}
+      {/* --- LAYER 4: Cheek Flutes & Temple Shielding (Crimson Flame + Gunmetal) --- */}
       <path
-        d="M23 38 L36 42 L34 56 L20 52 Z"
-        fill="var(--surface-2, #1e293b)"
-        stroke="var(--accent, #00f2fe)"
+        d="M22 37 L36 41 L34 56 L19 51 Z"
+        fill="url(#opt-crimson-flame)"
+        stroke="#ef4444"
         strokeWidth="1.2"
+        strokeLinejoin="round"
       />
       <path
-        d="M77 38 L64 42 L66 56 L80 52 Z"
-        fill="var(--surface-2, #1e293b)"
-        stroke="var(--accent, #00f2fe)"
+        d="M78 37 L64 41 L66 56 L81 51 Z"
+        fill="url(#opt-crimson-flame)"
+        stroke="#ef4444"
         strokeWidth="1.2"
+        strokeLinejoin="round"
       />
 
-      {/* --- LAYER 5: Glowing Laser Optics with Scanline Reticle --- */}
-      {/* Eye brow shadow visor plate */}
+      {/* Titanium Flute Lines */}
+      <line x1="23" y1="44" x2="33" y2="47" stroke="#ffffff" strokeWidth="0.8" opacity="0.7" />
+      <line x1="77" y1="44" x2="67" y2="47" stroke="#ffffff" strokeWidth="0.8" opacity="0.7" />
+
+      {/* --- LAYER 5: Glowing Energon Laser Optics with Anamorphic Flares --- */}
+      {/* Eye brow shadow visor */}
       <path
-        d="M32 41 L50 44 L68 41 L66 45 L50 48 L34 45 Z"
-        fill="var(--surface-1, #020617)"
-        stroke="var(--accent, #00f2fe)"
+        d="M31 40 L50 43 L69 40 L67 45 L50 47 L33 45 Z"
+        fill="#020617"
+        stroke="#1d4ed8"
         strokeWidth="1"
       />
 
       {/* Left Laser Optic */}
       <polygon
-        points="34,46 45,46 42,52 32,50"
-        fill="var(--accent-strong, #38bdf8)"
+        points="34,45 45,45 42,51 32,49"
+        fill="#00f2fe"
         style={{
-          filter:
-            'drop-shadow(0 0 calc(4px + var(--vg-level, 0) * 12px) var(--accent-strong, #38bdf8))',
-          opacity: 'calc(0.75 + var(--vg-level, 0) * 0.25)',
+          filter: 'drop-shadow(0 0 calc(5px + var(--vg-level, 0) * 14px) #00f2fe) drop-shadow(0 0 2px #ffffff)',
+          opacity: 'calc(0.85 + var(--vg-level, 0) * 0.15)',
         }}
       />
-      <line x1="33" y1="48" x2="44" y2="48" stroke="var(--surface-1, #ffffff)" strokeWidth="1" opacity="0.9" />
+      <line x1="33" y1="47.5" x2="44" y2="47.5" stroke="#ffffff" strokeWidth="1.2" opacity="0.95" />
 
       {/* Right Laser Optic */}
       <polygon
-        points="66,46 55,46 58,52 68,50"
-        fill="var(--accent-strong, #38bdf8)"
+        points="66,45 55,45 58,51 68,49"
+        fill="#00f2fe"
         style={{
-          filter:
-            'drop-shadow(0 0 calc(4px + var(--vg-level, 0) * 12px) var(--accent-strong, #38bdf8))',
-          opacity: 'calc(0.75 + var(--vg-level, 0) * 0.25)',
+          filter: 'drop-shadow(0 0 calc(5px + var(--vg-level, 0) * 14px) #00f2fe) drop-shadow(0 0 2px #ffffff)',
+          opacity: 'calc(0.85 + var(--vg-level, 0) * 0.15)',
         }}
       />
-      <line x1="67" y1="48" x2="56" y2="48" stroke="var(--surface-1, #ffffff)" strokeWidth="1" opacity="0.9" />
+      <line x1="67" y1="47.5" x2="56" y2="47.5" stroke="#ffffff" strokeWidth="1.2" opacity="0.95" />
 
-      {/* --- LAYER 5b: Anamorphic Diffraction Spikes (Audio Reactive) --- */}
-      {/* A real lens flares along its axes. Both optics get a wide horizontal
-          streak, a short vertical one and two diagonal spikes, all sharing one
-          amplitude-driven opacity and bloom, so they spike together on a
-          consonant and fall away between words. */}
+      {/* Anamorphic Laser Diffraction Flares */}
       {OPTICS.map(({ cx, cy }) => (
         <g
           key={cx}
           className="vg-optimus-flare"
           style={{
-            opacity: 'calc(0.18 + var(--vg-level, 0) * 0.82)',
-            filter:
-              'drop-shadow(0 0 calc(2px + var(--vg-level, 0) * 9px) var(--accent, #00f2fe))',
+            opacity: 'calc(0.25 + var(--vg-level, 0) * 0.75)',
+            filter: 'drop-shadow(0 0 calc(3px + var(--vg-level, 0) * 10px) #00f2fe)',
           }}
         >
-          <line
-            x1={cx - 26}
-            y1={cy}
-            x2={cx + 26}
-            y2={cy}
-            stroke="var(--accent, #00f2fe)"
-            strokeWidth="0.7"
-            strokeLinecap="round"
-            opacity="0.75"
-          />
-          <line
-            x1={cx}
-            y1={cy - 11}
-            x2={cx}
-            y2={cy + 11}
-            stroke="var(--accent, #00f2fe)"
-            strokeWidth="0.55"
-            strokeLinecap="round"
-            opacity="0.6"
-          />
-          <line
-            x1={cx - 8}
-            y1={cy - 8}
-            x2={cx + 8}
-            y2={cy + 8}
-            stroke="var(--accent-strong, #38bdf8)"
-            strokeWidth="0.4"
-            strokeLinecap="round"
-            opacity="0.45"
-          />
-          <line
-            x1={cx - 8}
-            y1={cy + 8}
-            x2={cx + 8}
-            y2={cy - 8}
-            stroke="var(--accent-strong, #38bdf8)"
-            strokeWidth="0.4"
-            strokeLinecap="round"
-            opacity="0.45"
-          />
-          {/* Hot pinpoint at the centre of the lens. */}
-          <circle
-            cx={cx}
-            cy={cy}
-            r="1.1"
-            fill="var(--accent, #00f2fe)"
-            style={{ opacity: 'calc(0.5 + var(--vg-level, 0) * 0.5)' }}
-          />
+          <line x1={cx - 28} y1={cy} x2={cx + 28} y2={cy} stroke="#00f2fe" strokeWidth="0.8" strokeLinecap="round" opacity="0.85" />
+          <line x1={cx} y1={cy - 12} x2={cx} y2={cy + 12} stroke="#67e8f9" strokeWidth="0.6" strokeLinecap="round" opacity="0.75" />
+          <line x1={cx - 9} y1={cy - 9} x2={cx + 9} y2={cy + 9} stroke="#38bdf8" strokeWidth="0.45" strokeLinecap="round" opacity="0.5" />
+          <line x1={cx - 9} y1={cy + 9} x2={cx + 9} y2={cy - 9} stroke="#38bdf8" strokeWidth="0.45" strokeLinecap="round" opacity="0.5" />
+          <circle cx={cx} cy={cy} r="1.3" fill="#ffffff" style={{ opacity: 'calc(0.7 + var(--vg-level, 0) * 0.3)' }} />
         </g>
       ))}
 
-      {/* --- LAYER 6: Hydraulic Articulated Battle Mask (Lip-Sync) --- */}
-      {/* Upper nose & bridge connector */}
-      <polygon points="50,47 45,56 55,56" fill="var(--surface-2, #334155)" stroke="var(--accent, #00f2fe)" strokeWidth="1" />
+      {/* --- LAYER 6: Hydraulic Articulated Chrome Battle Mask (Lip Sync) --- */}
+      {/* Nose bridge mount */}
+      <polygon points="50,46 44,55 56,55" fill="url(#opt-dark-chassis)" stroke="#2563eb" strokeWidth="1" />
 
       {/* Articulating Faceplate / Grille that scales with voice amplitude */}
       <g
@@ -295,70 +256,50 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
           transformBox: 'view-box',
         }}
       >
-        {/* Main mask plate */}
+        {/* Main mask plate in Polished Chrome Silver */}
         <path
-          d="M38 58 L62 58 L58 78 L50 82 L42 78 Z"
-          fill="url(#opt-silver)"
-          stroke="var(--accent, #00f2fe)"
+          d="M37 57 L63 57 L58 77 L50 82 L42 77 Z"
+          fill="url(#opt-chrome-silver)"
+          stroke="#38bdf8"
           strokeWidth="1.8"
           strokeLinejoin="round"
         />
-        {/* Horizontal intake flutes */}
-        <line x1="42" y1="63" x2="58" y2="63" stroke="var(--surface-1, #0f172a)" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="44" y1="68" x2="56" y2="68" stroke="var(--surface-1, #0f172a)" strokeWidth="1.6" strokeLinecap="round" />
-        <line x1="46" y1="73" x2="54" y2="73" stroke="var(--surface-1, #0f172a)" strokeWidth="1.4" strokeLinecap="round" />
+        {/* Titanium intake flutes */}
+        <line x1="41" y1="62" x2="59" y2="62" stroke="#0f172a" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="43" y1="67" x2="57" y2="67" stroke="#0f172a" strokeWidth="1.8" strokeLinecap="round" />
+        <line x1="45" y1="72" x2="55" y2="72" stroke="#0f172a" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Center metallic highlight */}
+        <line x1="50" y1="58" x2="50" y2="80" stroke="#ffffff" strokeWidth="0.8" opacity="0.6" strokeLinecap="round" />
       </g>
 
       {/* --- LAYER 7: Matrix of Leadership Collar Core --- */}
-      {/* Collar V-mount */}
+      {/* Golden Collar V-mount */}
       <path
-        d="M34 84 L50 78 L66 84 L50 93 Z"
-        fill="var(--surface-1, #0f172a)"
-        stroke="var(--accent-line, rgba(255, 176, 32, 0.75))"
+        d="M33 83 L50 77 L67 83 L50 94 Z"
+        fill="url(#opt-matrix-gold)"
+        stroke="#f59e0b"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      {/* Matrix resonance — two rings pushed out of the crystal on their own
-          timer. The wrapper carries the amplitude and the children carry the
-          motion, so the resonance only appears while the Prime is speaking. */}
-      <g style={{ opacity: 'calc(var(--vg-level, 0) * 0.85)' }}>
-        <circle
-          cx="50"
-          cy="85"
-          r="6"
-          className="vg-optimus-matrix"
-          stroke="var(--accent, #38bdf8)"
-          strokeWidth="0.9"
-        />
-        <circle
-          cx="50"
-          cy="85"
-          r="6"
-          className="vg-optimus-matrix vg-optimus-matrix-2"
-          stroke="var(--accent-strong, #0284c7)"
-          strokeWidth="0.7"
-          strokeDasharray="2 3"
-        />
+
+      {/* Matrix resonance rings (Audio Reactive) */}
+      <g style={{ opacity: 'calc(var(--vg-level, 0) * 0.9)' }}>
+        <circle cx="50" cy="85" r="6.5" className="vg-optimus-matrix" stroke="#00f2fe" strokeWidth="1" />
+        <circle cx="50" cy="85" r="6.5" className="vg-optimus-matrix vg-optimus-matrix-2" stroke="#38bdf8" strokeWidth="0.75" strokeDasharray="3 2" />
       </g>
+
       {/* Glowing Matrix Crystal at the base */}
       <polygon
-        points="50,80 54,85 50,90 46,85"
-        fill="url(#opt-matrix-glow)"
+        points="50,79 55,85 50,91 45,85"
+        fill="url(#opt-energon-glow)"
         style={{
-          filter:
-            'drop-shadow(0 0 calc(3px + var(--vg-level, 0) * 8px) var(--accent, #38bdf8))',
-          opacity: 'calc(0.7 + var(--vg-level, 0) * 0.3)',
+          filter: 'drop-shadow(0 0 calc(4px + var(--vg-level, 0) * 10px) #00f2fe)',
+          opacity: 'calc(0.8 + var(--vg-level, 0) * 0.2)',
         }}
       />
 
-      {/* --- LAYER 8: Cybertronian Holographic Scanlines --- */}
-      {/* Raked over everything and clipped to the helmet: this is the layer
-          that turns a crest into a projection. Dashed at a 1:3 duty cycle so it
-          reads as interference rather than as hatching. */}
-      <g
-        clipPath="url(#opt-helmet-clip)"
-        style={{ opacity: 'calc(0.35 + var(--vg-level, 0) * 0.3)' }}
-      >
+      {/* --- LAYER 8: Holographic Scanlines --- */}
+      <g clipPath="url(#opt-helmet-clip)" style={{ opacity: 'calc(0.35 + var(--vg-level, 0) * 0.3)' }}>
         <g className="vg-optimus-scan">
           {SCANLINES.map((y) => (
             <line
@@ -367,10 +308,10 @@ export const OptimusAvatarVisual = ({ size = 130, speaking = false }) => (
               y1={y}
               x2="88"
               y2={y}
-              stroke="var(--accent, #00f2fe)"
+              stroke="#38bdf8"
               strokeWidth="0.6"
               strokeDasharray="1 3"
-              opacity="0.35"
+              opacity="0.4"
             />
           ))}
         </g>
