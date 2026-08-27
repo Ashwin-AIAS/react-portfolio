@@ -92,7 +92,7 @@ export const PERSONA_META = {
     short: 'OPTIMUS PRIME',
     tagline: 'Autobot commander',
     icon: '🤖',
-    badge: '[ TRANSMISSION // OPTIMUS PRIME ]',
+    badge: '[ AUTOBOT COMMAND // OPTIMUS PRIME ]',
   },
   ashwin: {
     id: 'ashwin',
@@ -100,15 +100,15 @@ export const PERSONA_META = {
     short: 'ASHWIN',
     tagline: 'The creator, first person',
     icon: '🎙️',
-    badge: '[ TRANSMISSION // ASHWIN ]',
+    badge: '[ LIVE TRANSMISSION // ASHWIN ]',
   },
   jarvis: {
     id: 'jarvis',
     name: 'JARVIS',
     short: 'JARVIS',
-    tagline: 'Tactical system diagnostics',
+    tagline: 'Stark tactical AI OS',
     icon: '⚡',
-    badge: '[ JARVIS // TACTICAL TELEMETRY ]',
+    badge: '[ STARK INDUSTRIES // J.A.R.V.I.S. OS ]',
   },
   megatron: {
     id: 'megatron',
@@ -116,7 +116,7 @@ export const PERSONA_META = {
     short: 'MEGATRON',
     tagline: 'Decepticon leader',
     icon: '🟣',
-    badge: '[ DECEPTICON COMMAND // MEGATRON ]',
+    badge: '[ DECEPTICON WAR MATRIX // LORD MEGATRON ]',
   },
 };
 

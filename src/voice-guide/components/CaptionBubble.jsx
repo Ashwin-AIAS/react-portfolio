@@ -17,16 +17,33 @@ import { useVoiceGuide } from '../useVoiceGuide';
 import { getPulseSeen, setPulseSeen } from '../utils/storage';
 
 /**
- * Transmission header names — holo spec §2.2.2. The badge in config.js reads
- * `[ TRANSMISSION // … ]`; on air the header says LIVE and takes the on-air
- * name, which is not always the persona's display name (JARVIS AI, not JARVIS).
- * Anything missing here falls back to the persona's own short name.
+ * On-air callsigns — holo spec §2.2.2, movie-persona pass.
+ *
+ * Each character transmits under its own command authority rather than under a
+ * generic `LIVE TRANSMISSION // <name>`: the header is the first thing that
+ * tells you which universe the HUD currently belongs to, and it recolours in
+ * CSS off the same data-vg-persona attribute the frame does. Ashwin keeps the
+ * plain broadcast label — the creator is not a franchise.
+ *
+ * Anything missing here falls back to the persona's own badge in config.js.
  */
 const LIVE_LABEL = {
-  optimus: 'OPTIMUS PRIME',
-  jarvis: 'JARVIS AI',
-  megatron: 'MEGATRON',
-  ashwin: 'ASHWIN',
+  optimus: 'AUTOBOT COMMAND // OPTIMUS PRIME',
+  jarvis: 'STARK INDUSTRIES // J.A.R.V.I.S.',
+  megatron: 'DECEPTICON WAR MATRIX // LORD MEGATRON',
+  ashwin: 'LIVE TRANSMISSION // ASHWIN',
+};
+
+/**
+ * The same slot before the visitor unlocks audio (personas spec §3.5), so the
+ * muted state reads as an offer from *that* character rather than as a voice
+ * that simply is not talking.
+ */
+const READY_LABEL = {
+  optimus: '[ AUTOBOT BRIEFING READY ]',
+  jarvis: '[ STARK PROTOCOL READY ]',
+  megatron: '[ DECEPTICON MATRIX READY ]',
+  ashwin: '[ AUDIO BRIEFING READY ]',
 };
 
 /** Five spectrum bars in the transmission header; heights are pure CSS. */
@@ -50,15 +67,19 @@ const SpeakerOn = () => (
 
 /**
  * Tactical transmission header — Optimus spec §5.2, e.g.
- * `[ TRANSMISSION // OPTIMUS PRIME ]`. Before the visitor unlocks audio the
- * same slot advertises the tour instead (personas spec §3.5), so the muted
- * state reads as an offer rather than as a voice that isn't talking.
+ * `[ ● AUTOBOT COMMAND // OPTIMUS PRIME ]`. Before the visitor unlocks audio
+ * the same slot advertises the tour instead (personas spec §3.5).
  *
  * Reads the persona straight off the store rather than taking it as a prop, so
  * AvatarGuide.jsx (the eager consumer) needs no changes. It comes from
  * ../config, which holds no script imports — importing the persona metadata
  * from data/narrationScript.js here would drag all three narration scripts
  * into the initial bundle and undo the lazy split (§8).
+ *
+ * data-vg-persona is the only hook the movie theming needs: the badge, the live
+ * lamp and the spectrum all read their colour from tokens the stylesheet scopes
+ * to that attribute, so switching character repaints them with no re-render of
+ * anything below.
  *
  * Hidden until the provider is ready: before that the bubble is still showing
  * AvatarGuide's own tour copy, which nobody is narrating.
@@ -67,19 +88,20 @@ export const PersonaBadge = ({ style }) => {
   const { ready, enabled, persona } = useVoiceGuide();
   if (!ready) return null;
 
-  const name = LIVE_LABEL[persona] || getPersonaMeta(persona).short;
+  const name = LIVE_LABEL[persona] || getPersonaMeta(persona).badge;
+  const readyText = READY_LABEL[persona] || '[ AUDIO BRIEFING READY ]';
 
   return (
-    <span className="vg-caption-head" style={style}>
+    <span className="vg-caption-head" data-vg-persona={persona} style={style}>
       <span className={`vg-caption-badge${enabled ? ' vg-caption-badge-live' : ''}`}>
         {enabled ? (
           <>
             {'[ '}
             <i className="vg-live-dot" aria-hidden="true" />
-            {` LIVE TRANSMISSION // ${name} ]`}
+            {` ${name} ]`}
           </>
         ) : (
-          '[ AUDIO BRIEFING READY ]'
+          readyText
         )}
       </span>
 
@@ -184,7 +206,11 @@ export const AgentControls = () => {
   const progress = total > 1 ? ((caption.clipIndex + 1) / total) * 100 : null;
 
   return (
-    <div className="vg-agent-controls">
+    /* data-vg-persona carries the active character's palette down to the
+       progress bar, the CTA and the live pill. The pills below carry their OWN
+       data-persona instead, because each one has to advertise the character it
+       switches to, not the one currently speaking. */
+    <div className="vg-agent-controls" data-vg-persona={persona}>
       {enabled ? (
         progress !== null && (
           <div className="vg-agent-progress" aria-hidden="true">
@@ -204,6 +230,7 @@ export const AgentControls = () => {
               key={id}
               type="button"
               role="radio"
+              data-persona={id}
               aria-checked={isActive}
               className={`vg-persona-pill ${isActive ? 'vg-persona-pill-active' : ''}${
                 isActive && enabled ? ' vg-persona-pill-live' : ''

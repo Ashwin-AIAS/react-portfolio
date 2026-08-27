@@ -193,6 +193,14 @@ export const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             className="vg-hud-card"
+                            /* The whole terminal takes the active character's
+                               palette from here (holo spec §2.4). voice-guide.css
+                               scopes --accent/--accent-line/--accent-wash to this
+                               attribute, and the inline border, shadow and corner
+                               arms below already resolve those tokens — so the
+                               frame recolours on a persona switch without this
+                               component knowing anything about the characters. */
+                            data-vg-persona={voice.persona}
                             style={{
                                 pointerEvents: 'auto',
                                 // Frosted glass. --surface-1 is opaque, so the
@@ -254,6 +262,7 @@ export const AvatarGuide = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             className="vg-hud-card"
+                            data-vg-persona={voice.persona}
                             style={{
                                 pointerEvents: 'auto',
                                 background: 'var(--surface-1)',

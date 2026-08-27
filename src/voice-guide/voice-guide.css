@@ -1376,6 +1376,308 @@
   }
 }
 
+/* ============================================================================
+   PERSONA-ADAPTIVE HUD — holo spec §2.4, movie-persona pass
+   ============================================================================
+   Every surface above paints itself out of --accent / --accent-strong /
+   --accent-line / --accent-wash, so switching the terminal to a character is a
+   matter of rebinding those four tokens on the element the character owns — not
+   of restyling the frame, the badge, the spectrum, the pills and the CTA one at
+   a time. Two hooks carry it:
+
+     [data-vg-persona] — the surface a character is currently speaking through
+                         (the desktop terminal, the mobile island, the docked
+                         controls). Tokens cascade to everything inside.
+     [data-persona]    — a control that SWITCHES to a character. It wears that
+                         character's colour whether or not it is the live one,
+                         which is what makes the picker readable at a glance.
+
+   --vg-persona-2 is the one addition. Each of these characters is a two-colour
+   identity on screen (Autobot cobalt against flame red, Stark cyan against
+   titanium gold, Dark Energon violet against blood red) and a single accent
+   flattens exactly the distinction this pass exists to restore. It drives the
+   counter-diagonal bracket arms and the outer spectrum bars — the accents,
+   never the body text, which has to stay legible against the glass.
+
+   Ashwin is deliberately absent. No override means the creator's terminal keeps
+   whatever accent the visitor picked in the theme switcher, which is the point:
+   the human is the one voice on this widget that is not a franchise.
+   ------------------------------------------------------------------------- */
+
+/* --- Optimus Prime: Autobot command, Energon blue over cobalt and flame --- */
+.vg-hud-card[data-vg-persona='optimus'],
+.vg-caption-head[data-vg-persona='optimus'],
+.vg-agent-controls[data-vg-persona='optimus'],
+.vg-pill[data-vg-persona='optimus'],
+.vg-pill-sheet[data-vg-persona='optimus'],
+.vg-persona-pill[data-persona='optimus'],
+.vg-pill-sheet-item[data-persona='optimus'] {
+  --accent: #38bdf8;
+  --accent-strong: #2563eb;
+  --accent-line: rgba(0, 242, 254, 0.5);
+  --accent-wash: rgba(37, 99, 235, 0.16);
+  --vg-persona-2: #ef4444;
+}
+
+/* --- J.A.R.V.I.S.: Stark arc-reactor cyan over titanium gold --- */
+.vg-hud-card[data-vg-persona='jarvis'],
+.vg-caption-head[data-vg-persona='jarvis'],
+.vg-agent-controls[data-vg-persona='jarvis'],
+.vg-pill[data-vg-persona='jarvis'],
+.vg-pill-sheet[data-vg-persona='jarvis'],
+.vg-persona-pill[data-persona='jarvis'],
+.vg-pill-sheet-item[data-persona='jarvis'] {
+  --accent: #00f2fe;
+  --accent-strong: #0284c7;
+  --accent-line: rgba(0, 242, 254, 0.5);
+  --accent-wash: rgba(2, 132, 199, 0.16);
+  --vg-persona-2: #fbbf24;
+}
+
+/* --- Megatron: Dark Energon violet over Cybertronian crimson --- */
+.vg-hud-card[data-vg-persona='megatron'],
+.vg-caption-head[data-vg-persona='megatron'],
+.vg-agent-controls[data-vg-persona='megatron'],
+.vg-pill[data-vg-persona='megatron'],
+.vg-pill-sheet[data-vg-persona='megatron'],
+.vg-persona-pill[data-persona='megatron'],
+.vg-pill-sheet-item[data-persona='megatron'] {
+  --accent: #c084fc;
+  --accent-strong: #9333ea;
+  --accent-line: rgba(168, 85, 247, 0.55);
+  --accent-wash: rgba(88, 28, 135, 0.24);
+  --vg-persona-2: #ff003c;
+}
+
+/* Fallback for --vg-persona-2 wherever no persona is set — Ashwin, and the
+   terminal before the provider reports one. Without it var() would drop the
+   whole declaration and leave a bar or a bracket arm unpainted. */
+.vg-hud-card,
+.vg-caption-head,
+.vg-agent-controls,
+.vg-pill,
+.vg-pill-sheet,
+.vg-persona-pill,
+.vg-pill-sheet-item {
+  --vg-persona-2: var(--accent-strong);
+}
+
+/* ---------------------------------------------- glass tint per character --- */
+/*
+ * The sheen across the top-left of the pane already runs on --accent-wash, so
+ * it recolours for free. What the characters need on top is a floor tint in the
+ * SECOND colour, so Megatron's terminal reads as obsidian and Optimus's as
+ * cobalt steel rather than as the same grey glass with a different edge.
+ *
+ * !important for the same reason the base rule needs it: the eager component
+ * sets an opaque inline background as its no-CSS fallback (§8).
+ */
+.vg-hud-card[data-vg-persona='optimus'],
+.vg-hud-card[data-vg-persona='jarvis'],
+.vg-hud-card[data-vg-persona='megatron'] {
+  background:
+    linear-gradient(155deg, var(--accent-wash) 0%, transparent 46%),
+    linear-gradient(
+      20deg,
+      color-mix(in srgb, var(--vg-persona-2) 9%, transparent) 0%,
+      transparent 40%
+    ),
+    color-mix(in srgb, var(--surface-1) 82%, transparent) !important;
+}
+
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+  .vg-hud-card[data-vg-persona='optimus'],
+  .vg-hud-card[data-vg-persona='jarvis'],
+  .vg-hud-card[data-vg-persona='megatron'] {
+    background: var(--surface-1) !important;
+  }
+}
+
+/* --------------------------------------------- two-tone corner brackets --- */
+/*
+ * The arms are 2px inline borders in var(--accent) (AvatarGuide.jsx), so the
+ * primary colour is already handled by the token rebind above. This flips the
+ * counter-diagonal pair to the character's second colour — flame red on
+ * Optimus, Stark gold on JARVIS, blood red on Megatron — which is what makes
+ * the frame read as a two-colour chassis instead of a uniform neon box.
+ *
+ * !important because border-color cannot otherwise beat the inline border-top /
+ * border-left shorthand. The edges with no border on a given arm are 0-width,
+ * so recolouring all four sides of each is harmless.
+ */
+.vg-hud-card[data-vg-persona='optimus'] .vg-hud-corner:nth-child(2),
+.vg-hud-card[data-vg-persona='optimus'] .vg-hud-corner:nth-child(3),
+.vg-hud-card[data-vg-persona='jarvis'] .vg-hud-corner:nth-child(2),
+.vg-hud-card[data-vg-persona='jarvis'] .vg-hud-corner:nth-child(3),
+.vg-hud-card[data-vg-persona='megatron'] .vg-hud-corner:nth-child(2),
+.vg-hud-card[data-vg-persona='megatron'] .vg-hud-corner:nth-child(3) {
+  border-color: var(--vg-persona-2) !important;
+}
+
+/* vg-corner-glow drop-shadows in --accent, which would put a blue halo under a
+   red arm. The counter-diagonal pair gets its own, in its own colour. */
+.vg-hud-corner:nth-child(2),
+.vg-hud-corner:nth-child(3) {
+  animation-name: vg-corner-glow-alt;
+}
+
+@keyframes vg-corner-glow-alt {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px var(--vg-persona-2));
+    opacity: 0.55;
+  }
+  50% {
+    filter: drop-shadow(0 0 5px var(--vg-persona-2));
+    opacity: 1;
+  }
+}
+
+/* Megatron's frame is the one that should not look machined. Longer arms bite
+   further into the edge and read as jagged Decepticon plating — no extra DOM. */
+.vg-hud-card[data-vg-persona='megatron'] .vg-hud-corner {
+  width: 17px;
+  height: 17px;
+}
+
+/* ----------------------------------------------- transmission header --- */
+
+/* The callsigns are longer than the old `[ TRANSMISSION // … ]`, so they get
+   back the tracking those extra characters cost. Still ellipsised by the base
+   rule when the card is narrow. */
+.vg-caption-head[data-vg-persona='optimus'] .vg-caption-badge,
+.vg-caption-head[data-vg-persona='jarvis'] .vg-caption-badge,
+.vg-caption-head[data-vg-persona='megatron'] .vg-caption-badge {
+  letter-spacing: 0.1em;
+  opacity: 1;
+}
+
+/* On air the callsign burns in the character's own colour and picks up a
+   second, dimmer shadow in the accent hue — the halo a lit HUD glyph has. */
+.vg-caption-head[data-vg-persona='optimus'] .vg-caption-badge-live,
+.vg-caption-head[data-vg-persona='jarvis'] .vg-caption-badge-live,
+.vg-caption-head[data-vg-persona='megatron'] .vg-caption-badge-live {
+  text-shadow:
+    0 0 calc(var(--vg-level) * 9px) var(--accent),
+    0 0 calc(1px + var(--vg-level) * 5px) var(--vg-persona-2);
+}
+
+/* Outer bars in the second colour, inner three in the accent. A real analyser
+   is never one flat hue, and five 2px bars are the cheapest place on this card
+   to show the two-colour identity — they carry no text. */
+.vg-caption-head[data-vg-persona='optimus'] .vg-spectrum-bar:nth-child(1),
+.vg-caption-head[data-vg-persona='optimus'] .vg-spectrum-bar:nth-child(5),
+.vg-caption-head[data-vg-persona='jarvis'] .vg-spectrum-bar:nth-child(1),
+.vg-caption-head[data-vg-persona='jarvis'] .vg-spectrum-bar:nth-child(5),
+.vg-caption-head[data-vg-persona='megatron'] .vg-spectrum-bar:nth-child(1),
+.vg-caption-head[data-vg-persona='megatron'] .vg-spectrum-bar:nth-child(5) {
+  background: var(--vg-persona-2);
+}
+
+/* ------------------------------------------------------- persona pills --- */
+/*
+ * Each pill is coloured by the character it SELECTS, not by the one speaking,
+ * so the picker is legible before anything is clicked. Held at a wash and a
+ * muted text colour while idle — four saturated pills side by side would
+ * out-shout the caption they sit under.
+ */
+.vg-persona-pill[data-persona='optimus'],
+.vg-persona-pill[data-persona='jarvis'],
+.vg-persona-pill[data-persona='megatron'] {
+  border-color: color-mix(in srgb, var(--accent) 26%, var(--rule));
+  color: color-mix(in srgb, var(--accent) 55%, var(--text-muted));
+}
+
+/* Hover has to be restated per persona: .vg-persona-pill:hover above carries
+   the same specificity as the idle rule and loses on source order, which would
+   leave these three pills with no hover feedback at all. */
+.vg-persona-pill[data-persona='optimus']:hover,
+.vg-persona-pill[data-persona='jarvis']:hover,
+.vg-persona-pill[data-persona='megatron']:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Selected: full character colour, plus a hairline of the second one along the
+   bottom — the pill-sized version of the two-tone frame. */
+.vg-persona-pill[data-persona='optimus'].vg-persona-pill-active,
+.vg-persona-pill[data-persona='jarvis'].vg-persona-pill-active,
+.vg-persona-pill[data-persona='megatron'].vg-persona-pill-active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  box-shadow: inset 0 -2px 0 -1px var(--vg-persona-2);
+}
+
+/* On air. The base .vg-persona-pill-live halo already rides --vg-level; this
+   restates it with the second colour on the outer edge, so the live pill
+   matches the frame it is docked in. */
+.vg-persona-pill[data-persona='optimus'].vg-persona-pill-live,
+.vg-persona-pill[data-persona='jarvis'].vg-persona-pill-live,
+.vg-persona-pill[data-persona='megatron'].vg-persona-pill-live {
+  box-shadow:
+    inset 0 -2px 0 -1px var(--vg-persona-2),
+    0 0 0 1px var(--accent-wash),
+    0 0 calc(4px + var(--vg-level) * 12px) var(--accent-wash),
+    0 0 calc(2px + var(--vg-level) * 8px)
+      color-mix(in srgb, var(--vg-persona-2) 45%, transparent);
+}
+
+/* ----------------------------------------------- mobile dynamic island --- */
+/*
+ * Same tokens, so the island needs almost nothing of its own. What it does need
+ * is the rim: at 38px tall there is no room for corner brackets, and the border
+ * is the only place the character can show.
+ */
+.vg-pill[data-vg-persona='optimus'].vg-pill-on,
+.vg-pill[data-vg-persona='jarvis'].vg-pill-on,
+.vg-pill[data-vg-persona='megatron'].vg-pill-on {
+  border-color: var(--accent-line);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    0 0 calc(6px + var(--vg-level) * 14px) var(--accent-wash);
+}
+
+/* Outer equaliser bars in the second colour, matching the desktop spectrum. */
+.vg-pill[data-vg-persona='optimus'] .vg-pill-eq-live .vg-pill-bar:nth-child(1),
+.vg-pill[data-vg-persona='optimus'] .vg-pill-eq-live .vg-pill-bar:nth-child(4),
+.vg-pill[data-vg-persona='jarvis'] .vg-pill-eq-live .vg-pill-bar:nth-child(1),
+.vg-pill[data-vg-persona='jarvis'] .vg-pill-eq-live .vg-pill-bar:nth-child(4),
+.vg-pill[data-vg-persona='megatron'] .vg-pill-eq-live .vg-pill-bar:nth-child(1),
+.vg-pill[data-vg-persona='megatron'] .vg-pill-eq-live .vg-pill-bar:nth-child(4) {
+  background: var(--vg-persona-2);
+}
+
+/* The sheet items are pickers, exactly like the desktop pills. */
+.vg-pill-sheet-item[data-persona='optimus'],
+.vg-pill-sheet-item[data-persona='jarvis'],
+.vg-pill-sheet-item[data-persona='megatron'] {
+  color: color-mix(in srgb, var(--accent) 55%, var(--text-muted));
+}
+
+.vg-pill-sheet-item[data-persona='optimus'].vg-pill-sheet-item-active,
+.vg-pill-sheet-item[data-persona='jarvis'].vg-pill-sheet-item-active,
+.vg-pill-sheet-item[data-persona='megatron'].vg-pill-sheet-item-active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  box-shadow: inset 0 -2px 0 -1px var(--vg-persona-2);
+}
+
+/* Browsers without color-mix fall back to the flat token rather than losing the
+   declaration and rendering an unstyled control. */
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  .vg-persona-pill[data-persona='optimus'],
+  .vg-persona-pill[data-persona='jarvis'],
+  .vg-persona-pill[data-persona='megatron'],
+  .vg-pill-sheet-item[data-persona='optimus'],
+  .vg-pill-sheet-item[data-persona='jarvis'],
+  .vg-pill-sheet-item[data-persona='megatron'] {
+    border-color: var(--accent-line);
+    color: var(--text-muted);
+  }
+}
+
 /* ------------------------------------------ reduced motion, HUD layers --- */
 @media (prefers-reduced-motion: reduce) {
   .vg-hud-corner,

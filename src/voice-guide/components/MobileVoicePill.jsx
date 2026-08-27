@@ -86,6 +86,7 @@ export const MobileVoicePill = () => {
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.16 }}
             className="vg-pill-sheet"
+            data-vg-persona={persona}
             role="radiogroup"
             aria-label="Narration voice"
           >
@@ -97,6 +98,7 @@ export const MobileVoicePill = () => {
                   key={id}
                   type="button"
                   role="radio"
+                  data-persona={id}
                   aria-checked={isActive}
                   className={`vg-pill-sheet-item ${isActive ? 'vg-pill-sheet-item-active' : ''}`}
                   onClick={() => handlePersona(id)}
@@ -115,6 +117,11 @@ export const MobileVoicePill = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
         className={`vg-pill${enabled ? ' vg-pill-on' : ''}`}
+        /* Same hook the desktop terminal uses: the island's rim, beam,
+           equaliser and name all read their colour from tokens scoped to this
+           attribute, so the phone gets the identical movie palette without a
+           second set of rules. */
+        data-vg-persona={persona}
       >
         {/* Perimeter beam: a light running the rim of the island. It is one
             element with two pseudo-layers (the sweep, and the mask that leaves
