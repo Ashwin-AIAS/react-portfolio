@@ -1,10 +1,10 @@
-import React, { lazy, Suspense, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useInView, motion, AnimatePresence } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
-import { ExternalLinkIcon, GitHubIcon } from '../../icons/Icons';
+import { ExternalLinkIcon, GitHubIcon, PlayIcon } from '../../icons/Icons';
 
 // Lazy load visual components
 const VisualComponents = {
@@ -55,6 +55,81 @@ const ProjectMedia = ({ project, featured }) => {
             {/* Corner marker instead of the old full-bleed black scrim that
                 crushed the bottom half of every visual. */}
             <span className="label absolute bottom-2 left-3 opacity-60">Schematic</span>
+        </div>
+    );
+};
+
+// One-shot IntersectionObserver, scoped to a single element rather than the
+// whole-page section tracking in src/voice-guide/useActiveSection.js — that
+// hook drives multi-section narration state and isn't a fit here. Flips to
+// true once the target is seen and disconnects; used to keep the demo
+// <video> unmounted until its card has actually scrolled into view.
+const useInViewOnce = (ref) => {
+    const [seen, setSeen] = useState(false);
+    useEffect(() => {
+        if (seen || typeof IntersectionObserver === 'undefined') return undefined;
+        const el = ref.current;
+        if (!el) return undefined;
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                setSeen(true);
+                observer.disconnect();
+            }
+        }, { rootMargin: '0px 0px -10% 0px' });
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [ref, seen]);
+    return seen;
+};
+
+// Click-to-play demo clip: poster + play button until clicked, and the
+// <video> tag itself isn't mounted until the frame has scrolled into view.
+const ProjectDemoVideo = ({ project }) => {
+    const frameRef = useRef(null);
+    const videoRef = useRef(null);
+    const inView = useInViewOnce(frameRef);
+    const [playing, setPlaying] = useState(false);
+
+    useEffect(() => {
+        if (playing) videoRef.current?.play().catch(() => {});
+    }, [playing]);
+
+    if (!project.demoVideoUrl) return null;
+
+    return (
+        <div ref={frameRef} className="demo-video-frame mb-5">
+            {playing && inView ? (
+                <video
+                    ref={videoRef}
+                    controls
+                    preload="none"
+                    poster={project.demoVideoPoster}
+                    playsInline
+                >
+                    <source src={project.demoVideoUrl} type="video/mp4" />
+                </video>
+            ) : (
+                <button
+                    type="button"
+                    onClick={() => setPlaying(true)}
+                    className="demo-video-trigger"
+                    aria-label={`Play ${project.title} demo video`}
+                >
+                    {project.demoVideoPoster && (
+                        <img
+                            src={project.demoVideoPoster}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    )}
+                    <span className="demo-video-play">
+                        <span className="demo-video-play-icon">
+                            <PlayIcon className="w-5 h-5" />
+                        </span>
+                    </span>
+                </button>
+            )}
         </div>
     );
 };
@@ -113,6 +188,8 @@ const ProjectCardWrapper = ({ project, index, featured = false }) => (
                         <span className="tech-tag">+{project.technologies.length - 5}</span>
                     )}
                 </div>
+
+                <ProjectDemoVideo project={project} />
 
                 <div className="flex gap-5 pt-4 border-t border-rule mt-auto">
                     <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="label hover:text-accent transition-colors inline-flex items-center gap-2">

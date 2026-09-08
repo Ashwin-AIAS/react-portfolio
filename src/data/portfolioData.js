@@ -52,6 +52,8 @@ export const portfolioData = {
       visualComponent: 'GymVision',
       githubUrl: "https://github.com/Ashwin-AIAS/posecoach",
       liveUrl: "https://posecoach-rho.vercel.app",
+      demoVideoUrl: "https://aapducp8kub2vmf6.public.blob.vercel-storage.com/WhatsApp%20Video%202026-08-24%20at%2013.18.08.mp4",
+      demoVideoPoster: "/projects/gymvision-demo-poster.jpg",
       category: "AI / Computer Vision",
       featured: true,
       metric: "Live demo — real-time rep counting & form scoring"
