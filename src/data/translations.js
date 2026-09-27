@@ -11,7 +11,7 @@ export const translations = {
     hero: {
       badge: "AI Engineer for Autonomous Systems",
       greeting: "Hi, I'm",
-      bio: "Aspiring AI Engineer with a Bachelor's in Mechanical Engineering and a background in ERP analysis. Passionate about autonomous systems, with experience in developing automation scripts, managing data, and working on cutting-edge computer vision and generative AI projects. Currently pursuing a Master's in AI Engineering.",
+      bio: "Master's student in AI Engineering for Autonomous Systems at THI Germany, specializing in Computer Vision, Deep Learning perception, and LLM/RAG systems. Experienced in deploying real-time vision pipelines and edge inference. Actively seeking roles as a Computer Vision Engineer, AI Engineer, or Autonomous Driving / Perception Engineer.",
       downloadCv: "Download Resume",
       viewProjects: "View Projects"
     },
@@ -96,7 +96,7 @@ export const translations = {
     hero: {
       badge: "KI-Ingenieur für Autonome Systeme",
       greeting: "Hallo, ich bin",
-      bio: "Angehender KI-Ingenieur mit einem Bachelor in Maschinenbau und Hintergrund in der ERP-Analyse. Leidenschaft für autonome Systeme, mit Erfahrung in der Entwicklung von Automatisierungsskripten, Datenverwaltung sowie in Computer Vision und generativer KI. Derzeit im Masterstudium KI-Engineering.",
+      bio: "Masterstudent im Bereich KI-Engineering für Autonome Systeme an der THI, spezialisiert auf Computer Vision, Deep Learning Perception und LLM/RAG-Systeme. Erfahren in der Bereitstellung von Echtzeit-Vision-Pipelines und Edge-Inferenz. Aktiv auf der Suche nach Positionen als Computer Vision Engineer, KI-Ingenieur oder Perception / Autonomous Driving Engineer.",
       downloadCv: "Lebenslauf herunterladen",
       viewProjects: "Projekte ansehen"
     },

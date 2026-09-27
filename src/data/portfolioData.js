@@ -2,7 +2,7 @@ export const portfolioData = {
   personalInfo: {
     name: "Ashwin",
     title: "AI Engineer for Autonomous Systems",
-    bio: "Master's student in AI Engineering at THI Germany, with a background in Mechanical Engineering and production experience building computer vision pipelines, full-stack RAG systems, and LLM-powered tools. Former ERP Analyst at DXC Technology. Focused on bridging AI research and real-world deployment in autonomous systems.",
+    bio: "Master's student in AI Engineering for Autonomous Systems at THI Germany, specializing in Computer Vision, Deep Learning perception, and LLM/RAG systems. Experienced in deploying real-time vision pipelines and edge inference. Actively seeking roles as a Computer Vision Engineer, AI Engineer, or Autonomous Driving / Perception Engineer.",
     email: "mashwinvignesh@gmail.com",
     phone: "+49 15560090137",
     location: "Ingolstadt, Germany",
@@ -13,11 +13,10 @@ export const portfolioData = {
   careerRoadmap: [
     {
       type: 'education',
-      title: "B.Tech in Mechanical Engineering",
-      institution: "Reva University, Bengaluru, India",
-      period: "2018 - 2022",
-      details: "• Key Project: Development of an Automated Hydroponic Plant Grow System using Arduino and computer vision (OpenCV).\n• Published a paper on the project at the 4th National Conference on New Trends in Mechanical Engineering (NCNTME-2022).",
-      paperUrl: "https://drive.google.com/file/d/1quhbB8EjNY-0763xEIUO81fEDs_fX9Kc/view?usp=sharing"
+      title: "Masters in AI Engineering for Autonomous Systems",
+      institution: "Technische Hochschule Ingolstadt, Germany",
+      period: "Mar 2024 - Present",
+      details: "Relevant coursework: Machine Learning, Deep Learning, Data Engineering, Sensor Data and Fusion (automotive-focused), and Autonomous Systems."
     },
     {
       type: 'work',
@@ -28,10 +27,11 @@ export const portfolioData = {
     },
     {
       type: 'education',
-      title: "Masters in AI Engineering for Autonomous Systems",
-      institution: "Technische Hochschule Ingolstadt, Germany",
-      period: "Mar 2024 - Present",
-      details: "Relevant coursework: Machine Learning, Deep Learning, Data Engineering, Sensor Data and Fusion (automotive-focused)."
+      title: "B.Tech in Mechanical Engineering",
+      institution: "Reva University, Bengaluru, India",
+      period: "2018 - 2022",
+      details: "• Key Project: Development of an Automated Hydroponic Plant Grow System using Arduino and computer vision (OpenCV).\n• Published a paper on the project at the 4th National Conference on New Trends in Mechanical Engineering (NCNTME-2022).",
+      paperUrl: "https://drive.google.com/file/d/1quhbB8EjNY-0763xEIUO81fEDs_fX9Kc/view?usp=sharing"
     }
   ],
   // Weighted roughly 60% computer vision / perception, 40% generative AI,

@@ -11,6 +11,7 @@ export const Hero = ({ t }) => {
     const roles = [
         t.hero.badge.toUpperCase(),
         "COMPUTER VISION ENGINEER",
+        "AUTONOMOUS DRIVING & PERCEPTION",
         "LLM & RAG SYSTEMS BUILDER",
         "MASTER'S STUDENT @ THI GERMANY",
     ];
