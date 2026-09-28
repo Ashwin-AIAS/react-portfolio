@@ -647,7 +647,7 @@ Wait for the user to finish speaking before responding.
                                 </div>
                                 <div className="readout-row">
                                     <dt>Model</dt>
-                                    <dd>Gemini 2.5 Flash</dd>
+                                    <dd>Gemini 3.8 Flash</dd>
                                 </div>
                             </dl>
                         </div>
