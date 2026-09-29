@@ -14,6 +14,7 @@ export const translations = {
       bio: "Master's student in AI Engineering for Autonomous Systems at THI Germany, specializing in Computer Vision, Deep Learning perception, and LLM/RAG systems. Experienced in deploying real-time vision pipelines and edge inference. Actively seeking roles as a Computer Vision Engineer, AI Engineer, or Autonomous Driving / Perception Engineer.",
       downloadCv: "Download Resume",
       viewProjects: "View Projects",
+      getInTouch: "Get in Touch",
       startAudioTour: "Start Audio Tour",
       audioTourActive: "Audio Tour Active",
       askAssistant: "Ask AI Assistant"
@@ -102,6 +103,7 @@ export const translations = {
       bio: "Masterstudent im Bereich KI-Engineering für Autonome Systeme an der THI, spezialisiert auf Computer Vision, Deep Learning Perception und LLM/RAG-Systeme. Erfahren in der Bereitstellung von Echtzeit-Vision-Pipelines und Edge-Inferenz. Aktiv auf der Suche nach Positionen als Computer Vision Engineer, KI-Ingenieur oder Perception / Autonomous Driving Engineer.",
       downloadCv: "Lebenslauf herunterladen",
       viewProjects: "Projekte ansehen",
+      getInTouch: "Kontakt aufnehmen",
       startAudioTour: "Audio-Tour starten",
       audioTourActive: "Audio-Tour aktiv",
       askAssistant: "KI-Assistent fragen"
