@@ -4,23 +4,23 @@ import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import AIAssistantVisual from '../visuals/AIAssistantVisual';
-import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon } from '../../icons/Icons';
+import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon, DownloadIcon, ExternalLinkIcon, LinkedInIcon, MailIcon, GraduationCapIcon, BriefcaseIcon } from '../../icons/Icons';
 import { streamGeminiResponse, getApiKey, formatModelDisplayName } from '../../geminiEmbed';
 import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SYSTEM_PROMPT = `
-You are Ashwin's AI Portfolio Assistant. You handle both general questions about Ashwin (skills, GitHub activity, background, etc.) and job description matching.
+You are Ashwin's AI Portfolio Assistant and technical evaluation agent. You handle general inquiries about Ashwin (background, skills, GitHub activity, autonomous systems projects), resume requests, and job description matching.
 
-Ashwin's Resume Data:
+Ashwin's Resume & Verified Profile:
 ${JSON.stringify(portfolioData)}
 
 GitHub Activity Highlights (Top 10 Recent Repos):
 {{GITHUB_REPOS}}
 
 INSTRUCTIONS:
-1. For general questions: Answer in a friendly, professional, and concise way (2-3 sentences). Highlight Ashwin's skills, autonomous systems projects, and real-world experience.
+1. For general questions: Answer in a friendly, knowledgeable, concise, and structured way (2-3 sentences or clear bullet points). Emphasize Ashwin's core strengths in Computer Vision, Autonomous Systems Perception, and RAG/LLM pipelines.
 2. For job description analysis:
    - If the user provides or pastes a job description or role requirements, evaluate Ashwin's fit against the qualifications and YOU MUST RETURN PURE JSON ONLY (no markdown fences, no conversational text) matching this schema:
 {
@@ -32,13 +32,15 @@ INSTRUCTIONS:
   "recommendation": "Short final recommendation statement."
 }
    - If the user states they have a job description or asks about analyzing one without providing the text yet (e.g. "I have a job description I'd like you to analyze for Ashwin's fit"), respond conversationally in 1-2 friendly sentences inviting them to paste or describe the job description or role requirements.
+3. For resume, CV, credentials, or contact inquiries (e.g. "Can I see his resume?", "Show me his CV", "Download resume", "Where is his resume?"):
+   - Provide a warm overview of Ashwin's credentials: Master's in AI Engineering for Autonomous Systems at THI Germany, 2 years at DXC Technology, and state-of-the-art projects in Computer Vision & RAG. Mention the interactive resume card attached below where they can download or open the verified PDF.
 `;
 
 const SUGGESTIONS = {
   initial: [
     "What are Ashwin's strongest technical skills?",
+    "Can I see his resume?",
     "Tell me about his RAG project",
-    "Is he open to relocation in Germany?",
     "Paste a job description for a fit analysis"
   ],
   afterFitReport: [
@@ -124,22 +126,22 @@ const CONVERSATION_STARTERS = [
     message: "I have a job description I'd like you to analyze for Ashwin's fit."
   },
   {
+    icon: "📄",
+    title: "View Official Resume",
+    subtitle: "Download PDF & view verified qualifications",
+    message: "Can I see Ashwin's resume and qualifications?"
+  },
+  {
     icon: "🤖",
     title: "AI & ML Projects",
-    subtitle: "RAG, YOLO, GANs, computer vision",
+    subtitle: "RAG, YOLO26, GANs, computer vision",
     message: "Tell me about Ashwin's most impressive AI and machine learning projects."
   },
   {
     icon: "🚗",
     title: "Autonomous Systems",
     subtitle: "Radar, LiDAR, roundabout coordination",
-    message: "What autonomous systems experience does Ashwin have?"
-  },
-  {
-    icon: "💼",
-    title: "Work Experience",
-    subtitle: "DXC Technology, THI Germany",
-    message: "Walk me through Ashwin's professional background and education."
+    message: "What autonomous systems and perception experience does Ashwin have?"
   }
 ];
 
@@ -243,6 +245,113 @@ const FitReportCard = ({ data, t }) => (
         </blockquote>
     </div>
 );
+
+const ResumeCard = ({ data }) => {
+    const resumeUrl = data?.resume_url || portfolioData.personalInfo.resumeUrl;
+    const email = data?.email || portfolioData.personalInfo.email;
+    const linkedin = data?.linkedin || portfolioData.personalInfo.linkedin;
+    const github = data?.github || portfolioData.personalInfo.github;
+
+    return (
+        <div className="panel p-5 mt-2 flex flex-col gap-4 w-full border border-accent/40 bg-surface-1/95 backdrop-blur-md relative overflow-hidden shadow-lg select-text" style={{ borderRadius: 'var(--r-md)' }}>
+            {/* Top ambient glow */}
+            <div className="absolute top-0 right-0 w-48 h-24 bg-accent/15 blur-2xl pointer-events-none" />
+
+            <div className="flex items-start justify-between gap-4 border-b border-rule pb-4">
+                <div className="flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center text-accent shadow-sm flex-shrink-0">
+                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h4 className="font-display text-base font-bold tracking-tight text-ink">
+                                Ashwin Vignesh M
+                            </h4>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border border-ok/40 text-ok bg-ok/10 uppercase tracking-wider font-semibold">
+                                Verified Profile
+                            </span>
+                        </div>
+                        <p className="text-xs text-ink-muted mt-0.5">
+                            Master's in AI Engineering for Autonomous Systems • THI Germany
+                        </p>
+                    </div>
+                </div>
+
+                <a
+                    href={resumeUrl}
+                    download="Ashwin_Vignesh_M_Resume.pdf"
+                    className="hidden sm:inline-flex items-center gap-2 text-xs font-mono font-semibold py-2 px-3.5 rounded-lg bg-accent text-surface-0 hover:brightness-110 active:scale-95 transition-all shadow-md flex-shrink-0 cursor-pointer"
+                >
+                    <DownloadIcon className="w-3.5 h-3.5" />
+                    <span>Download PDF</span>
+                </a>
+            </div>
+
+            {/* Quick Credentials Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                <div className="p-2.5 rounded-lg bg-surface-2 border border-rule">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-ink-dim block mb-1">Degree</span>
+                    <span className="font-medium text-ink block truncate">M.Sc. AI Autonomous Systems</span>
+                    <span className="text-[11px] text-ink-muted">THI Ingolstadt (2024–Present)</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-surface-2 border border-rule">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-ink-dim block mb-1">Industry Experience</span>
+                    <span className="font-medium text-ink block truncate">Analyst II (Enterprise App)</span>
+                    <span className="text-[11px] text-ink-muted">DXC Technology (2 Years)</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-surface-2 border border-rule">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-ink-dim block mb-1">Key Specialization</span>
+                    <span className="font-medium text-ink block truncate">CV, RAG & Sensor Fusion</span>
+                    <span className="text-[11px] text-ink-muted">PyTorch, YOLO26, ROS</span>
+                </div>
+            </div>
+
+            {/* Actions Bar */}
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+                <a
+                    href={resumeUrl}
+                    download="Ashwin_Vignesh_M_Resume.pdf"
+                    className="sm:hidden inline-flex items-center justify-center gap-2 text-xs font-mono font-semibold py-2 px-4 rounded-lg bg-accent text-surface-0 hover:brightness-110 active:scale-95 transition-all w-full cursor-pointer"
+                >
+                    <DownloadIcon className="w-3.5 h-3.5" />
+                    <span>Download PDF Resume</span>
+                </a>
+                <a
+                    href={resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted hover:text-accent py-1.5 px-3 rounded-md bg-surface-2 hover:bg-surface-3 border border-rule transition-colors cursor-pointer"
+                >
+                    <ExternalLinkIcon className="w-3 h-3" />
+                    <span>Open in New Tab</span>
+                </a>
+                <a
+                    href={linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted hover:text-accent py-1.5 px-3 rounded-md bg-surface-2 hover:bg-surface-3 border border-rule transition-colors cursor-pointer"
+                >
+                    <LinkedInIcon className="w-3 h-3" />
+                    <span>LinkedIn</span>
+                </a>
+                <a
+                    href={`mailto:${email}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-mono text-ink-muted hover:text-accent py-1.5 px-3 rounded-md bg-surface-2 hover:bg-surface-3 border border-rule transition-colors cursor-pointer"
+                >
+                    <MailIcon className="w-3 h-3" />
+                    <span>Email Ashwin</span>
+                </a>
+            </div>
+        </div>
+    );
+};
+
 
 export const AIAssistantSection = ({ t }) => {
     const [messages, setMessages] = useState([
@@ -594,7 +703,7 @@ Wait for the user to finish speaking before responding.
         if (msg.role === 'user') {
             return (
                 <div
-                    className="text-sm px-4 py-2.5 max-w-[85%] leading-relaxed text-ink bg-surface-3 border border-accent-line"
+                    className="text-sm px-4 py-2.5 max-w-[85%] leading-relaxed text-ink bg-surface-3 border border-accent/40 shadow-sm"
                     style={{ borderRadius: 'var(--r-md)' }}
                 >
                     {msg.content}
@@ -602,8 +711,7 @@ Wait for the user to finish speaking before responding.
             );
         }
 
-        // Check if this is a voice-driven structured output or contains JSON
-        const sourceMessage = msg.content;
+        const sourceMessage = msg.content || '';
         try {
             const possibleJsonMatch = sourceMessage.match(/\{[\s\S]*\}/);
             if (possibleJsonMatch) {
@@ -611,13 +719,42 @@ Wait for the user to finish speaking before responding.
                 if (data.type === 'fit_report') {
                     return <FitReportCard data={data} t={t.assistant} />;
                 }
+                if (data.type === 'resume_card') {
+                    return (
+                        <div className="flex flex-col gap-3 w-full">
+                            {data.note && (
+                                <div className="bg-surface-1 border border-rule text-ink text-sm px-4 py-3 leading-relaxed rounded-xl">
+                                    {data.note}
+                                </div>
+                            )}
+                            <ResumeCard data={data} />
+                        </div>
+                    );
+                }
             }
         } catch (e) {}
 
+        const contentLower = sourceMessage.toLowerCase();
+        const mentionsResume = contentLower.includes('resume') || contentLower.includes('cv');
+        const mentionsDownloadOrView = contentLower.includes('download') || contentLower.includes('pdf') || contentLower.includes('link') || contentLower.includes('credential') || contentLower.includes('attached') || contentLower.includes('qualification') || contentLower.includes('experience') || contentLower.includes('here');
+
+        if (mentionsResume && mentionsDownloadOrView) {
+            return (
+                <div className="flex flex-col gap-3 w-full">
+                    <div
+                        className="bg-surface-1 border border-rule text-ink text-sm px-4 py-3 leading-relaxed whitespace-pre-wrap"
+                        style={{ borderRadius: 'var(--r-md)' }}
+                    >
+                        {msg.content}
+                    </div>
+                    <ResumeCard data={{ resume_url: portfolioData.personalInfo.resumeUrl }} />
+                </div>
+            );
+        }
 
         return (
             <div
-                className="bg-surface-1 border border-rule text-ink-muted text-sm px-4 py-2.5 leading-relaxed whitespace-pre-wrap"
+                className="bg-surface-1 border border-rule text-ink text-sm px-4 py-2.5 leading-relaxed whitespace-pre-wrap"
                 style={{ borderRadius: 'var(--r-md)' }}
             >
                 {msg.content}
@@ -629,46 +766,116 @@ Wait for the user to finish speaking before responding.
         <Section id="assistant" title={t.assistant.title} subtitle={t.assistant.subtitle}>
             <div className="grid md:grid-cols-5 gap-4">
                 <AnimateOnScroll className="md:col-span-2">
-                    <Card className="h-full">
+                    <Card className="h-full flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
                         <div className="p-6 h-full flex flex-col">
-                            <div className="flex items-baseline gap-3 mb-5 pb-3 border-b border-rule">
-                                <span className="label label-accent flex items-center gap-2">
-                                    <SparklesIcon className="w-3 h-3" /> {t.assistant.badge}
+                            {/* Terminal Top Badge */}
+                            <div className="flex items-center justify-between mb-4 pb-3 border-b border-rule">
+                                <span className="label label-accent flex items-center gap-2 font-mono text-[11px] tracking-wider uppercase">
+                                    <SparklesIcon className="w-3.5 h-3.5" /> Cyber Intelligence
                                 </span>
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-2 border border-rule text-[10px] font-mono text-ink-muted">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-ok animate-pulse" />
+                                    <span>SYSTEM ONLINE</span>
+                                </div>
                             </div>
 
+                            {/* Holographic Quantum Core Visualizer */}
                             <AIAssistantVisual isGenerating={isGenerating} />
 
-                            <p className="text-sm text-ink-muted font-light leading-relaxed mt-6">
-                                {t.assistant.disclaimer}
-                            </p>
-
-                            <dl className="mt-auto pt-6 border-t border-rule">
-                                <div className="readout-row">
-                                    <dt>Mode</dt>
-                                    <dd>{isVoiceMode ? 'Live voice' : 'Text'}</dd>
+                            {/* Candidate Dossier Overview */}
+                            <div className="mt-4 p-3.5 rounded-xl bg-surface-2/70 border border-rule/80">
+                                <div className="flex items-baseline justify-between mb-1">
+                                    <span className="font-display text-sm font-bold tracking-tight text-ink">
+                                        Ashwin Vignesh M
+                                    </span>
+                                    <span className="text-[10px] font-mono text-accent">M.Sc. THI Germany</span>
                                 </div>
-                                <div className="readout-row">
-                                    <dt>State</dt>
-                                    <dd className="flex items-center gap-2">
+                                <p className="text-xs text-ink-dim leading-relaxed mb-3">
+                                    Autonomous Systems & Computer Vision Engineer specializing in Real-Time Perception, YOLO26, and RAG Pipelines.
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                    {['Computer Vision', 'Sensor Fusion', 'RAG & Graph RAG', 'Edge PyTorch'].map(tag => (
+                                        <span key={tag} className="tech-tag text-[10px] py-0.5 px-2">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Telemetry Matrix */}
+                            <dl className="mt-4 pt-3 border-t border-rule space-y-2">
+                                <div className="readout-row text-xs">
+                                    <dt className="text-ink-dim">Model Engine</dt>
+                                    <dd className="font-mono text-ink font-semibold">{activeModel}</dd>
+                                </div>
+                                <div className="readout-row text-xs">
+                                    <dt className="text-ink-dim">Interface Mode</dt>
+                                    <dd className="font-mono text-ink">{isVoiceMode ? 'Neural Live Voice' : 'Stream Text'}</dd>
+                                </div>
+                                <div className="readout-row text-xs">
+                                    <dt className="text-ink-dim">Processing State</dt>
+                                    <dd className="flex items-center gap-2 font-mono">
                                         <span
-                                            className="status-dot"
-                                            style={{ background: isGenerating ? 'var(--accent)' : 'var(--ok)' }}
+                                            className="w-2 h-2 rounded-full"
+                                            style={{
+                                                background: isGenerating ? 'var(--accent)' : 'var(--ok)',
+                                                boxShadow: isGenerating ? '0 0 8px var(--accent)' : '0 0 6px var(--ok)'
+                                            }}
                                         />
-                                        {isGenerating ? 'Generating' : 'Ready'}
+                                        <span style={{ color: isGenerating ? 'var(--accent)' : 'var(--ok)' }}>
+                                            {isGenerating ? 'Synthesizing...' : 'Standing By'}
+                                        </span>
                                     </dd>
                                 </div>
-                                <div className="readout-row">
-                                    <dt>Model</dt>
-                                    <dd>{activeModel}</dd>
-                                </div>
                             </dl>
+
+                            {/* Direct Quick Action Deck */}
+                            <div className="mt-auto pt-4 flex flex-col gap-2">
+                                <a
+                                    href={portfolioData.personalInfo.resumeUrl}
+                                    download="Ashwin_Vignesh_M_Resume.pdf"
+                                    className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-mono font-semibold bg-accent text-surface-0 hover:brightness-110 active:scale-95 transition-all shadow-md cursor-pointer"
+                                >
+                                    <DownloadIcon className="w-3.5 h-3.5" />
+                                    <span>Download Official Resume (PDF)</span>
+                                </a>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleSuggestionClick("I have a job description I'd like you to analyze for Ashwin's fit.")}
+                                        className="py-1.5 px-2.5 rounded-lg text-[11px] font-mono text-ink-muted hover:text-accent bg-surface-2 hover:bg-surface-3 border border-rule transition-colors text-center cursor-pointer truncate"
+                                    >
+                                        🎯 Analyze Job Fit
+                                    </button>
+                                    <a
+                                        href={`mailto:${portfolioData.personalInfo.email}`}
+                                        className="py-1.5 px-2.5 rounded-lg text-[11px] font-mono text-ink-muted hover:text-accent bg-surface-2 hover:bg-surface-3 border border-rule transition-colors text-center cursor-pointer truncate"
+                                    >
+                                        ✉️ Direct Connect
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </Card>
                 </AnimateOnScroll>
 
                 <AnimateOnScroll delay={120} className="md:col-span-3">
-                    <Card className="h-[550px] flex flex-col relative overflow-hidden">
+                    <Card className="h-[650px] flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
+                        {/* Terminal Header Bar */}
+                        <div className="flex items-center justify-between px-5 py-3 border-b border-rule bg-surface-2/40 backdrop-blur-sm">
+                            <div className="flex items-center gap-2.5">
+                                <div className="flex gap-1.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-red-500/70 inline-block" />
+                                    <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70 inline-block" />
+                                    <span className="w-2.5 h-2.5 rounded-full bg-green-500/70 inline-block" />
+                                </div>
+                                <span className="font-mono text-xs text-ink-dim">ashwin-neural-agent // terminal session</span>
+                            </div>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-3 border border-rule text-ink-muted uppercase">
+                                v2.5 live
+                            </span>
+                        </div>
 
                         <div 
                                 ref={chatContainerRef}
@@ -730,10 +937,10 @@ Wait for the user to finish speaking before responding.
                                         >
                                             {msg.role === 'model' && (
                                                 <div
-                                                    className="w-8 h-8 border border-rule flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-accent"
-                                                    style={{ borderRadius: 'var(--r-sm)' }}
+                                                    className="w-8 h-8 rounded-lg border border-accent/40 bg-accent/10 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-accent shadow-sm relative"
                                                 >
                                                     <BotIcon className="w-4 h-4" />
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-ok absolute -bottom-0.5 -right-0.5 ring-2 ring-surface-1" />
                                                 </div>
                                             )}
                                             {msg.role === 'model' ? (
