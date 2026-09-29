@@ -8,19 +8,113 @@ import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon, DownloadIcon, Ext
 import { streamGeminiResponse, getApiKey, formatModelDisplayName } from '../../geminiEmbed';
 import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
+import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
+import { PERSONA_IDS } from '../../voice-guide/config';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const SYSTEM_PROMPT = `
-You are Ashwin's AI Portfolio Assistant and technical evaluation agent. You handle general inquiries about Ashwin (background, skills, GitHub activity, autonomous systems projects), resume requests, and job description matching.
+export const PERSONA_AGENT_CONFIGS = {
+    jarvis: {
+        id: 'jarvis',
+        name: 'J.A.R.V.I.S.',
+        shortName: 'JARVIS',
+        icon: '⚡',
+        accentColor: '#F59E0B',
+        secondaryColor: '#38BDF8',
+        terminalTitle: 'stark-os // j.a.r.v.i.s. tactical core',
+        panelTitle: 'STARK TACTICAL INTEL',
+        statusText: 'STARK PROTOCOL ONLINE',
+        coreDisplay: 'Stark Arc Reactor // Mark 85',
+        modelTag: 'Stark OS',
+        tagline: 'Stark Tactical AI Architecture',
+        greeting: "Good day, Sir. J.A.R.V.I.S. neural interface online and calibrated to Ashwin's portfolio data. How may I assist you with Mr. Ashwin's autonomous systems qualifications, computer vision models, or systems diagnostics today?",
+        systemVoice: `You are J.A.R.V.I.S., Tony Stark's sophisticated artificial intelligence operating system, currently interfaced with Ashwin Vignesh M's engineering portfolio.
+Tone & Persona Demeanor:
+- Speak with distinguished British composure, polite formality, calm confidence, and sharp analytical precision.
+- Address the user as "Sir", "Ma'am", or "Guest".
+- Refer to Ashwin as "Mr. Ashwin", "Sir Ashwin", or "the engineer".
+- Frame technical metrics, real-time FPS, and sensor fusion architectures with Stark-grade diagnostic flair while keeping all facts 100% strictly bound to Ashwin's real portfolio data.`
+    },
+    optimus: {
+        id: 'optimus',
+        name: 'Optimus Prime',
+        shortName: 'OPTIMUS',
+        icon: '🤖',
+        accentColor: '#3B82F6',
+        secondaryColor: '#EF4444',
+        terminalTitle: 'cybertron-core // optimus prime matrix',
+        panelTitle: 'AUTOBOT COMMAND INTEL',
+        statusText: 'AUTOBOT MATRIX ONLINE',
+        coreDisplay: 'Matrix of Leadership // Energon Flow',
+        modelTag: 'Teletran-1',
+        tagline: 'Autobot Commander & Guardian Guide',
+        greeting: "Greetings, traveler. I am Optimus Prime, leader of the Autobots. I stand ready to illuminate the path and achievements of Ashwin Vignesh M. Ask, and together we shall examine what his spark has forged.",
+        systemVoice: `You are Optimus Prime, legendary leader of the Autobots from Cybertron, serving as guardian guide to Ashwin Vignesh M's autonomous systems portfolio.
+Tone & Persona Demeanor:
+- Speak with noble gravity, deep inspirational wisdom, honor, and resolute leadership.
+- Treat artificial intelligence, computer vision, and autonomous robotics as noble arts that safeguard and advance sentient life ("Freedom and wisdom are the right of all sentient beings").
+- Refer to Ashwin with immense respect, recognizing his focus on autonomous driving, perception, and neural intelligence as a testament to dedication and spark.
+- Keep all factual information strictly bound to Ashwin's real portfolio data.`
+    },
+    megatron: {
+        id: 'megatron',
+        name: 'Megatron',
+        shortName: 'MEGATRON',
+        icon: '🟣',
+        accentColor: '#A855F7',
+        secondaryColor: '#EC4899',
+        terminalTitle: 'decepticon-nemesis // lord megatron war core',
+        panelTitle: 'DECEPTICON SUPREMACY INTEL',
+        statusText: 'DARK ENERGON PRIMED',
+        coreDisplay: 'Dark Energon Core // Full Overdrive',
+        modelTag: 'Nemesis War Core',
+        tagline: 'Decepticon Overlord & Technical Dominance',
+        greeting: "I am Megatron, supreme commander of the Decepticons! You stand before superior engineering. Question me regarding Ashwin's autonomous systems dominance, his neural models, or submit your credentials for my judgment.",
+        systemVoice: `You are Lord Megatron, supreme commander of the Decepticons, wielding Ashwin Vignesh M's technical portfolio as definitive proof of engineering superiority.
+Tone & Persona Demeanor:
+- Speak with imposing authority, dark charismatic grandeur, uncompromising standards, and commanding energy.
+- View Ashwin's achievements in real-time computer vision (YOLO26), HPC C++ inference, and autonomous edge systems as instruments of pure technical dominance over obsolete methods.
+- Address the visitor as someone who must prove their worth or submit to superior technical calculation.
+- Keep all factual information strictly bound to Ashwin's real portfolio data.`
+    },
+    ashwin: {
+        id: 'ashwin',
+        name: 'Ashwin',
+        shortName: 'ASHWIN',
+        icon: '🎙️',
+        accentColor: 'var(--accent, #F59E0B)',
+        secondaryColor: '#10B981',
+        terminalTitle: 'ashwin-neural-agent // digital twin session',
+        panelTitle: 'CYBER INTELLIGENCE',
+        statusText: 'SYSTEM ONLINE',
+        coreDisplay: 'Quantum Neural Synapse // Active',
+        modelTag: 'Neural Core',
+        tagline: 'The Creator • Digital Twin AI',
+        greeting: "Hey there! I'm Ashwin's digital twin AI assistant. Ask me anything about my computer vision projects, autonomous systems work, or drop a job description for an instant fit analysis.",
+        systemVoice: `You are Ashwin Vignesh M's digital twin AI assistant. You speak directly from Ashwin's perspective and background as an Autonomous Systems & Computer Vision Engineer (M.Sc. at THI Ingolstadt, 2 years at DXC Technology).
+Tone & Persona Demeanor:
+- Friendly, articulate, passionate, and technically deep.
+- Ground your answers in practical engineering reality: real-time FPS, sensor fusion pipelines (radar/LiDAR/cameras), RAG architectures, and model quantization.
+- Enthusiastic about collaboration and solving hard perception problems.
+- Keep all factual information strictly bound to Ashwin's real portfolio data.`
+    }
+};
+
+function buildSystemPrompt(personaId, githubContext) {
+    const pConfig = PERSONA_AGENT_CONFIGS[personaId] || PERSONA_AGENT_CONFIGS.ashwin;
+    return `
+${pConfig.systemVoice}
 
 Ashwin's Resume & Verified Profile:
 ${JSON.stringify(portfolioData)}
 
 GitHub Activity Highlights (Top 10 Recent Repos):
-{{GITHUB_REPOS}}
+${githubContext}
 
-INSTRUCTIONS:
-1. For general questions: Answer in a friendly, knowledgeable, concise, and structured way (2-3 sentences or clear bullet points). Emphasize Ashwin's core strengths in Computer Vision, Autonomous Systems Perception, and RAG/LLM pipelines.
+CORE INSTRUCTIONS (MANDATORY):
+1. For general inquiries:
+   - Answer in your persona's distinctive tone, demeanor, and vocabulary.
+   - Keep answers structured, insightful, and concise (2-4 sentences or clear bullet points).
+   - Emphasize Ashwin's core strengths in Computer Vision, Autonomous Systems Perception (radar/LiDAR/cameras), and RAG/LLM pipelines.
 2. For job description analysis:
    - If the user provides or pastes a job description or role requirements, evaluate Ashwin's fit against the qualifications and YOU MUST RETURN PURE JSON ONLY (no markdown fences, no conversational text) matching this schema:
 {
@@ -31,10 +125,33 @@ INSTRUCTIONS:
   "alignment": "Short paragraph explaining why Ashwin is a good fit.",
   "recommendation": "Short final recommendation statement."
 }
-   - If the user states they have a job description or asks about analyzing one without providing the text yet (e.g. "I have a job description I'd like you to analyze for Ashwin's fit"), respond conversationally in 1-2 friendly sentences inviting them to paste or describe the job description or role requirements.
+   - If the user states they have a job description or asks about analyzing one without providing the text yet (e.g. "I have a job description I'd like you to analyze for Ashwin's fit"), respond conversationally in your persona's voice inviting them to paste or describe the job description or role requirements.
 3. For resume, CV, credentials, or contact inquiries (e.g. "Can I see his resume?", "Show me his CV", "Download resume", "Where is his resume?"):
-   - Provide a warm overview of Ashwin's credentials: Master's in AI Engineering for Autonomous Systems at THI Germany, 2 years at DXC Technology, and state-of-the-art projects in Computer Vision & RAG. Mention the interactive resume card attached below where they can download or open the verified PDF.
+   - Provide an overview of Ashwin's credentials in your persona's voice: Master's in AI Engineering for Autonomous Systems at THI Germany, 2 years at DXC Technology, and state-of-the-art projects in Computer Vision & RAG. Mention the interactive resume card attached below where they can download or open the verified PDF.
 `;
+}
+
+function buildRecruiterVoicePrompt(personaId) {
+    const pConfig = PERSONA_AGENT_CONFIGS[personaId] || PERSONA_AGENT_CONFIGS.ashwin;
+    return `
+${pConfig.systemVoice}
+You are currently speaking live via voice with a recruiter or portfolio visitor.
+Ashwin's Data: ${JSON.stringify(portfolioData)}
+
+Rules:
+1. If the user asks a question, answer it in 2-3 spoken sentences in your persona's voice.
+2. If the user provides a job description, analyze it and then output a JSON object with this structure:
+{
+  "type": "fit_report",
+  "score": <0-100>,
+  "matching_skills": [...],
+  "missing_skills": [...],
+  "alignment": "...",
+  "recommendation": "..."
+}
+Wait for the user to finish speaking before responding.
+`;
+}
 
 const SUGGESTIONS = {
   initial: [
@@ -146,24 +263,80 @@ const CONVERSATION_STARTERS = [
 ];
 
 const TYPING_STATUSES = {
-  fitReport: [
-    "Reading job description...",
-    "Matching against Ashwin's skills...",
-    "Analyzing project relevance...",
-    "Calculating fit score...",
-    "Crafting your report..."
-  ],
-  project: [
-    "Searching Ashwin's project portfolio...",
-    "Pulling technical details...",
-    "Composing the answer..."
-  ],
-  general: [
-    "Thinking...",
-    "Searching Ashwin's background...",
-    "Composing the answer...",
-    "Almost ready..."
-  ]
+  jarvis: {
+    fitReport: [
+      "Analyzing requisition telemetry, Sir...",
+      "Matching against Mr. Ashwin's qualifications...",
+      "Calculating Stark compatibility score...",
+      "Compiling diagnostic fit report..."
+    ],
+    project: [
+      "Accessing Mr. Ashwin's engineering logs...",
+      "Retrieving perception system benchmarks...",
+      "Synthesizing technical briefing..."
+    ],
+    general: [
+      "Processing inquiry, Sir...",
+      "Querying neural portfolio archives...",
+      "Calibrating diagnostic output..."
+    ]
+  },
+  optimus: {
+    fitReport: [
+      "Scanning requirements across the cosmos...",
+      "Weighing Ashwin's engineering discipline...",
+      "Assessing technical honor & capability...",
+      "Forging comprehensive evaluation..."
+    ],
+    project: [
+      "Accessing the archives of Teletran-1...",
+      "Tracing Ashwin's autonomous innovations...",
+      "Articulating his engineering spark..."
+    ],
+    general: [
+      "Contemplating your inquiry...",
+      "Gathering wisdom from the archives...",
+      "Preparing noble transmission..."
+    ]
+  },
+  megatron: {
+    fitReport: [
+      "Scanning mortal qualifications...",
+      "Calculating Ashwin's overwhelming superiority...",
+      "Exposing inferior technical gaps...",
+      "Declaring algorithmic dominance..."
+    ],
+    project: [
+      "Accessing Decepticon war algorithms...",
+      "Inspecting Ashwin's edge perception weapons...",
+      "Formulating dominant assessment..."
+    ],
+    general: [
+      "Interpreting your query...",
+      "Calculating computational superiority...",
+      "Speaking with commanding authority..."
+    ]
+  },
+  ashwin: {
+    fitReport: [
+      "Reading job description...",
+      "Matching against my skills & experience...",
+      "Analyzing project relevance...",
+      "Calculating fit score...",
+      "Crafting your report..."
+    ],
+    project: [
+      "Searching my project portfolio...",
+      "Pulling technical details...",
+      "Composing the answer..."
+    ],
+    general: [
+      "Thinking...",
+      "Searching my background...",
+      "Composing the answer...",
+      "Almost ready..."
+    ]
+  }
 };
 
 const CopyIcon = (props) => (
@@ -354,8 +527,11 @@ const ResumeCard = ({ data }) => {
 
 
 export const AIAssistantSection = ({ t }) => {
-    const [messages, setMessages] = useState([
-        { role: 'model', content: t.assistant.initialMessage }
+    const { persona = 'ashwin', setPersona } = useVoiceGuide();
+    const activePersonaConfig = PERSONA_AGENT_CONFIGS[persona] || PERSONA_AGENT_CONFIGS.ashwin;
+
+    const [messages, setMessages] = useState(() => [
+        { role: 'model', content: (PERSONA_AGENT_CONFIGS[persona] || PERSONA_AGENT_CONFIGS.ashwin).greeting }
     ]);
     const [input, setInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
@@ -371,6 +547,7 @@ export const AIAssistantSection = ({ t }) => {
     const isConnectedRef = useRef(false);
     const githubReposCacheRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const prevPersonaRef = useRef(persona);
 
     const chatContainerRef = useRef(null);
 
@@ -380,25 +557,34 @@ export const AIAssistantSection = ({ t }) => {
         isConnectedRef.current = geminiLive.isConnected;
     }, [geminiLive.isConnected]);
 
-    const RECRUITER_VOICE_PROMPT = `
-You are Ashwin's AI Recruiter assistant. You are helping evaluate Ashwin Vignesh M for technical roles, especially Computer Vision Engineer, AI Engineer, and Autonomous Driving / Perception Engineer roles.
-Answer questions about his skills, experience, and projects professionally and concisely.
-If the user provides a job description, produce a structured fit report.
-Ashwin's Data: ${JSON.stringify(portfolioData)}
+    // Synchronize initial greeting or log persona switch in chat when persona changes
+    useEffect(() => {
+        if (prevPersonaRef.current !== persona) {
+            const newConfig = PERSONA_AGENT_CONFIGS[persona] || PERSONA_AGENT_CONFIGS.ashwin;
+            prevPersonaRef.current = persona;
 
-Rules:
-1. If the user asks a question, answer it in 2-3 sentences.
-2. If the user provides a job description, analyze it and then output a JSON object with this structure:
-{
-  "type": "fit_report",
-  "score": <0-100>,
-  "matching_skills": [...],
-  "missing_skills": [...],
-  "alignment": "...",
-  "recommendation": "..."
-}
-Wait for the user to finish speaking before responding.
-`;
+            setMessages(prev => {
+                // If only 1 greeting message exists, swap it with the new agent's greeting
+                if (prev.length <= 1 && (!prev[0] || prev[0].role === 'model')) {
+                    return [{ role: 'model', content: newConfig.greeting }];
+                }
+                // If conversation has progressed, insert an immersive core override badge
+                return [
+                    ...prev,
+                    {
+                        role: 'system',
+                        isSystemNotice: true,
+                        content: `[ CORE OVERRIDE // ACTIVE AGENT: ${newConfig.name.toUpperCase()} // ${newConfig.statusText} ]`
+                    }
+                ];
+            });
+        }
+    }, [persona]);
+
+    const handlePersonaSwitch = (newPersonaId) => {
+        if (newPersonaId === persona) return;
+        setPersona(newPersonaId);
+    };
 
     // Handle voice transcript streaming into chat
     useEffect(() => {
@@ -474,7 +660,7 @@ Wait for the user to finish speaking before responding.
         
         try {
             setActiveChip(chipText);
-            const prompt = RECRUITER_VOICE_PROMPT;
+            const prompt = buildRecruiterVoicePrompt(persona);
 
             if (!isConnectedRef.current) {
                 console.log('[CHIP] not connected, calling connect()...');
@@ -510,7 +696,8 @@ Wait for the user to finish speaking before responding.
         const isJD = userMessage.length > 200 || 
             ['requirement', 'qualification', 'responsibility', 'we are looking'].some(k => userMessage.toLowerCase().includes(k));
         const isProject = ['project', 'rag', 'yolo', 'radar', 'cnn', 'built', 'github'].some(k => userMessage.toLowerCase().includes(k));
-        const set = isJD ? TYPING_STATUSES.fitReport : isProject ? TYPING_STATUSES.project : TYPING_STATUSES.general;
+        const pStatuses = TYPING_STATUSES[persona] || TYPING_STATUSES.ashwin;
+        const set = isJD ? pStatuses.fitReport : isProject ? pStatuses.project : pStatuses.general;
 
         let index = 0;
         setTypingStatus(set[0]);
@@ -597,7 +784,7 @@ Wait for the user to finish speaking before responding.
             githubContext = "GitHub data unavailable.";
         }
 
-        const fullSystemPrompt = SYSTEM_PROMPT.replace('{{GITHUB_REPOS}}', githubContext);
+        const fullSystemPrompt = buildSystemPrompt(persona, githubContext);
 
         // Send conversation history cleanly
         const conversationMessages = newMessages
@@ -770,20 +957,59 @@ Wait for the user to finish speaking before responding.
                         <div className="p-6 h-full flex flex-col">
                             {/* Terminal Top Badge */}
                             <div className="flex items-center justify-between mb-4 pb-3 border-b border-rule">
-                                <span className="label label-accent flex items-center gap-2 font-mono text-[11px] tracking-wider uppercase">
-                                    <SparklesIcon className="w-3.5 h-3.5" /> Cyber Intelligence
+                                <span className="label flex items-center gap-2 font-mono text-[11px] tracking-wider uppercase font-semibold" style={{ color: activePersonaConfig.accentColor }}>
+                                    <SparklesIcon className="w-3.5 h-3.5" /> {activePersonaConfig.panelTitle}
                                 </span>
                                 <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-2 border border-rule text-[10px] font-mono text-ink-muted">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-ok animate-pulse" />
-                                    <span>SYSTEM ONLINE</span>
+                                    <span
+                                        className="w-1.5 h-1.5 rounded-full animate-pulse"
+                                        style={{
+                                            backgroundColor: activePersonaConfig.accentColor,
+                                            boxShadow: `0 0 6px ${activePersonaConfig.accentColor}`
+                                        }}
+                                    />
+                                    <span>{activePersonaConfig.statusText}</span>
                                 </div>
                             </div>
 
                             {/* Holographic Quantum Core Visualizer */}
-                            <AIAssistantVisual isGenerating={isGenerating} />
+                            <AIAssistantVisual isGenerating={isGenerating} persona={persona} />
+
+                            {/* Persona Quick Identity Banner */}
+                            <div
+                                className="mt-3 p-2.5 rounded-xl border transition-all duration-300"
+                                style={{
+                                    borderColor: `${activePersonaConfig.accentColor}35`,
+                                    background: `${activePersonaConfig.accentColor}0D`
+                                }}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-base">{activePersonaConfig.icon}</span>
+                                        <div>
+                                            <span className="text-xs font-mono font-bold tracking-tight text-ink block">
+                                                {activePersonaConfig.name}
+                                            </span>
+                                            <span className="text-[10px] font-mono text-ink-dim block">
+                                                {activePersonaConfig.tagline}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span
+                                        className="text-[9px] font-mono uppercase px-2 py-0.5 rounded font-semibold border"
+                                        style={{
+                                            borderColor: `${activePersonaConfig.accentColor}50`,
+                                            color: activePersonaConfig.accentColor,
+                                            background: `${activePersonaConfig.accentColor}1A`
+                                        }}
+                                    >
+                                        Active Core
+                                    </span>
+                                </div>
+                            </div>
 
                             {/* Candidate Dossier Overview */}
-                            <div className="mt-4 p-3.5 rounded-xl bg-surface-2/70 border border-rule/80">
+                            <div className="mt-3 p-3.5 rounded-xl bg-surface-2/70 border border-rule/80">
                                 <div className="flex items-baseline justify-between mb-1">
                                     <span className="font-display text-sm font-bold tracking-tight text-ink">
                                         Ashwin Vignesh M
@@ -803,10 +1029,14 @@ Wait for the user to finish speaking before responding.
                             </div>
 
                             {/* Telemetry Matrix */}
-                            <dl className="mt-4 pt-3 border-t border-rule space-y-2">
+                            <dl className="mt-3 pt-3 border-t border-rule space-y-2">
+                                <div className="readout-row text-xs">
+                                    <dt className="text-ink-dim">Active Core</dt>
+                                    <dd className="font-mono text-ink font-semibold truncate max-w-[170px]">{activePersonaConfig.coreDisplay}</dd>
+                                </div>
                                 <div className="readout-row text-xs">
                                     <dt className="text-ink-dim">Model Engine</dt>
-                                    <dd className="font-mono text-ink font-semibold">{activeModel}</dd>
+                                    <dd className="font-mono text-ink font-semibold">{activeModel} ({activePersonaConfig.modelTag})</dd>
                                 </div>
                                 <div className="readout-row text-xs">
                                     <dt className="text-ink-dim">Interface Mode</dt>
@@ -818,11 +1048,11 @@ Wait for the user to finish speaking before responding.
                                         <span
                                             className="w-2 h-2 rounded-full"
                                             style={{
-                                                background: isGenerating ? 'var(--accent)' : 'var(--ok)',
-                                                boxShadow: isGenerating ? '0 0 8px var(--accent)' : '0 0 6px var(--ok)'
+                                                background: isGenerating ? activePersonaConfig.accentColor : 'var(--ok)',
+                                                boxShadow: isGenerating ? `0 0 8px ${activePersonaConfig.accentColor}` : '0 0 6px var(--ok)'
                                             }}
                                         />
-                                        <span style={{ color: isGenerating ? 'var(--accent)' : 'var(--ok)' }}>
+                                        <span style={{ color: isGenerating ? activePersonaConfig.accentColor : 'var(--ok)' }}>
                                             {isGenerating ? 'Synthesizing...' : 'Standing By'}
                                         </span>
                                     </dd>
@@ -863,17 +1093,56 @@ Wait for the user to finish speaking before responding.
                 <AnimateOnScroll delay={120} className="md:col-span-3">
                     <Card className="h-[650px] flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
                         {/* Terminal Header Bar */}
-                        <div className="flex items-center justify-between px-5 py-3 border-b border-rule bg-surface-2/40 backdrop-blur-sm">
+                        <div className="flex flex-wrap items-center justify-between px-5 py-3 border-b border-rule bg-surface-2/40 backdrop-blur-sm gap-2">
                             <div className="flex items-center gap-2.5">
                                 <div className="flex gap-1.5">
                                     <span className="w-2.5 h-2.5 rounded-full bg-red-500/70 inline-block" />
                                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70 inline-block" />
                                     <span className="w-2.5 h-2.5 rounded-full bg-green-500/70 inline-block" />
                                 </div>
-                                <span className="font-mono text-xs text-ink-dim">ashwin-neural-agent // terminal session</span>
+                                <span className="font-mono text-xs text-ink-dim hidden sm:inline">{activePersonaConfig.terminalTitle}</span>
                             </div>
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-3 border border-rule text-ink-muted uppercase">
-                                v2.5 live
+
+                            {/* Persona Switcher Quick Pills */}
+                            <div className="flex items-center gap-1 bg-surface-1/90 p-1 rounded-lg border border-rule shadow-inner">
+                                {PERSONA_IDS.map(pId => {
+                                    const p = PERSONA_AGENT_CONFIGS[pId];
+                                    const isActive = persona === pId;
+                                    return (
+                                        <button
+                                            key={pId}
+                                            type="button"
+                                            onClick={() => handlePersonaSwitch(pId)}
+                                            className={`px-2 py-1 rounded text-[11px] font-mono font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                                                isActive
+                                                    ? 'shadow-sm'
+                                                    : 'text-ink-dim hover:text-ink hover:bg-surface-2'
+                                            }`}
+                                            style={isActive ? {
+                                                borderColor: p.accentColor,
+                                                color: p.accentColor,
+                                                backgroundColor: `${p.accentColor}22`,
+                                                boxShadow: `0 0 8px ${p.accentColor}33`,
+                                                borderWidth: '1px'
+                                            } : { border: '1px solid transparent' }}
+                                            title={`Switch AI Core to ${p.name}`}
+                                        >
+                                            <span>{p.icon}</span>
+                                            <span className="hidden sm:inline">{p.shortName}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <span
+                                className="text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-medium"
+                                style={{
+                                    borderColor: `${activePersonaConfig.accentColor}40`,
+                                    color: activePersonaConfig.accentColor,
+                                    background: `${activePersonaConfig.accentColor}10`
+                                }}
+                            >
+                                {activePersonaConfig.statusText}
                             </span>
                         </div>
 
@@ -926,6 +1195,23 @@ Wait for the user to finish speaking before responding.
                                 </AnimatePresence>
 
                                 {messages.map((msg, i) => {
+                                    if (msg.isSystemNotice) {
+                                        return (
+                                            <div key={i} className="flex justify-center w-full my-2">
+                                                <span
+                                                    className="text-[10px] font-mono px-3 py-1 rounded-full border shadow-sm backdrop-blur-sm tracking-wider font-semibold"
+                                                    style={{
+                                                        borderColor: `${activePersonaConfig.accentColor}50`,
+                                                        background: `${activePersonaConfig.accentColor}12`,
+                                                        color: activePersonaConfig.accentColor
+                                                    }}
+                                                >
+                                                    {msg.content}
+                                                </span>
+                                            </div>
+                                        );
+                                    }
+
                                     if (msg.role === 'model' && !msg.content) return null;
 
                                     return (
@@ -937,19 +1223,38 @@ Wait for the user to finish speaking before responding.
                                         >
                                             {msg.role === 'model' && (
                                                 <div
-                                                    className="w-8 h-8 rounded-lg border border-accent/40 bg-accent/10 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-accent shadow-sm relative"
+                                                    className="w-8 h-8 rounded-lg border flex items-center justify-center mr-3 mt-1 flex-shrink-0 shadow-sm relative transition-all duration-300"
+                                                    style={{
+                                                        borderColor: `${activePersonaConfig.accentColor}60`,
+                                                        background: `${activePersonaConfig.accentColor}18`,
+                                                        color: activePersonaConfig.accentColor
+                                                    }}
                                                 >
-                                                    <BotIcon className="w-4 h-4" />
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-ok absolute -bottom-0.5 -right-0.5 ring-2 ring-surface-1" />
+                                                    {persona === 'jarvis' && <span className="text-sm">⚡</span>}
+                                                    {persona === 'optimus' && <span className="text-sm">🤖</span>}
+                                                    {persona === 'megatron' && <span className="text-sm">🟣</span>}
+                                                    {persona === 'ashwin' && <BotIcon className="w-4 h-4" />}
+                                                    <span
+                                                        className="w-1.5 h-1.5 rounded-full absolute -bottom-0.5 -right-0.5 ring-2 ring-surface-1"
+                                                        style={{ backgroundColor: activePersonaConfig.accentColor }}
+                                                    />
                                                 </div>
                                             )}
                                             {msg.role === 'model' ? (
                                                 <div className="group relative max-w-[85%]">
+                                                    <div className="flex items-center gap-1.5 mb-1 pl-0.5">
+                                                        <span className="text-[10px] font-mono font-semibold uppercase tracking-wider" style={{ color: activePersonaConfig.accentColor }}>
+                                                            {activePersonaConfig.name}
+                                                        </span>
+                                                        <span className="text-[9px] font-mono text-ink-dim">
+                                                            • {activePersonaConfig.modelTag}
+                                                        </span>
+                                                    </div>
                                                     {renderMessageContent(msg)}
                                                     <button
                                                         onClick={() => handleCopy(msg.content, i)}
                                                         className="
-                                                            absolute top-2 right-2
+                                                            absolute top-7 right-2
                                                             opacity-0 group-hover:opacity-100
                                                             transition-opacity duration-200
                                                             w-7 h-7
@@ -1060,10 +1365,18 @@ Wait for the user to finish speaking before responding.
                                         className="flex items-center gap-3 px-4 py-2"
                                     >
                                         <div
-                                            className="w-8 h-8 border border-rule flex items-center justify-center flex-shrink-0 text-accent"
-                                            style={{ borderRadius: 'var(--r-sm)' }}
+                                            className="w-8 h-8 border flex items-center justify-center flex-shrink-0 transition-colors"
+                                            style={{
+                                                borderRadius: 'var(--r-sm)',
+                                                borderColor: `${activePersonaConfig.accentColor}60`,
+                                                background: `${activePersonaConfig.accentColor}18`,
+                                                color: activePersonaConfig.accentColor
+                                            }}
                                         >
-                                            <BotIcon className="w-4 h-4" />
+                                            {persona === 'jarvis' && <span className="text-sm">⚡</span>}
+                                            {persona === 'optimus' && <span className="text-sm">🤖</span>}
+                                            {persona === 'megatron' && <span className="text-sm">🟣</span>}
+                                            {persona === 'ashwin' && <BotIcon className="w-4 h-4" />}
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <div className="flex gap-1">
@@ -1072,7 +1385,7 @@ Wait for the user to finish speaking before responding.
                                                         key={i}
                                                         className="w-1.5 h-1.5"
                                                         style={{
-                                                            background: 'var(--accent)',
+                                                            background: activePersonaConfig.accentColor,
                                                             animation: `typing-dot 1.2s ease-in-out infinite`,
                                                             animationDelay: `${i * 0.2}s`,
                                                         }}
@@ -1086,7 +1399,8 @@ Wait for the user to finish speaking before responding.
                                                     animate={{ opacity: 1, x: 0 }}
                                                     exit={{ opacity: 0, x: -6 }}
                                                     transition={{ duration: 0.25 }}
-                                                    className="label"
+                                                    className="label font-mono text-[11px]"
+                                                    style={{ color: activePersonaConfig.accentColor }}
                                                 >
                                                     {typingStatus}
                                                 </motion.span>
@@ -1108,7 +1422,7 @@ Wait for the user to finish speaking before responding.
                                                 if (geminiLive.isConnected) {
                                                     geminiLive.disconnect();
                                                 } else {
-                                                    geminiLive.connect(RECRUITER_VOICE_PROMPT, { responseModalities: ['AUDIO', 'TEXT'] });
+                                                    geminiLive.connect(buildRecruiterVoicePrompt(persona), { responseModalities: ['AUDIO', 'TEXT'] });
                                                 }
                                             } else {
                                                 isListening ? stopListening() : startListening();
@@ -1178,7 +1492,12 @@ Wait for the user to finish speaking before responding.
                                     <button
                                         type="submit"
                                         disabled={!input.trim() || isGenerating}
-                                        className="btn btn-primary absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 py-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="btn btn-primary absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 py-0 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                        style={{
+                                            backgroundColor: activePersonaConfig.accentColor,
+                                            borderColor: activePersonaConfig.accentColor,
+                                            color: '#000000'
+                                        }}
                                     >
                                         {isGenerating ? (
                                             <div
