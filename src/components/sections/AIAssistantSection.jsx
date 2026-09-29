@@ -5,7 +5,7 @@ import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import AIAssistantVisual from '../visuals/AIAssistantVisual';
 import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon } from '../../icons/Icons';
-import { streamGeminiResponse, getApiKey } from '../../geminiEmbed';
+import { streamGeminiResponse, getApiKey, formatModelDisplayName } from '../../geminiEmbed';
 import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,10 +20,9 @@ GitHub Activity Highlights (Top 10 Recent Repos):
 {{GITHUB_REPOS}}
 
 INSTRUCTIONS:
-1. For general questions: Answer in a friendly, professional, and concise way (2-3 sentences). Highlight Ashwin's skills and projects.
-2. For job description analysis: If the user pastes a job description or asks about fit, YOU MUST RETURN PURE JSON. NEVER return markdown or conversational text for fit analysis.
-
-JSON structure for fit analysis:
+1. For general questions: Answer in a friendly, professional, and concise way (2-3 sentences). Highlight Ashwin's skills, autonomous systems projects, and real-world experience.
+2. For job description analysis:
+   - If the user provides or pastes a job description or role requirements, evaluate Ashwin's fit against the qualifications and YOU MUST RETURN PURE JSON ONLY (no markdown fences, no conversational text) matching this schema:
 {
   "type": "fit_report",
   "score": <0-100 number>,
@@ -32,6 +31,7 @@ JSON structure for fit analysis:
   "alignment": "Short paragraph explaining why Ashwin is a good fit.",
   "recommendation": "Short final recommendation statement."
 }
+   - If the user states they have a job description or asks about analyzing one without providing the text yet (e.g. "I have a job description I'd like you to analyze for Ashwin's fit"), respond conversationally in 1-2 friendly sentences inviting them to paste or describe the job description or role requirements.
 `;
 
 const SUGGESTIONS = {
@@ -258,7 +258,9 @@ export const AIAssistantSection = ({ t }) => {
     const [voiceError, setVoiceError] = useState('');
     const [isVoiceMode, setIsVoiceMode] = useState(false);
     const [activeChip, setActiveChip] = useState(null);
+    const [activeModel, setActiveModel] = useState('Gemini 2.5 Flash');
     const isConnectedRef = useRef(false);
+    const githubReposCacheRef = useRef(null);
     const messagesEndRef = useRef(null);
 
     const chatContainerRef = useRef(null);
@@ -468,29 +470,34 @@ Wait for the user to finish speaking before responding.
         setMessages(newMessages);
         setIsGenerating(true);
 
-        // Fetch GitHub repos
-        let githubContext = "GitHub data unavailable.";
-        try {
-            const githubRes = await fetch('https://api.github.com/users/Ashwin-AIAS/repos?sort=updated&per_page=10');
-            if (githubRes.ok) {
-                const repos = await githubRes.json();
-                githubContext = repos.map(r => `- ${r.name}: ${r.description || 'No description'} (Language: ${r.language || 'N/A'})`).join('\n');
+        // Fetch GitHub repos (cached across conversation to avoid rate limits and latency)
+        let githubContext = githubReposCacheRef.current;
+        if (!githubContext) {
+            try {
+                const githubRes = await fetch('https://api.github.com/users/Ashwin-AIAS/repos?sort=updated&per_page=10');
+                if (githubRes.ok) {
+                    const repos = await githubRes.json();
+                    githubContext = repos.map(r => `- ${r.name}: ${r.description || 'No description'} (Language: ${r.language || 'N/A'})`).join('\n');
+                    githubReposCacheRef.current = githubContext;
+                }
+            } catch (err) {
+                console.error("GitHub fetch error:", err);
             }
-        } catch (err) {
-            console.error("GitHub fetch error:", err);
+        }
+        if (!githubContext) {
+            githubContext = "GitHub data unavailable.";
         }
 
         const fullSystemPrompt = SYSTEM_PROMPT.replace('{{GITHUB_REPOS}}', githubContext);
 
-        const apiMessages = [
-            { role: 'user', content: fullSystemPrompt },
-            { role: 'model', content: "Understood. I am ready." },
-            ...newMessages.slice(0, -1).map(m => ({ role: m.role, content: m.content }))
-        ];
+        // Send conversation history cleanly
+        const conversationMessages = newMessages
+            .slice(0, -1)
+            .map(m => ({ role: m.role, content: m.content }));
 
         try {
             await streamGeminiResponse(
-                apiMessages,
+                conversationMessages,
                 (chunk) => {
                     setMessages(prev => {
                         const updated = [...prev];
@@ -503,7 +510,10 @@ Wait for the user to finish speaking before responding.
                         }
                     }, 0);
                 },
-                (finalText) => {
+                (finalText, usedModel) => {
+                    if (usedModel) {
+                        setActiveModel(formatModelDisplayName(usedModel));
+                    }
                     setMessages(prev => {
                         const updated = [...prev];
                         updated[updated.length - 1].content = finalText;
@@ -528,11 +538,14 @@ Wait for the user to finish speaking before responding.
                     console.error("Gemini Error:", err);
                     setMessages(prev => {
                         const updated = [...prev];
-                        updated[updated.length - 1].content = "Sorry, I encountered an error connecting to my core processor.";
+                        updated[updated.length - 1].content = "Sorry, I encountered an error connecting to my core processor. Please check your network connection and try again.";
                         return updated;
                     });
                     setIsGenerating(false);
                     stopTypingStatus();
+                },
+                {
+                    systemInstruction: fullSystemPrompt
                 }
             );
         } catch (error) {
@@ -647,7 +660,7 @@ Wait for the user to finish speaking before responding.
                                 </div>
                                 <div className="readout-row">
                                     <dt>Model</dt>
-                                    <dd>Gemini 3.8 Flash</dd>
+                                    <dd>{activeModel}</dd>
                                 </div>
                             </dl>
                         </div>
