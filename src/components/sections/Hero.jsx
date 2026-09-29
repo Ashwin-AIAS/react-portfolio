@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
 import { LidarSweep } from '../ui/LidarSweep';
-import { DownloadIcon, GitHubIcon, LinkedInIcon } from '../../icons/Icons';
+import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
 
 export const Hero = ({ t }) => {
-    const [isResumeOpen, setIsResumeOpen] = useState(false);
-    const resumePreviewUrl = portfolioData.personalInfo.resumeUrl.replace('/view', '/preview');
+    const voice = useVoiceGuide();
 
     const roles = [
         t.hero.badge.toUpperCase(),
-        "COMPUTER VISION ENGINEER",
-        "AUTONOMOUS DRIVING & PERCEPTION",
-        "LLM & RAG SYSTEMS BUILDER",
-        "MASTER'S STUDENT @ THI GERMANY",
+        "COMPUTER VISION & PERCEPTION ENGINEER",
+        "AUTONOMOUS DRIVING & SENSOR FUSION",
+        "MULTIMODAL & GRAPH RAG ARCHITECT",
+        "EDGE PYTORCH & C++ HPC INFERENCE",
     ];
     const [roleIndex, setRoleIndex] = useState(0);
     const [displayText, setDisplayText] = useState('');
@@ -50,14 +49,7 @@ export const Hero = ({ t }) => {
         return () => clearTimeout(timeout);
     }, [roleIndex]);
 
-    useEffect(() => {
-        const handleEsc = (e) => { if (e.key === 'Escape') setIsResumeOpen(false); };
-        if (isResumeOpen) window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
-    }, [isResumeOpen]);
-
     return (
-        <>
         <section id="hero" data-narrate="hero" className="relative min-h-screen flex items-center px-6 py-28 overflow-hidden" style={{ backgroundColor: 'var(--bg)' }}>
             {/* Single background layer. The LiDAR sweep is the only one with
                 actual shape — the three blue blurs it used to compete with
@@ -87,46 +79,147 @@ export const Hero = ({ t }) => {
                             {t.hero.greeting} Ashwin
                         </h1>
 
-                        <p className="text-base md:text-lg text-ink-muted font-light leading-relaxed max-w-xl mb-9">
+                        <p className="text-base md:text-lg text-ink-muted font-light leading-relaxed max-w-xl mb-7">
                             {t.hero.bio}
                         </p>
 
-                        {/* Instrument readout — also the only place the site
-                            states availability and location outright. */}
-                        <dl className="max-w-md mb-10 border-t border-rule">
-                            <div className="readout-row">
-                                <dt>Status</dt>
-                                <dd className="flex items-center gap-2">
-                                    <span className="status-dot" />
-                                    Available &middot; {portfolioData.personalInfo.location}
-                                </dd>
-                            </div>
-                            <div className="readout-row">
-                                <dt>Focus</dt>
-                                <dd>Perception &middot; LLM Systems</dd>
-                            </div>
-                            <div className="readout-row">
-                                <dt>Degree</dt>
-                                <dd>MSc AI Engineering &middot; THI</dd>
-                            </div>
-                        </dl>
+                        {/* Autonomous Cockpit Telemetry HUD — Real-time engineering benchmarks */}
+                        <div className="max-w-xl mb-7 p-4 rounded-2xl bg-surface-1/90 border border-rule/90 shadow-lg backdrop-blur-md relative overflow-hidden">
+                            {/* Ambient accent glow */}
+                            <div className="absolute top-0 right-0 w-36 h-20 bg-accent/10 blur-xl pointer-events-none" />
 
-                        <div className="flex flex-wrap gap-4 items-center">
-                            <a href="#projects" className="btn btn-primary">
-                                {t.hero.viewProjects}
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                            </a>
-                            <button onClick={() => setIsResumeOpen(true)} className="btn btn-secondary">
-                                <DownloadIcon className="w-4 h-4" /> {t.hero.downloadCv}
-                            </button>
-                            <div className="flex items-center gap-2">
-                                <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="w-10 h-10 rounded border border-rule flex items-center justify-center text-ink-muted hover:text-accent hover:border-accent transition-colors">
-                                    <GitHubIcon className="w-4 h-4" />
-                                </a>
-                                <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-10 h-10 rounded border border-rule flex items-center justify-center text-ink-muted hover:text-accent hover:border-accent transition-colors">
-                                    <LinkedInIcon className="w-4 h-4" />
-                                </a>
+                            {/* HUD Header Bar */}
+                            <div className="flex items-center justify-between pb-3 mb-3 border-b border-rule text-[11px] font-mono">
+                                <div className="flex items-center gap-2 text-ink-dim">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                                    <span className="tracking-wider uppercase font-semibold text-accent">Perception Telemetry</span>
+                                    <span className="text-rule-strong">/</span>
+                                    <span className="hidden sm:inline text-ink-muted">Edge Perception Pipeline</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-2 border border-rule text-[10px] text-ok font-mono font-medium">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-ok animate-pulse" />
+                                    <span>SUB-16MS LIVE</span>
+                                </div>
                             </div>
+
+                            {/* Telemetry Metrics 4-Card Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                {/* Metric 1: Real-time Latency */}
+                                <div className="p-2.5 rounded-xl bg-surface-2/70 border border-rule/70 hover:border-accent/40 transition-colors group">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-[10px] font-mono uppercase tracking-wider text-ink-dim">Latency</span>
+                                        <span className="text-[9px] font-mono text-ok font-semibold">● 60+ FPS</span>
+                                    </div>
+                                    <div className="font-mono text-sm sm:text-base font-bold text-ink group-hover:text-accent transition-colors leading-none mb-1">
+                                        &lt;16 ms
+                                    </div>
+                                    <span className="text-[10px] text-ink-muted block leading-tight">
+                                        YOLO26 Real-Time
+                                    </span>
+                                </div>
+
+                                {/* Metric 2: Multi-Modal Sensor Fusion */}
+                                <div className="p-2.5 rounded-xl bg-surface-2/70 border border-rule/70 hover:border-accent/40 transition-colors group">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-[10px] font-mono uppercase tracking-wider text-ink-dim">Sensors</span>
+                                        <span className="text-[9px] font-mono text-accent font-semibold">● Fusion</span>
+                                    </div>
+                                    <div className="font-mono text-sm sm:text-base font-bold text-ink group-hover:text-accent transition-colors leading-none mb-1">
+                                        3 Modes
+                                    </div>
+                                    <span className="text-[10px] text-ink-muted block leading-tight">
+                                        Radar • LiDAR • Vision
+                                    </span>
+                                </div>
+
+                                {/* Metric 3: Edge Quantization & HPC */}
+                                <div className="p-2.5 rounded-xl bg-surface-2/70 border border-rule/70 hover:border-accent/40 transition-colors group">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-[10px] font-mono uppercase tracking-wider text-ink-dim">Runtime</span>
+                                        <span className="text-[9px] font-mono text-purple-400 font-semibold">● C++ Int8</span>
+                                    </div>
+                                    <div className="font-mono text-sm sm:text-base font-bold text-ink group-hover:text-accent transition-colors leading-none mb-1">
+                                        Edge HPC
+                                    </div>
+                                    <span className="text-[10px] text-ink-muted block leading-tight">
+                                        Quantized Engine
+                                    </span>
+                                </div>
+
+                                {/* Metric 4: Vision-Augmented RAG */}
+                                <div className="p-2.5 rounded-xl bg-surface-2/70 border border-rule/70 hover:border-accent/40 transition-colors group">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-[10px] font-mono uppercase tracking-wider text-ink-dim">Agentic AI</span>
+                                        <span className="text-[9px] font-mono text-cyan-400 font-semibold">● Hybrid</span>
+                                    </div>
+                                    <div className="font-mono text-sm sm:text-base font-bold text-ink group-hover:text-accent transition-colors leading-none mb-1">
+                                        Vision-RAG
+                                    </div>
+                                    <span className="text-[10px] text-ink-muted block leading-tight">
+                                        Multimodal Vectors
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Telemetry Bus & Real-time Scanline Waveform */}
+                            <div className="mt-3 pt-2.5 border-t border-rule/60 flex items-center justify-between text-[10px] font-mono text-ink-dim">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-ink-muted">Telemetry Bus:</span>
+                                    <span className="text-ink font-medium">PyTorch &bull; ROS &bull; TensorRT &bull; FastAPI</span>
+                                </div>
+                                <div className="hidden sm:flex items-center gap-1">
+                                    {[0.4, 0.8, 0.5, 1, 0.6, 0.9, 0.3, 0.7, 0.5].map((h, i) => (
+                                        <motion.span
+                                            key={i}
+                                            animate={{ height: [`${h * 6}px`, `${h * 13}px`, `${h * 6}px`] }}
+                                            transition={{ duration: 1.2 + (i % 3) * 0.3, repeat: Infinity, ease: 'easeInOut' }}
+                                            className="w-1 bg-accent/60 rounded-full inline-block"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Interactive Action Deck — Direct navigation to interactive features */}
+                        <div className="flex flex-wrap gap-3.5 items-center">
+                            <a href="#projects" className="btn btn-primary group shadow-md hover:shadow-accent/20 cursor-pointer">
+                                <span>{t.hero.viewProjects}</span>
+                                <svg className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </a>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (voice.enabled) {
+                                        voice.toggle();
+                                    } else {
+                                        voice.enable();
+                                    }
+                                }}
+                                className={`btn btn-secondary cursor-pointer flex items-center gap-2 transition-all ${
+                                    voice.enabled ? 'border-accent text-accent' : ''
+                                }`}
+                                title="Start interactive voice tour"
+                            >
+                                <span className="text-sm">{voice.enabled ? '🔊' : '🎙️'}</span>
+                                <span>{voice.enabled ? (voice.isSpeaking ? 'Mute Voice Tour' : t.hero.audioTourActive || 'Audio Tour Active') : (t.hero.startAudioTour || 'Start Audio Tour')}</span>
+                            </button>
+
+                            <a
+                                href="#assistant"
+                                className="inline-flex items-center gap-2 text-xs font-mono font-medium py-2.5 px-3.5 rounded-lg bg-surface-2 hover:bg-surface-3 text-ink-muted hover:text-accent border border-rule hover:border-accent/40 transition-all cursor-pointer shadow-sm"
+                            >
+                                <span>🤖</span>
+                                <span>{t.hero.askAssistant || 'Ask AI Assistant'}</span>
+                            </a>
+                        </div>
+
+                        {/* Live Candidate Status Pill */}
+                        <div className="flex items-center gap-2 mt-4 text-[11px] font-mono text-ink-muted">
+                            <span className="w-2 h-2 rounded-full bg-ok animate-pulse" />
+                            <span>Available for <strong>Computer Vision & Autonomous Systems</strong> roles &middot; Ingolstadt, Germany / Remote</span>
                         </div>
                     </div>
 
@@ -150,47 +243,7 @@ export const Hero = ({ t }) => {
                 </div>
             </div>
         </section>
-
-        <AnimatePresence>
-            {isResumeOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
-                    style={{ background: 'rgba(0,0,0,0.72)' }}
-                    onClick={() => setIsResumeOpen(false)}
-                >
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        className="panel relative w-full max-w-4xl h-[85vh] overflow-hidden flex flex-col"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setIsResumeOpen(false)}
-                            aria-label="Close resume preview"
-                            className="absolute top-3 right-3 z-10 w-8 h-8 rounded border border-rule bg-surface-2 flex items-center justify-center text-ink-muted hover:text-accent hover:border-accent transition-colors text-sm"
-                        >✕</button>
-                        <iframe
-                            src={resumePreviewUrl}
-                            title="Resume Preview"
-                            className="w-full flex-grow border-0"
-                            allow="autoplay"
-                        />
-                        <div className="p-4 border-t border-rule flex justify-center">
-                            <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary px-6 py-2.5">
-                                <DownloadIcon className="w-4 h-4" /> {t.hero.downloadCv}
-                            </a>
-                        </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-        </>
     );
 };
+
 
