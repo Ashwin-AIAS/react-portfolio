@@ -55,8 +55,10 @@ export const LidarSweep = () => {
 
         const resize = () => {
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const rect = canvas.parentElement.getBoundingClientRect();
-            w = rect.width; h = rect.height;
+            // Layout size, not getBoundingClientRect: the hero scales this
+            // field on scroll, and a resize mid-dolly must not bake that in.
+            const parent = canvas.parentElement;
+            w = parent.clientWidth; h = parent.clientHeight;
             canvas.width = w * dpr; canvas.height = h * dpr;
             canvas.style.width = `${w}px`; canvas.style.height = `${h}px`;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

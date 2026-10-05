@@ -17,7 +17,10 @@ export const translations = {
       getInTouch: "Get in Touch",
       startAudioTour: "Start Audio Tour",
       audioTourActive: "Audio Tour Active",
-      askAssistant: "Ask AI Assistant"
+      askAssistant: "Ask AI Assistant",
+      statement: "I teach machines to see.",
+      statementSub: "Perception, sensor fusion and LLM systems for vehicles that drive themselves.",
+      scrollCue: "Scroll"
     },
     roadmap: {
       title: "Career Roadmap",
@@ -106,7 +109,10 @@ export const translations = {
       getInTouch: "Kontakt aufnehmen",
       startAudioTour: "Audio-Tour starten",
       audioTourActive: "Audio-Tour aktiv",
-      askAssistant: "KI-Assistent fragen"
+      askAssistant: "KI-Assistent fragen",
+      statement: "Ich bringe Maschinen das Sehen bei.",
+      statementSub: "Perception, Sensorfusion und LLM-Systeme für Fahrzeuge, die selbst fahren.",
+      scrollCue: "Scrollen"
     },
     roadmap: {
       title: "Werdegang",

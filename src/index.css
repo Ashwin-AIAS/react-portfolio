@@ -1009,6 +1009,47 @@
 .theme-light .ambient-grain { opacity: 0.035; }
 
 /* ===================================================================
+   HERO SCROLL CUE — a hairline that keeps draining downward.
+   =================================================================== */
+.hero-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 2rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero-cue-line {
+  position: relative;
+  width: 1px;
+  height: 3rem;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.hero-cue-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, var(--accent));
+  transform: translateY(-100%);
+  animation: hero-cue-drain 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes hero-cue-drain {
+  to { transform: translateY(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cue-line::after { animation: none; transform: none; }
+}
+
+/* ===================================================================
    MIGRATION SHIM
    Every section and UI component now uses semantic classes, so what is
    left here covers only src/components/visuals/* — the twelve animated
