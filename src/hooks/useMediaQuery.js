@@ -34,7 +34,8 @@ export const usePrefersReducedMotion = () =>
 
 /**
  * True where a pinned (sticky, one-viewport) scene has room to breathe.
- * Kept in one place so the hero and the project stack agree on the cut-off.
+ * Kept in one place so every pinned scene shares the same rule (and the
+ * reduced-motion opt-out); a scene with bigger content passes a larger size.
  */
 export const useCanPin = (minWidth = 768, minHeight = 640) => {
     const fits = useMediaQuery(`(min-width: ${minWidth}px) and (min-height: ${minHeight}px)`);

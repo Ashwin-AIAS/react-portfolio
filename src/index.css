@@ -1121,6 +1121,67 @@
 }
 
 /* ===================================================================
+   FEATURED PROJECT STACK — see FeaturedStack in ProjectsSection.jsx.
+   Each slot is one viewport tall and sticks; later slots slide over
+   earlier ones. Nothing may set overflow on .showcase-stack or its
+   ancestors, or the sticky slots stop sticking.
+   =================================================================== */
+.showcase-slot {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.showcase-frame {
+  position: relative;
+  transform-origin: 50% 0%;
+  will-change: transform;
+}
+
+.showcase-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  height: 100%;
+  overflow: hidden;
+  background: var(--surface-1);
+  box-shadow: 0 -24px 60px -30px color-mix(in srgb, var(--bg) 80%, transparent);
+}
+
+.showcase-media {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--rule);
+  background: var(--surface-2);
+}
+
+/* The portrait demo clip letterboxes into the whole column. */
+.showcase-media .demo-video-frame {
+  aspect-ratio: auto;
+  height: 100%;
+  margin: 0;
+  border: 0;
+}
+
+.showcase-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 1.75rem;
+  overflow-y: auto;
+}
+
+/* Recession dims with the page colour, so it reads as distance in every
+   palette and in light mode alike. */
+.showcase-dim {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ===================================================================
    MIGRATION SHIM
    Every section and UI component now uses semantic classes, so what is
    left here covers only src/components/visuals/* — the twelve animated

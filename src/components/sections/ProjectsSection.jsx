@@ -1,10 +1,11 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { useInView, motion, AnimatePresence } from 'framer-motion';
+import { useInView, motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import { ExternalLinkIcon, GitHubIcon, PlayIcon } from '../../icons/Icons';
+import { useCanPin } from '../../hooks/useMediaQuery';
 
 // Lazy load visual components
 const VisualComponents = {
@@ -25,15 +26,18 @@ const VisualComponents = {
 // Media slot: a real screenshot when the project has one, otherwise the
 // existing animated visual. Drop a file in public/projects/ and set
 // `image` in portfolioData.js and that project upgrades automatically.
-const ProjectMedia = ({ project, featured }) => {
+// `fill` stretches it to its parent instead (the showcase media column).
+const ProjectMedia = ({ project, featured, fill = false }) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: '0px 0px -100px 0px' });
     const Visual = VisualComponents[project.visualComponent];
-    const height = featured ? 'aspect-[16/10]' : 'aspect-[16/9]';
+    const height = fill
+        ? 'h-full'
+        : `${featured ? 'aspect-[16/10]' : 'aspect-[16/9]'} border-b border-rule`;
 
     if (project.image) {
         return (
-            <div className={`${height} relative overflow-hidden border-b border-rule`}>
+            <div className={`${height} relative overflow-hidden`}>
                 <img
                     src={project.image}
                     alt={`${project.title} screenshot`}
@@ -46,7 +50,7 @@ const ProjectMedia = ({ project, featured }) => {
     }
 
     return (
-        <div ref={ref} className={`${height} relative overflow-hidden border-b border-rule bg-surface-2`}>
+        <div ref={ref} className={`${height} relative overflow-hidden bg-surface-2`}>
             {isInView && (
                 <Suspense fallback={<div className="w-full h-full" />}>
                     {Visual ? <Visual /> : null}
@@ -151,24 +155,43 @@ const MetricReadout = ({ project }) => {
     );
 };
 
+const hasLiveUrl = (project) => project.liveUrl && project.liveUrl !== '#';
+
+// NN ── CATEGORY ............ ▸ LIVE
+const ProjectMeta = ({ project, index }) => (
+    <div className="flex items-center gap-3 mb-3">
+        <span className="label label-accent">
+            {String(index + 1).padStart(2, '0')}
+        </span>
+        <span className="label truncate">{project.category}</span>
+        {hasLiveUrl(project) && (
+            <span className="label label-accent ml-auto flex items-center gap-1.5 flex-shrink-0">
+                <span className="status-dot" /> Live
+            </span>
+        )}
+    </div>
+);
+
+const ProjectLinks = ({ project }) => (
+    <div className="flex gap-5 pt-4 border-t border-rule mt-auto">
+        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="label hover:text-accent transition-colors inline-flex items-center gap-2">
+            <GitHubIcon className="w-3.5 h-3.5" /> Code
+        </a>
+        {hasLiveUrl(project) && (
+            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="label label-accent hover:text-accent-strong transition-colors inline-flex items-center gap-2">
+                Live Demo <ExternalLinkIcon className="w-3 h-3" />
+            </a>
+        )}
+    </div>
+);
+
 const ProjectCardWrapper = ({ project, index, featured = false }) => (
     <AnimateOnScroll delay={index * 90} className="h-full">
         <Card className={`h-full flex flex-col group ${featured ? 'panel-accent' : ''}`}>
             <ProjectMedia project={project} featured={featured} />
 
             <div className={`${featured ? 'p-6' : 'p-5'} flex-grow flex flex-col`}>
-                {/* NN ── CATEGORY ............ ▸ LIVE */}
-                <div className="flex items-center gap-3 mb-3">
-                    <span className="label label-accent">
-                        {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span className="label truncate">{project.category}</span>
-                    {project.liveUrl && project.liveUrl !== '#' && (
-                        <span className="label label-accent ml-auto flex items-center gap-1.5 flex-shrink-0">
-                            <span className="status-dot" /> Live
-                        </span>
-                    )}
-                </div>
+                <ProjectMeta project={project} index={index} />
 
                 <h3 className={`font-display ${featured ? 'text-2xl' : 'text-lg'} font-bold tracking-tight text-ink mb-3 group-hover:text-accent transition-colors`}>
                     {project.title}
@@ -191,33 +214,118 @@ const ProjectCardWrapper = ({ project, index, featured = false }) => (
 
                 <ProjectDemoVideo project={project} />
 
-                <div className="flex gap-5 pt-4 border-t border-rule mt-auto">
-                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="label hover:text-accent transition-colors inline-flex items-center gap-2">
-                        <GitHubIcon className="w-3.5 h-3.5" /> Code
-                    </a>
-                    {project.liveUrl && project.liveUrl !== '#' && (
-                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="label label-accent hover:text-accent-strong transition-colors inline-flex items-center gap-2">
-                            Live Demo <ExternalLinkIcon className="w-3 h-3" />
-                        </a>
-                    )}
-                </div>
+                <ProjectLinks project={project} />
             </div>
         </Card>
     </AnimateOnScroll>
 );
 
+// Horizontal showcase card: media column left, the write-up right. A demo
+// clip, where there is one, beats the schematic as the media.
+const ShowcaseCard = ({ project, index }) => (
+    <article className="panel panel-accent showcase-card group">
+        <div className="showcase-media">
+            {project.demoVideoUrl
+                ? <ProjectDemoVideo project={project} />
+                : <ProjectMedia project={project} featured fill />}
+        </div>
+
+        <div className="showcase-body custom-scrollbar">
+            <ProjectMeta project={project} index={index} />
+
+            <h3 className="font-display text-2xl lg:text-3xl font-bold tracking-tight text-ink mb-4 group-hover:text-accent transition-colors">
+                {project.title}
+            </h3>
+
+            <p className="text-sm text-ink-muted font-light leading-relaxed mb-5 whitespace-pre-line">
+                {project.description}
+            </p>
+
+            <MetricReadout project={project} />
+
+            <div className="flex flex-wrap gap-1.5 mb-5">
+                {project.technologies.map(tech => (
+                    <span key={tech} className="tech-tag">{tech}</span>
+                ))}
+            </div>
+
+            <ProjectLinks project={project} />
+        </div>
+    </article>
+);
+
+// How far each card sits below the one before it, so the stack reads as a
+// pile rather than a single card swapping its contents.
+const STACK_STEP_REM = 1.1;
+
+const StackSlot = ({ project, index, total, progress }) => {
+    // Card i starts receding the moment card i+1 begins to arrive, and keeps
+    // going as each later card lands on top of it.
+    const depth = total - 1 - index;
+    const start = Math.min(index / (total - 1), 0.999);
+    const scale = useTransform(progress, [start, 1], [1, 1 - depth * 0.045]);
+    const dim = useTransform(progress, [start, 1], [0, Math.min(depth * 0.2, 0.6)]);
+
+    return (
+        <div className="showcase-slot" style={{ paddingTop: `calc(6rem + ${index * STACK_STEP_REM}rem)` }}>
+            <motion.div
+                className="showcase-frame"
+                style={{
+                    scale,
+                    height: `min(34rem, calc(100vh - ${8 + total * STACK_STEP_REM}rem))`,
+                }}
+            >
+                <ShowcaseCard project={project} index={index} />
+                <motion.div className="showcase-dim" style={{ opacity: dim }} aria-hidden="true" />
+            </motion.div>
+        </div>
+    );
+};
+
+/**
+ * Featured projects as a pinned stack: each card is a full-viewport slot that
+ * sticks, and as the next one slides up over it the card underneath shrinks
+ * back and dims. Only where a two-column card fits in one screen; elsewhere
+ * the featured grid renders as before.
+ */
+const FeaturedStack = ({ projects }) => {
+    const stackRef = useRef(null);
+    const { scrollYProgress } = useScroll({ target: stackRef, offset: ['start start', 'end end'] });
+
+    return (
+        <div ref={stackRef} className="showcase-stack">
+            {projects.map((project, index) => (
+                <StackSlot
+                    key={project.title}
+                    project={project}
+                    index={index}
+                    total={projects.length}
+                    progress={scrollYProgress}
+                />
+            ))}
+        </div>
+    );
+};
+
 export const ProjectsSection = ({ t }) => {
     const [showAll, setShowAll] = useState(false);
+    // Stricter than the hero's cut-off: the showcase card is two columns, and
+    // below ~1024px wide the write-up column no longer fits one screen.
+    const canStack = useCanPin(1024, 700);
     const featured = portfolioData.projects.filter(p => p.featured);
     const rest = portfolioData.projects.filter(p => !p.featured);
 
     return (
         <Section id="projects" title={t.projects.title} subtitle={t.projects.subtitle}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {featured.map((project, index) => (
-                    <ProjectCardWrapper key={project.title} project={project} index={index} featured />
-                ))}
-            </div>
+            {canStack && featured.length > 1 ? (
+                <FeaturedStack projects={featured} />
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {featured.map((project, index) => (
+                        <ProjectCardWrapper key={project.title} project={project} index={index} featured />
+                    ))}
+                </div>
+            )}
             <AnimatePresence initial={false}>
                 {showAll && (
                     <motion.div
