@@ -20,6 +20,7 @@ import { Header } from './components/ui/Header';
 import { Footer } from './components/ui/Footer';
 import { ScrollToTop } from './components/ui/ScrollToTop';
 import { AvatarGuide } from './components/ui/AvatarGuide';
+import { AmbientBackdrop } from './components/ui/AmbientBackdrop';
 
 // Section Components
 import { Hero } from './components/sections/Hero';
@@ -341,8 +342,9 @@ export default function App() {
             <AnimatePresence>
                 {!splashDone && <SplashScreen key="splash" onEnter={dismissSplash} />}
             </AnimatePresence>
-            <div className={`${isDark ? 'theme-dark' : 'theme-light'} palette-${palette} min-h-screen font-sans transition-colors duration-500 relative`}>
-<Header activeSection={activeSection} lang={lang} t={t} toggleLang={toggleLang} />
+            <div className={`${isDark ? 'theme-dark' : 'theme-light'} palette-${palette} scene-root min-h-screen font-sans transition-colors duration-500 relative`}>
+                <AmbientBackdrop />
+                <Header activeSection={activeSection} lang={lang} t={t} toggleLang={toggleLang} />
                 
                 <main>
                     <Hero t={t} />
