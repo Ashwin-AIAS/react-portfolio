@@ -21,6 +21,7 @@ import { Footer } from './components/ui/Footer';
 import { ScrollToTop } from './components/ui/ScrollToTop';
 import { AvatarGuide } from './components/ui/AvatarGuide';
 import { AmbientBackdrop } from './components/ui/AmbientBackdrop';
+import { SectionSeam } from './components/ui/SectionSeam';
 
 // Section Components
 import { Hero } from './components/sections/Hero';
@@ -348,19 +349,19 @@ export default function App() {
                 
                 <main>
                     <Hero t={t} />
-                    <div className="section-divider"></div>
+                    <SectionSeam />
                     <AIAssistantSection t={t} />
-                    <div className="section-divider"></div>
+                    <SectionSeam />
                     <CareerRoadmapSection t={t} />
-                    <div className="section-divider"></div>
+                    <SectionSeam />
                     <SkillsSection t={t} />
-                    <div className="section-divider"></div>
+                    <SectionSeam />
                     <GitHubSection t={t} />
-                    <div className="section-divider"></div>
+                    <SectionSeam />
                     <ProjectsSection t={t} />
-                    <div className="section-divider"></div>
+                    <SectionSeam />
                     <CertificationsSection t={t} />
-                    <div className="section-divider"></div>
+                    <SectionSeam />
                     <ContactSection t={t} />
                 </main>
 

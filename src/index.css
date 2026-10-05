@@ -1050,6 +1050,77 @@
 }
 
 /* ===================================================================
+   SECTION DEPTH REVEAL — see src/components/ui/Section.jsx
+   =================================================================== */
+
+/* One mask per heading word. The padding/negative margin pair gives
+   descenders room without changing the line box. */
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+/* The index hairline draws itself from the number outward, with a lit tip. */
+.section-index::after {
+  background: linear-gradient(90deg, var(--accent-line), var(--rule) 22%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+
+.section-index.is-drawn::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-index::after { transform: none; transition: none; }
+}
+
+/* Light seam between sections: a 1px rule centred in a clipped 48px band, so
+   the beam's glow has room but never widens the page. Net layout height is
+   the same 0-ish footprint the old divider had. */
+.section-seam {
+  position: relative;
+  height: 48px;
+  margin: -24px 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.section-seam::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--rule);
+}
+
+.section-seam-beam {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  will-change: transform, opacity;
+}
+
+.section-seam-beam::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: -14px;
+  height: 28px;
+  background: radial-gradient(ellipse at center, var(--accent-wash) 0%, transparent 70%);
+}
+
+/* ===================================================================
    MIGRATION SHIM
    Every section and UI component now uses semantic classes, so what is
    left here covers only src/components/visuals/* — the twelve animated
