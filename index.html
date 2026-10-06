@@ -49,7 +49,11 @@
           var dark = localStorage.getItem('theme-mode') !== 'light';
           root.classList.toggle('theme-dark', dark);
           root.classList.toggle('theme-light', !dark);
-          var known = ['cyan', 'amber', 'indigo', 'emerald', 'crimson'];
+          var known = [
+            'cyan', 'amber', 'indigo', 'emerald', 'crimson',
+            'ironman', 'vibranium', 'batman', 'cyberpunk',
+            'obsidian', 'titanium', 'onyx', 'venom', 'ember'
+          ];
           var saved = localStorage.getItem('theme-palette');
           root.classList.add('palette-' + (known.indexOf(saved) > -1 ? saved : 'cyan'));
         } catch (e) {
