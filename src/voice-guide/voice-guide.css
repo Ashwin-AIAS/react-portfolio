@@ -1129,19 +1129,31 @@
 
 /* The frosted pane. !important because the eager component sets an opaque
    --surface-1 inline as the no-CSS fallback, and an inline declaration would
-   otherwise win. The gradient is the sheen across the top-left of the glass. */
+   otherwise win. The gradient is the sheen across the top-left of the glass.
+
+   --vg-panel is one step lighter than the page in dark mode (--surface-2) and
+   plain white-ish --surface-1 in light mode, so the card separates from the
+   page instead of blending into it. At 90% with a heavy blur the hero copy and
+   the floor grid no longer read through the captions. */
 .vg-hud-card {
+  --vg-panel: var(--surface-2);
   position: relative;
   background:
     linear-gradient(155deg, var(--accent-wash) 0%, transparent 42%),
-    color-mix(in srgb, var(--surface-1) 84%, transparent) !important;
+    color-mix(in srgb, var(--vg-panel) 90%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+}
+
+.theme-light .vg-hud-card {
+  --vg-panel: var(--surface-1);
 }
 
 /* Browsers without color-mix get the flat surface back rather than a
    transparent card with text floating over the page. */
 @supports not (background: color-mix(in srgb, red 50%, transparent)) {
   .vg-hud-card {
-    background: var(--surface-1) !important;
+    background: var(--vg-panel) !important;
   }
 }
 
@@ -1429,14 +1441,14 @@
       color-mix(in srgb, var(--vg-persona-2) 9%, transparent) 0%,
       transparent 40%
     ),
-    color-mix(in srgb, var(--surface-1) 82%, transparent) !important;
+    color-mix(in srgb, var(--vg-panel) 90%, transparent) !important;
 }
 
 @supports not (background: color-mix(in srgb, red 50%, transparent)) {
   .vg-hud-card[data-vg-persona='optimus'],
   .vg-hud-card[data-vg-persona='jarvis'],
   .vg-hud-card[data-vg-persona='megatron'] {
-    background: var(--surface-1) !important;
+    background: var(--vg-panel) !important;
   }
 }
 

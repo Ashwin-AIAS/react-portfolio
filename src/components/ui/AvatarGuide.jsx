@@ -209,8 +209,8 @@ export const AvatarGuide = () => {
                                 // solid fill is the fallback (§8).
                                 background: 'var(--surface-1)',
                                 border: '1px solid var(--accent-line)',
-                                backdropFilter: 'blur(16px)',
-                                WebkitBackdropFilter: 'blur(16px)',
+                                backdropFilter: 'blur(24px)',
+                                WebkitBackdropFilter: 'blur(24px)',
                                 ...(isMobile ? {
                                     position: 'fixed', bottom: '16px', left: '8px', right: '8px', top: 'auto', width: 'auto'
                                 } : {
@@ -267,8 +267,8 @@ export const AvatarGuide = () => {
                                 pointerEvents: 'auto',
                                 background: 'var(--surface-1)',
                                 border: '1px solid var(--accent-line)',
-                                backdropFilter: 'blur(16px)',
-                                WebkitBackdropFilter: 'blur(16px)',
+                                backdropFilter: 'blur(24px)',
+                                WebkitBackdropFilter: 'blur(24px)',
                                 borderRadius: 'var(--r-md)',
                                 padding: '8px 12px', marginBottom: '8px',
                                 fontSize: '12px', color: 'var(--text)', whiteSpace: 'nowrap',
