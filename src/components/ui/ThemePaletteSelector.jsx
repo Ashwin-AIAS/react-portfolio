@@ -81,6 +81,14 @@ export const THEMES = [
         color: '#a8b3c4',
         dotClass: 'bg-[#a8b3c4]',
         group: 'noir'
+    },
+    {
+        id: 'onyx',
+        name: 'Onyx & Gold',
+        label: 'Champagne Luxe',
+        color: '#d4af37',
+        dotClass: 'bg-[#d4af37]',
+        group: 'noir'
     }
 ];
 
