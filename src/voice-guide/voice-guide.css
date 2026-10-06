@@ -2148,6 +2148,147 @@
   }
 }
 
+/* -------------------------------------------------------- Megatron --- */
+/* Enter: the crest glitches in — horizontal slices with sideways jitter on
+   hard steps — and the optics flare blood-red once it locks. Exit: a glitch
+   burst, a last eye flare, then a hard cut to black rather than a fade.
+   "Unclipped" is inset(-40%), not inset(0): the svg's drop-shadow glow spills
+   past its box, and a zero inset would shave it off until the phase ended. */
+.vg-megatron .vg-meg-eyes {
+  transform-box: view-box;
+  transform-origin: 50% 46%;
+}
+
+.vg-megatron.vg-phase-enter .vg-megatron-svg {
+  animation: vg-meg-glitch-in 420ms steps(1, end) both;
+}
+
+.vg-megatron.vg-phase-enter .vg-meg-eyes {
+  animation: vg-meg-eye-flare 280ms ease-out 260ms both;
+}
+
+.vg-megatron.vg-phase-exit .vg-megatron-svg {
+  animation: vg-meg-glitch-out 225ms steps(1, end) both;
+}
+
+.vg-megatron.vg-phase-exit .vg-meg-eyes {
+  animation: vg-meg-eye-cut 225ms ease-in both;
+}
+
+/* Overrides the shared hold-out: Megatron cuts, it does not fade. */
+.vg-megatron.vg-phase-exit {
+  animation: vg-meg-cut 300ms linear both;
+}
+
+/* Stay: a slow, menacing pulse in the plasma aura. The blur is restated
+   because an animated filter replaces the static one. */
+.vg-megatron.vg-phase-stay .vg-megatron-aura {
+  animation: vg-meg-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes vg-meg-glitch-in {
+  0% {
+    opacity: 0;
+    clip-path: inset(42% 0 44% 0);
+    transform: translateX(-6px);
+  }
+  12% {
+    opacity: 1;
+    clip-path: inset(8% 0 70% 0);
+    transform: translateX(5px);
+  }
+  24% {
+    clip-path: inset(58% 0 10% 0);
+    transform: translateX(-4px);
+  }
+  36% {
+    clip-path: inset(22% 0 34% 0);
+    transform: translateX(3px);
+  }
+  50% {
+    clip-path: inset(-40%);
+    transform: translateX(-2px);
+  }
+  62%,
+  100% {
+    opacity: 1;
+    clip-path: inset(-40%);
+    transform: none;
+  }
+}
+
+@keyframes vg-meg-glitch-out {
+  0% {
+    clip-path: inset(-40%);
+    transform: none;
+  }
+  20% {
+    clip-path: inset(30% 0 28% 0);
+    transform: translateX(4px);
+  }
+  40% {
+    clip-path: inset(0 0 62% 0);
+    transform: translateX(-5px);
+  }
+  60% {
+    clip-path: inset(55% 0 12% 0);
+    transform: translateX(6px);
+  }
+  80%,
+  100% {
+    clip-path: inset(48% 0 48% 0);
+    transform: translateX(-3px);
+  }
+}
+
+@keyframes vg-meg-eye-flare {
+  0% {
+    filter: brightness(1);
+    transform: none;
+  }
+  40% {
+    filter: brightness(2.6) drop-shadow(0 0 4px #ff003c);
+    transform: scale(1.08);
+  }
+  100% {
+    filter: brightness(1);
+    transform: none;
+  }
+}
+
+@keyframes vg-meg-eye-cut {
+  0% {
+    filter: brightness(1);
+  }
+  45% {
+    filter: brightness(3) drop-shadow(0 0 5px #ff003c);
+  }
+  100% {
+    filter: brightness(0);
+  }
+}
+
+@keyframes vg-meg-cut {
+  0%,
+  74% {
+    opacity: 1;
+  }
+  75%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vg-meg-pulse {
+  0%,
+  100% {
+    filter: blur(14px) brightness(1);
+  }
+  50% {
+    filter: blur(14px) brightness(1.45);
+  }
+}
+
 /* --------------------------------------------- reduced motion, phases --- */
 /* A plain fade for every persona: no assembly, no glitch, no wave, and none
    of the phase-specific stay loops either. */

@@ -38,16 +38,17 @@ const SPARK_FLARES = [0, 45, 90, 135];
  * @param {Object} props
  * @param {number}  [props.size]     px, square
  * @param {boolean} [props.speaking] brightens the crest while speaking
+ * @param {string}  [props.phase]    'enter' | 'stay' | 'exit' — see useAvatarPhase
  */
-export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
+export const MegatronAvatarVisual = ({ size = 130, speaking = false, phase = 'stay' }) => (
   <div
-    className={`vg-megatron${speaking ? ' vg-megatron-live' : ''}`}
+    className={`vg-megatron vg-phase-${phase}${speaking ? ' vg-megatron-live' : ''}`}
     style={{ width: size, height: size }}
     aria-hidden="true"
   >
-    {/* Dark Energon vortex plasma aura */}
+    {/* Dark Energon vortex plasma aura — pulses menacingly during stay */}
     <div
-      className="vg-megatron-aura"
+      className="vg-megatron-aura vg-ph"
       style={{ transform: 'scale(calc(1 + var(--vg-level, 0) * 0.5))' }}
     />
     {/* Decepticon containment ring */}
@@ -55,7 +56,9 @@ export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
 
     <svg
       viewBox="0 0 100 100"
-      className="vg-megatron-svg"
+      /* vg-ph: the enter/exit glitch slices the whole crest. It animates only
+         clip-path and transform, so the inline drop-shadow filter survives. */
+      className="vg-megatron-svg vg-ph"
       fill="none"
       focusable="false"
       style={{ filter: 'drop-shadow(0 0 18px rgba(168, 85, 247, 0.7)) drop-shadow(0 0 8px rgba(255, 0, 60, 0.5))' }}
@@ -243,29 +246,32 @@ export const MegatronAvatarVisual = ({ size = 130, speaking = false }) => (
         strokeWidth="1"
       />
 
-      {/* Left Glowing Blood-Red Laser Optic */}
-      <polygon
-        points="29,43.5 45,41.5 43,50 30,49"
-        fill="#ff003c"
-        style={{
-          filter: 'drop-shadow(0 0 calc(6px + var(--vg-level, 0) * 16px) #ff003c) drop-shadow(0 0 3px #ffffff)',
-          opacity: 'calc(0.9 + var(--vg-level, 0) * 0.1)',
-        }}
-      />
-      {/* Left Pupil Highlight */}
-      <line x1="30" y1="45.5" x2="44" y2="44.5" stroke="#ffffff" strokeWidth="1.2" opacity="0.95" />
+      {/* Flare red on enter; flare once more then cut on exit. */}
+      <g className="vg-ph vg-meg-eyes">
+        {/* Left Glowing Blood-Red Laser Optic */}
+        <polygon
+          points="29,43.5 45,41.5 43,50 30,49"
+          fill="#ff003c"
+          style={{
+            filter: 'drop-shadow(0 0 calc(6px + var(--vg-level, 0) * 16px) #ff003c) drop-shadow(0 0 3px #ffffff)',
+            opacity: 'calc(0.9 + var(--vg-level, 0) * 0.1)',
+          }}
+        />
+        {/* Left Pupil Highlight */}
+        <line x1="30" y1="45.5" x2="44" y2="44.5" stroke="#ffffff" strokeWidth="1.2" opacity="0.95" />
 
-      {/* Right Glowing Blood-Red Laser Optic */}
-      <polygon
-        points="71,43.5 55,41.5 57,50 70,49"
-        fill="#ff003c"
-        style={{
-          filter: 'drop-shadow(0 0 calc(6px + var(--vg-level, 0) * 16px) #ff003c) drop-shadow(0 0 3px #ffffff)',
-          opacity: 'calc(0.9 + var(--vg-level, 0) * 0.1)',
-        }}
-      />
-      {/* Right Pupil Highlight */}
-      <line x1="70" y1="45.5" x2="56" y2="44.5" stroke="#ffffff" strokeWidth="1.2" opacity="0.95" />
+        {/* Right Glowing Blood-Red Laser Optic */}
+        <polygon
+          points="71,43.5 55,41.5 57,50 70,49"
+          fill="#ff003c"
+          style={{
+            filter: 'drop-shadow(0 0 calc(6px + var(--vg-level, 0) * 16px) #ff003c) drop-shadow(0 0 3px #ffffff)',
+            opacity: 'calc(0.9 + var(--vg-level, 0) * 0.1)',
+          }}
+        />
+        {/* Right Pupil Highlight */}
+        <line x1="70" y1="45.5" x2="56" y2="44.5" stroke="#ffffff" strokeWidth="1.2" opacity="0.95" />
+      </g>
 
       {/* --- LAYER 5: Segmented Mechanical Vocoder Grille (Lip-Sync) --- */}
       {/* Mouth Guard Housing Frame in Gunmetal Obsidian */}
