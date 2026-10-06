@@ -5,14 +5,14 @@ import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import AIAssistantVisual from '../visuals/AIAssistantVisual';
 import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon, DownloadIcon, ExternalLinkIcon, LinkedInIcon, MailIcon, GraduationCapIcon, BriefcaseIcon } from '../../icons/Icons';
-import { streamGeminiResponse, getApiKey, formatModelDisplayName } from '../../geminiEmbed';
+import { streamGeminiResponse, formatModelDisplayName } from '../../geminiEmbed';
 import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
 import { PERSONA_IDS } from '../../voice-guide/config';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const PERSONA_AGENT_CONFIGS = {
+const PERSONA_AGENT_CONFIGS = {
     jarvis: {
         id: 'jarvis',
         name: 'J.A.R.V.I.S.',
@@ -423,7 +423,6 @@ const ResumeCard = ({ data }) => {
     const resumeUrl = data?.resume_url || portfolioData.personalInfo.resumeUrl;
     const email = data?.email || portfolioData.personalInfo.email;
     const linkedin = data?.linkedin || portfolioData.personalInfo.linkedin;
-    const github = data?.github || portfolioData.personalInfo.github;
 
     return (
         <div className="panel p-5 mt-2 flex flex-col gap-4 w-full border border-accent/40 bg-surface-1/95 backdrop-blur-md relative overflow-hidden shadow-lg select-text" style={{ borderRadius: 'var(--r-md)' }}>
@@ -625,6 +624,9 @@ export const AIAssistantSection = ({ t }) => {
             
             scrollToBottom(true);
         }
+        // Fires once per finished reply. Listing transcript/messages would re-run
+        // the suggestions and the scroll on every streamed update.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [geminiLive.isResponseComplete]);
 
     const toggleVoiceMode = async () => {
@@ -867,7 +869,9 @@ export const AIAssistantSection = ({ t }) => {
                     `Alignment: ${parsed.alignment}\n\n` +
                     `Recommendation: ${parsed.recommendation}`;
             }
-        } catch {}
+        } catch {
+            // Plain-text reply, not a fit report — copy it as-is.
+        }
         
         navigator.clipboard.writeText(copyText).then(() => {
             setCopiedId(id);
@@ -919,7 +923,9 @@ export const AIAssistantSection = ({ t }) => {
                     );
                 }
             }
-        } catch (e) {}
+        } catch {
+            // No parseable card JSON in the reply — fall through to plain rendering.
+        }
 
         const contentLower = sourceMessage.toLowerCase();
         const mentionsResume = contentLower.includes('resume') || contentLower.includes('cv');

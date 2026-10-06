@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThemeContext } from '../../App';
+import { ThemeContext } from '../../ThemeContext';
 
-export const THEMES = [
+const THEMES = [
     {
         id: 'cyan',
         name: 'Cyber-Optic',
@@ -109,7 +109,7 @@ export const THEMES = [
 ];
 
 export const ThemePaletteSelector = ({ compact = false }) => {
-    const { palette, setPalette, isDark } = useContext(ThemeContext);
+    const { palette, setPalette } = useContext(ThemeContext);
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 

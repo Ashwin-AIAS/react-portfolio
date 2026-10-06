@@ -1,3 +1,4 @@
+/* global process -- read only behind a typeof guard, for non-Vite runtimes */
 export const getApiKey = () => {
   if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) {
     return import.meta.env.VITE_GEMINI_API_KEY;

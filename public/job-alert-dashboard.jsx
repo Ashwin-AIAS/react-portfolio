@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 const PROFILE = {
   name: "Ashwin Vignesh Muniappan",
@@ -274,7 +274,7 @@ ${jobDesc}`
       const raw = data.content?.find(b => b.type === "text")?.text || "{}";
       const clean = raw.replace(/```json|```/g, "").trim();
       setResult(JSON.parse(clean));
-    } catch (e) {
+    } catch {
       setResult({ error: "Could not analyze. Try again." });
     }
     setLoading(false);

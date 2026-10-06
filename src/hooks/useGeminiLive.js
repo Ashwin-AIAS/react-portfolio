@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { getApiKey } from '../geminiEmbed';
-import { portfolioData } from '../data/portfolioData';
 
 const INPUT_SAMPLE_RATE = 16000;
 const OUTPUT_SAMPLE_RATE = 24000;
@@ -74,7 +73,6 @@ export function useGeminiLive() {
   const playbackContextRef = useRef(null);
   const audioQueueRef = useRef([]);
   const isPlayingRef = useRef(false);
-  const optionsRef = useRef({});
   const sourceRef = useRef(null);
 
   const analyserRef = useRef(null);
@@ -86,13 +84,32 @@ export function useGeminiLive() {
     isConnectedRef.current = isConnected;
   }, [isConnected]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      disconnectCleanup();
-    };
+  const playNextInQueue = useCallback(() => {
+    if (audioQueueRef.current.length === 0) {
+      isPlayingRef.current = false;
+      setIsSpeaking(false);
+      return;
+    }
+
+    isPlayingRef.current = true;
+    setIsSpeaking(true);
+
+    const ctx = playbackContextRef.current;
+    if (!ctx || ctx.state === 'closed') {
+      isPlayingRef.current = false;
+      setIsSpeaking(false);
+      return;
+    }
+
+    const buffer = audioQueueRef.current.shift();
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.onended = playNextInQueue;
+    source.start();
   }, []);
 
+  // Below playNextInQueue so it can list it as a dependency (it is stable).
   const playAudioChunk = useCallback((base64Audio) => {
     try {
       if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
@@ -123,32 +140,7 @@ export function useGeminiLive() {
     } catch (e) {
       console.error('Error playing audio chunk:', e);
     }
-  }, []);
-
-  const playNextInQueue = useCallback(() => {
-    if (audioQueueRef.current.length === 0) {
-      isPlayingRef.current = false;
-      setIsSpeaking(false);
-      return;
-    }
-
-    isPlayingRef.current = true;
-    setIsSpeaking(true);
-
-    const ctx = playbackContextRef.current;
-    if (!ctx || ctx.state === 'closed') {
-      isPlayingRef.current = false;
-      setIsSpeaking(false);
-      return;
-    }
-
-    const buffer = audioQueueRef.current.shift();
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(ctx.destination);
-    source.onended = playNextInQueue;
-    source.start();
-  }, []);
+  }, [playNextInQueue]);
 
   const startMicCapture = useCallback((ws) => {
     return navigator.mediaDevices.getUserMedia({
@@ -274,6 +266,14 @@ export function useGeminiLive() {
     setAudioLevel(0);
   }, [stopMicCapture]);
 
+  // Cleanup on unmount. Declared after disconnectCleanup so it can list it:
+  // that callback is stable, so this still runs exactly once, on unmount.
+  useEffect(() => {
+    return () => {
+      disconnectCleanup();
+    };
+  }, [disconnectCleanup]);
+
   const connect = useCallback(async (systemPrompt, options = {}) => {
     const {
       responseModalities = ['AUDIO'],
@@ -376,7 +376,7 @@ export function useGeminiLive() {
                       const parsed = JSON.parse(possibleJson);
                       setStructuredOutput(parsed);
                     }
-                  } catch (e) {
+                  } catch {
                     // Not valid JSON yet
                   }
 

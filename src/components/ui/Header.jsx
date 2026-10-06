@@ -5,7 +5,7 @@ import { portfolioData } from '../../data/portfolioData';
 // Assuming ThemeContext will be exported from App.jsx or a separate context file later.
 // For now, we'll keep the context dependency injection pattern used in the original code,
 // but we will import it from App.jsx once App is orchestrator.
-import { ThemeContext } from '../../App';
+import { ThemeContext } from '../../ThemeContext';
 import { ThemePaletteSelector } from './ThemePaletteSelector';
 
 // Replaces the emoji theme toggle (🌙/☀️) — OS-rendered emoji clashed with

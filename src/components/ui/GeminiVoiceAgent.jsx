@@ -305,7 +305,7 @@ export const GeminiVoiceAgent = ({ isActive, onActivate }) => {
           className="hero-idle-prompts"
           style={{ position: 'relative', zIndex: 10 }}
         >
-          {prompts.slice(0, 3).map((prompt, i) => (
+          {prompts.slice(0, 3).map((prompt) => (
             <button
               key={prompt}
               type="button"

@@ -1,4 +1,5 @@
-import React, { useState, createContext, useEffect, useCallback, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import { ThemeContext } from './ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useActiveSection } from './hooks/useActiveSection';
 import { useLang } from './hooks/useLang';
@@ -32,13 +33,6 @@ import { ProjectsSection } from './components/sections/ProjectsSection';
 import { AIAssistantSection } from './components/sections/AIAssistantSection';
 import { CertificationsSection } from './components/sections/CertificationsSection';
 import { ContactSection } from './components/sections/ContactSection';
-
-export const ThemeContext = createContext({
-    isDark: true,
-    setIsDark: () => {},
-    palette: 'cyan',
-    setPalette: () => {}
-});
 
 // Boot readout. Replaces a 2.5s screen that ran 8 concurrent animation
 // tracks in a monospace/conic-gradient/green palette used nowhere else on

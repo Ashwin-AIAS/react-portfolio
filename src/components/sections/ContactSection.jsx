@@ -44,7 +44,7 @@ export const ContactSection = ({ t }) => {
             } else {
                 setFormStatus('error');
             }
-        } catch (error) {
+        } catch {
             setFormStatus('error');
         }
     };

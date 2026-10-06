@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { LidarSweep } from '../ui/LidarSweep';
 import { useCanPin, usePrefersReducedMotion } from '../../hooks/useMediaQuery';
@@ -8,13 +8,15 @@ const EASE = [0.16, 1, 0.3, 1];
 // The typewriter ticks every 60ms. It lives in its own component so those
 // ticks re-render one <p>, not the whole stage.
 const RoleTicker = ({ badge }) => {
-    const roles = [
+    // Memoised: the ticker re-renders every 60ms, and a fresh array each time
+    // would restart the typing effect below on every tick.
+    const roles = useMemo(() => [
         badge.toUpperCase(),
         "COMPUTER VISION & PERCEPTION ENGINEER",
         "AUTONOMOUS DRIVING & SENSOR FUSION",
         "MULTIMODAL & GRAPH RAG ARCHITECT",
         "EDGE PYTORCH & C++ HPC INFERENCE",
-    ];
+    ], [badge]);
     const [roleIndex, setRoleIndex] = useState(0);
     const [displayText, setDisplayText] = useState('');
 
@@ -48,7 +50,7 @@ const RoleTicker = ({ badge }) => {
 
         timeout = setTimeout(type, 60);
         return () => clearTimeout(timeout);
-    }, [roleIndex]);
+    }, [roleIndex, roles]);
 
     return (
         <p className="label mb-6 h-5">
