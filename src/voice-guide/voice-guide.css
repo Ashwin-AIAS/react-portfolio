@@ -1914,11 +1914,126 @@
   }
 }
 
+/* ---------------------------------------------- shared robot roots --- */
+/* The aura and ring divs sit outside the SVG, so the root carries the overall
+   fade: in quickly on enter while the parts assemble, out at the very end of
+   exit once the parts have already broken away. */
+.vg-optimus.vg-phase-enter,
+.vg-jarvis.vg-phase-enter,
+.vg-megatron.vg-phase-enter {
+  animation: vg-phase-fade-in 160ms ease-out both;
+}
+
+.vg-optimus.vg-phase-exit,
+.vg-jarvis.vg-phase-exit,
+.vg-megatron.vg-phase-exit {
+  animation: vg-phase-hold-out 300ms ease-in both;
+}
+
+@keyframes vg-phase-hold-out {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* --------------------------------------------------------- Optimus --- */
+/* Enter: the faceplate assembles piece by piece — chassis, antennae, crown,
+   cheeks, mask, collar — each sliding in from its own side (--dx/--dy/--s set
+   inline per part), then the optics light up last. Exit runs it backwards. */
+.vg-optimus .vg-opt-part,
+.vg-optimus .vg-opt-optics {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+
+.vg-optimus.vg-phase-enter .vg-opt-part {
+  animation: vg-opt-assemble 280ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(var(--i) * 40ms) both;
+}
+
+.vg-optimus.vg-phase-enter .vg-opt-optics {
+  animation: vg-opt-optics-on 220ms ease-out 320ms both;
+}
+
+.vg-optimus.vg-phase-exit .vg-opt-part {
+  animation: vg-opt-split 200ms ease-in calc((6 - var(--i)) * 15ms) both;
+}
+
+.vg-optimus.vg-phase-exit .vg-opt-optics {
+  animation: vg-opt-optics-off 120ms ease-in both;
+}
+
+/* Stay: a slow breathing glow on the optics, on top of the voice response. */
+.vg-optimus.vg-phase-stay .vg-opt-optics {
+  animation: vg-opt-breathe 3.6s ease-in-out infinite;
+}
+
+@keyframes vg-opt-assemble {
+  from {
+    opacity: 0;
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--s, 1));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vg-opt-split {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--s, 1));
+  }
+}
+
+@keyframes vg-opt-optics-on {
+  0% {
+    opacity: 0;
+    filter: brightness(1);
+  }
+  60% {
+    opacity: 1;
+    filter: brightness(2.2);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+@keyframes vg-opt-optics-off {
+  from {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  to {
+    opacity: 0;
+    filter: brightness(0.3);
+  }
+}
+
+@keyframes vg-opt-breathe {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
+
 /* --------------------------------------------- reduced motion, phases --- */
-/* A plain fade for every persona: no assembly, no glitch, no wave. */
+/* A plain fade for every persona: no assembly, no glitch, no wave, and none
+   of the phase-specific stay loops either. */
 @media (prefers-reduced-motion: reduce) {
-  .vg-phase-enter .vg-ph,
-  .vg-phase-exit .vg-ph {
+  .vg-ph {
     animation: none !important;
   }
 
