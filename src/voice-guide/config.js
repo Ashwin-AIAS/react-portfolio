@@ -14,7 +14,13 @@ export const SETTLED_VELOCITY = 60;
 /** Quiet gap after a clip finishes naturally before the engine will speak again. */
 export const COOLDOWN_MS = 600;
 
-// --- Scroll tracking (§4.1) --------------------------------------------------
+// --- Avatar phases -------------------------------------------------------------
+/** Enter animation when a section commits or the persona changes. */
+export const AVATAR_ENTER_MS = 550;
+/** Exit animation for the outgoing section, played in place before the move. */
+export const AVATAR_EXIT_MS = 300;
+
+// --- Scroll tracking (§4.1)--------------------------------------------------
 /** EMA smoothing factor for velocity. Higher = twitchier. */
 export const VELOCITY_SMOOTHING = 0.2;
 /** Direction won't flip until the scroll moves more than this many px. */

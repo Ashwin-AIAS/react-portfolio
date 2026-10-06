@@ -33,9 +33,9 @@
   line-height: 0;
 }
 
-/* Head bob (§6.1). The wrapper carries the inline framer-motion transform, so
-   the bob lives on the image, which has none. Descendant rather than child:
-   the image sits inside PersonaAvatar now, one level further down. */
+/* Head bob (§6.1). The bob lives on the image, which carries no other
+   transform. Descendant rather than child: the image sits inside
+   PersonaAvatar, one level further down. */
 .vg-avatar-wrap img {
   transform: translateY(calc(var(--vg-level) * -2px));
   will-change: transform;
@@ -1663,8 +1663,8 @@
 /* Second stage of the float. AvatarGuide drifts the whole guide in framer, and
    this banks the avatar against that drift on a different period, so the two
    never line up and the motion reads as buoyancy instead of a slide.
-   Deliberately CSS: it must not share a transform with the emotion animation
-   that framer puts on .vg-avatar-wrap one level down. */
+   Deliberately CSS on its own element: it must not share a transform with the
+   enter/exit phases the avatar visuals run one level down. */
 .vg-levitate {
   animation: vg-levitate 7.5s ease-in-out infinite;
   will-change: transform;
@@ -1824,5 +1824,127 @@
      border, which .vg-pill-on already provides. */
   .vg-pill-beam {
     display: none !important;
+  }
+}
+
+/* ============================================================================
+   AVATAR PHASES — enter / stay / exit per committed section
+   ============================================================================
+   useAvatarPhase.js puts vg-phase-{enter,stay,exit} on each visual's root.
+   Every element that runs a phase animation also carries .vg-ph, which is the
+   single hook reduced motion uses to switch them all off (bottom of section).
+
+   Budget: enter <= AVATAR_ENTER_MS (550ms), exit <= AVATAR_EXIT_MS (300ms), and
+   nothing travels outside the 130px avatar box. `stay` is deliberately empty
+   here — each visual's existing idle and --vg-level motion IS the stay state.
+   Exit animations end invisible and hold (`both`) until the enter replaces
+   them, so the guide is never seen mid-move.
+   ------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------- Ashwin (memoji) --- */
+/* Enter: pops up into the beam, then a quick two-swing wave. */
+.vg-ashwin-holo.vg-phase-enter {
+  animation: vg-ashwin-pop 550ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+.vg-ashwin-holo.vg-phase-enter .vg-persona-avatar {
+  transform-origin: 50% 90%;
+  animation: vg-ashwin-wave 430ms ease-in-out 120ms both;
+}
+
+/* Exit: a small nod, then the projection fades. */
+.vg-ashwin-holo.vg-phase-exit {
+  animation: vg-ashwin-out 300ms ease-in both;
+}
+
+.vg-ashwin-holo.vg-phase-exit .vg-persona-avatar {
+  transform-origin: 50% 80%;
+  animation: vg-ashwin-nod 220ms ease-in-out both;
+}
+
+@keyframes vg-ashwin-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.85);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vg-ashwin-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-7deg);
+  }
+  55% {
+    transform: rotate(6deg);
+  }
+  80% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes vg-ashwin-nod {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(5px) scaleY(0.97);
+  }
+}
+
+@keyframes vg-ashwin-out {
+  0%,
+  45% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.94);
+  }
+}
+
+/* --------------------------------------------- reduced motion, phases --- */
+/* A plain fade for every persona: no assembly, no glitch, no wave. */
+@media (prefers-reduced-motion: reduce) {
+  .vg-phase-enter .vg-ph,
+  .vg-phase-exit .vg-ph {
+    animation: none !important;
+  }
+
+  .vg-phase-enter {
+    animation: vg-phase-fade-in 200ms ease-out both !important;
+  }
+
+  .vg-phase-exit {
+    animation: vg-phase-fade-out 200ms ease-in both !important;
+  }
+}
+
+@keyframes vg-phase-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vg-phase-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }

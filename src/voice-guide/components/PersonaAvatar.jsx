@@ -42,16 +42,17 @@ const LAYER = { position: 'absolute', pointerEvents: 'none' };
  * @param {string}  [props.persona]  'optimus' | 'jarvis' | 'megatron' | 'ashwin'
  * @param {number}  [props.size]     px, square
  * @param {boolean} [props.speaking] a clip is currently playing
+ * @param {string}  [props.phase]    'enter' | 'stay' | 'exit' — see useAvatarPhase
  */
-export const PersonaAvatar = ({ persona = DEFAULT_PERSONA, size = 130, speaking = false }) => {
+export const PersonaAvatar = ({ persona = DEFAULT_PERSONA, size = 130, speaking = false, phase = 'stay' }) => {
   if (persona === 'optimus') {
-    return <OptimusAvatarVisual size={size} speaking={speaking} />;
+    return <OptimusAvatarVisual size={size} speaking={speaking} phase={phase} />;
   }
   if (persona === 'jarvis') {
-    return <JarvisAvatarVisual size={size} speaking={speaking} />;
+    return <JarvisAvatarVisual size={size} speaking={speaking} phase={phase} />;
   }
   if (persona === 'megatron') {
-    return <MegatronAvatarVisual size={size} speaking={speaking} />;
+    return <MegatronAvatarVisual size={size} speaking={speaking} phase={phase} />;
   }
 
   // The creator, first person — keeps the original cartoon memoji and its
@@ -60,7 +61,7 @@ export const PersonaAvatar = ({ persona = DEFAULT_PERSONA, size = 130, speaking 
   // hologram rig.
   return (
     <div
-      className={`vg-ashwin-holo${speaking ? ' vg-ashwin-live' : ''}`}
+      className={`vg-ashwin-holo vg-phase-${phase}${speaking ? ' vg-ashwin-live' : ''}`}
       style={{ position: 'relative', width: size, height: size }}
     >
       {/* Orbital soundwave halo — three counter-rotating rings on one container
@@ -79,7 +80,7 @@ export const PersonaAvatar = ({ persona = DEFAULT_PERSONA, size = 130, speaking 
         ))}
       </div>
 
-      <div className="vg-persona-avatar" style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div className="vg-persona-avatar vg-ph" style={{ position: 'relative', width: '100%', height: '100%' }}>
         <img
           src={avatarEmoji}
           alt=""

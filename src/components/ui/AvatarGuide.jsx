@@ -3,28 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Voice guide: these three are tiny and engine-free — the heavy half is lazy (§8).
 import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
 import { PersonaAvatar } from '../../voice-guide/components/PersonaAvatar';
+import { useAvatarPhase } from '../../voice-guide/useAvatarPhase';
 import { CaptionText, AgentControls } from '../../voice-guide/components/CaptionBubble';
 
 const tourSteps = [
-  { section: 'hero',           emotion: 'wave',    message: "👋 Hey! I'm Ashwin — welcome! Let me show you around." },
-  { section: 'assistant',      emotion: 'think',   message: "🤖 Try my AI assistant — paste a job description and see how I match!" },
-  { section: 'roadmap',        emotion: 'nod',     message: "📚 Here's my journey — B.Tech in India to AI Engineering in Germany!" },
-  { section: 'skills',         emotion: 'flex',    message: "⚡ My core stack — PyTorch, OpenCV, LangChain, RAG systems and more." },
-  { section: 'github',         emotion: 'flex',    message: "💻 Here's my live GitHub activity — open source contributions and commits." },
-  { section: 'projects',       emotion: 'excited', message: "🚀 These are my projects — from LiDAR fusion to full-stack RAG!" },
-  { section: 'certifications', emotion: 'proud',   message: "🎓 Certified by Anthropic, NVIDIA, Kaggle and more." },
-  { section: 'contact',        emotion: 'bye',     message: "📬 Like what you see? I'm open to opportunities — let's connect!" },
+  { section: 'hero',           message: "👋 Hey! I'm Ashwin — welcome! Let me show you around." },
+  { section: 'assistant',      message: "🤖 Try my AI assistant — paste a job description and see how I match!" },
+  { section: 'roadmap',        message: "📚 Here's my journey — B.Tech in India to AI Engineering in Germany!" },
+  { section: 'skills',         message: "⚡ My core stack — PyTorch, OpenCV, LangChain, RAG systems and more." },
+  { section: 'github',         message: "💻 Here's my live GitHub activity — open source contributions and commits." },
+  { section: 'projects',       message: "🚀 These are my projects — from LiDAR fusion to full-stack RAG!" },
+  { section: 'certifications', message: "🎓 Certified by Anthropic, NVIDIA, Kaggle and more." },
+  { section: 'contact',        message: "📬 Like what you see? I'm open to opportunities — let's connect!" },
 ];
-
-const emotionAnimations = {
-  wave: { rotate: [0, -30, 25, -20, 15, 0], y: [0, -20, -10, -15, 0], scale: [1, 1.1, 1.05, 1.1, 1], transition: { duration: 0.9, ease: "easeInOut" } },
-  nod: { scaleY: [1, 0.85, 1.05, 0.9, 1], y: [0, 10, -5, 8, 0], transition: { duration: 0.7 } },
-  flex: { scale: [1, 1.35, 0.95, 1.25, 1], rotate: [0, -10, 10, -5, 0], y: [0, -25, 0, -15, 0], transition: { duration: 0.7 } },
-  excited: { y: [0, -40, 0, -30, 0, -20, 0], rotate: [0, -12, 12, -8, 8, 0], scale: [1, 1.2, 1, 1.15, 1], transition: { duration: 1.0 } },
-  think: { rotate: [0, -20, 0, -15, 0], x: [0, -15, 0, -10, 0], scaleX: [1, 0.92, 1], transition: { duration: 0.8 } },
-  proud: { scale: [1, 1.3, 1.1, 1.25, 1], y: [0, -30, -10, -20, 0], rotate: [0, 5, -5, 3, 0], transition: { duration: 0.7 } },
-  bye: { rotate: [0, -25, 25, -25, 25, -25, 25, 0], y: [0, -10, 0], scale: [1, 1.1, 1], transition: { duration: 1.2 } },
-};
 
 /**
  * Telemetry corner brackets on the HUD terminal — holo spec §2.2.1.
@@ -69,6 +60,13 @@ export const AvatarGuide = () => {
     // this component behaves exactly as before until then.
     const voice = useVoiceGuide();
     const [dismissed, setDismissed] = useState(false);
+    // Enter/stay/exit for the avatar, keyed to the narration's committed
+    // section. Once the guide is ready that section also decides where the
+    // guide stands, so it exits in place, moves, then enters, and a fast flick
+    // through the page no longer sends it flying from side to side.
+    const { phase, shownSection } = useAvatarPhase(voice.ready ? voice.section : null, voice.persona);
+    const committedStep = tourSteps.findIndex((s) => s.section === shownSection);
+    const step = committedStep >= 0 ? committedStep : currentStep;
 
     useEffect(() => {
         const handleResize = () => setScreenConfig(getScreenConfig());
@@ -132,7 +130,7 @@ export const AvatarGuide = () => {
 
     const avatarPx = screenConfig.isMobile ? 80 : 144;
     const bubbleH = 340; // Full height with docked persona selector, unmute button and status
-    const pos = getPositions()[currentStep] || getPositions()[0];
+    const pos = getPositions()[step] || getPositions()[0];
     const safePos = {
         x: Math.min(Math.max(pos.x, 16), Math.max(16, window.innerWidth - avatarPx - 16)),
         y: Math.min(Math.max(pos.y, bubbleH + 20), Math.max(window.innerHeight - avatarPx - 20, bubbleH + 20)),
@@ -171,7 +169,11 @@ export const AvatarGuide = () => {
         <motion.div 
             style={{ position: 'fixed', top: 0, left: 0, zIndex: 9999, pointerEvents: 'none' }}
             animate={isMobile ? { x: 0, y: 0 } : { x: safePos.x, y: safePos.y }}
-            transition={{ type: "spring", stiffness: 80, damping: 16 }}
+            /* Following commits, the avatar has already exited (it ends
+               invisible) when the step changes, so the guide cuts straight to
+               its new spot and enters there instead of flying across the page
+               mid-animation. The raw-scroll fallback keeps the spring. */
+            transition={committedStep >= 0 ? { duration: 0 } : { type: "spring", stiffness: 80, damping: 16 }}
             {...mobileTransformReset}
         >
             <motion.div 
@@ -188,9 +190,11 @@ export const AvatarGuide = () => {
                 <AnimatePresence mode="wait">
                     {showBubble ? (
                         <motion.div
-                            key={currentStep}
+                            key={step}
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            /* Fades out with the avatar's exit, so the old caption
+                               is already gone when the guide cuts to its next spot. */
+                            animate={phase === 'exit' ? { opacity: 0, y: 10, scale: 1 } : { opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10 }}
                             className="vg-hud-card"
                             /* The whole terminal takes the active character's
@@ -238,12 +242,12 @@ export const AvatarGuide = () => {
                                 sliding away with the content. */}
                             <div style={{ minHeight: 0, overflowY: isMobile ? 'visible' : 'auto' }}>
                                 <p style={{ margin: '0 0 10px 0', lineHeight: '1.4' }}>
-                                    <CaptionText text={voice.caption?.text} fallback={tourSteps[currentStep].message} />
+                                    <CaptionText text={voice.caption?.text} fallback={tourSteps[step].message} />
                                 </p>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                                     <div style={{ display: 'flex', gap: '4px' }}>
                                         {tourSteps.map((_, i) => (
-                                            <div key={i} style={{ width: 5, height: 5, background: i === currentStep ? 'var(--accent)' : 'var(--rule-strong)', transition: 'background 0.3s' }} />
+                                            <div key={i} style={{ width: 5, height: 5, background: i === step ? 'var(--accent)' : 'var(--rule-strong)', transition: 'background 0.3s' }} />
                                         ))}
                                     </div>
                                     <button onClick={(e) => { e.stopPropagation(); dismissAll(); }} style={{ color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, padding: 0 }} aria-label="Dismiss and stop narration">✕</button>
@@ -288,21 +292,17 @@ export const AvatarGuide = () => {
                     element: the wrapper above drifts the whole guide, this one
                     lets the avatar bank against that drift, which is what makes
                     the motion read as buoyancy rather than as a slide. Kept in
-                    CSS so it never has to share a transform with the emotion
-                    animation on the wrapper below. */}
+                    CSS so it never has to share a transform with the enter/exit
+                    phases, which each visual runs on its own parts. */}
                 <div className="vg-levitate">
-                {/* Avatar + mouth share one positioned wrapper so they scale together (§6.1).
-                    The emotion animation moved from the <img> to this wrapper so the mouth
-                    overlay stays aligned through it; PersonaAvatar keeps its own filters. */}
-                <motion.div
-                    key={`avatar-${currentStep}`}
+                {/* Avatar + mouth share one positioned wrapper so they scale together (§6.1). */}
+                <div
                     className={`vg-avatar-wrap${voice.enabled && !voice.isSpeaking ? ' vg-idle' : ''}`}
                     /* Optimus spec §5.2 — the only hook the persona visual mode
                        needs. The aura recolours in CSS off this attribute; the
                        intensity stays driven by --vg-level, so nothing here
                        re-renders per frame. */
                     data-vg-persona={voice.persona}
-                    animate={hasStarted ? emotionAnimations[tourSteps[currentStep].emotion] : {}}
                     onClick={handleAvatarClick}
                     style={{
                         pointerEvents: 'auto', cursor: tourActive && !dismissed ? 'default' : 'pointer',
@@ -312,8 +312,8 @@ export const AvatarGuide = () => {
                 >
                     {/* Autobot crest, arc-reactor HUD, or the memoji and its
                         overlaid mouth — personas spec §3.3. */}
-                    <PersonaAvatar persona={voice.persona} size={130} speaking={voice.isSpeaking} />
-                </motion.div>
+                    <PersonaAvatar persona={voice.persona} size={130} speaking={voice.isSpeaking} phase={phase} />
+                </div>
                 </div>
             </motion.div>
         </motion.div>

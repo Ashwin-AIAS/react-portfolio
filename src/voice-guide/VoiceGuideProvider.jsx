@@ -93,7 +93,7 @@ export const VoiceGuideProvider = ({ children }) => {
       removeSpeechCleanup();
       engine.destroy();
       engineRef.current = null;
-      setState({ ready: false, machine: STATE.disabled, enabled: false });
+      setState({ ready: false, machine: STATE.disabled, enabled: false, section: null });
       setLevel(0);
     };
   }, []);
@@ -116,6 +116,7 @@ export const VoiceGuideProvider = ({ children }) => {
   useEffect(() => {
     if (!committedId || !engineRef.current) return;
     engineRef.current.onSectionCommitted(committedId, scrollRef.current.velocity);
+    setState({ section: committedId });
   }, [committedId, scrollRef]);
 
   // --- automatic gesture unlock (§1.3, §7) -----------------------------------

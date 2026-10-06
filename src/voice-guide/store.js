@@ -22,6 +22,7 @@ import { DEFAULT_PERSONA } from './config';
  * @property {{sectionId: string, text: string, clipIndex: number, total: number} | null} caption
  * @property {string | null} sourceKind
  * @property {string}  persona   active narration persona id
+ * @property {string | null} section  last section the scroll logic committed to
  */
 
 /**
@@ -44,6 +45,10 @@ let snapshot = {
   caption: null,
   sourceKind: null,
   persona: DEFAULT_PERSONA,
+  // The committed section, not the one under the scroll position: it only
+  // moves once a candidate has settled (SETTLE_MS, FAST_SCROLL), which is what
+  // lets the avatar's enter/exit phases ignore a fast flick through the page.
+  section: null,
 };
 
 const listeners = new Set();
