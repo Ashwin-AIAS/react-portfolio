@@ -73,6 +73,14 @@ export const THEMES = [
         color: '#ffffff',
         dotClass: 'bg-[#ffffff]',
         group: 'noir'
+    },
+    {
+        id: 'titanium',
+        name: 'Carbon Titanium',
+        label: 'Brushed Steel',
+        color: '#a8b3c4',
+        dotClass: 'bg-[#a8b3c4]',
+        group: 'noir'
     }
 ];
 

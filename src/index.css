@@ -490,6 +490,52 @@
   --heat-4: #000000;
 }
 
+/* Titanium — Carbon / Brushed Steel */
+.palette-titanium {
+  --bg: #0a0a0b;
+  --surface-1: #0f0f11;
+  --surface-2: #151518;
+  --surface-3: #1c1c20;
+  --rule: #26262b;
+  --rule-strong: #38383f;
+  --text: #f4f5f7;
+  --text-muted: #a1a1aa;
+  --text-dim: #6b6b73;
+  --accent: #a8b3c4;
+  --on-accent: #0a0a0b;
+  --accent-strong: #cbd5e1;
+  --accent-dim: #64748b;
+  --accent-wash: rgba(168, 179, 196, 0.1);
+  --accent-line: rgba(168, 179, 196, 0.35);
+  --heat-0: #151518;
+  --heat-1: rgba(168, 179, 196, 0.22);
+  --heat-2: rgba(168, 179, 196, 0.45);
+  --heat-3: rgba(168, 179, 196, 0.7);
+  --heat-4: #a8b3c4;
+}
+.theme-light.palette-titanium {
+  --bg: #f5f5f7;
+  --surface-1: #ffffff;
+  --surface-2: #ececef;
+  --surface-3: #e2e2e6;
+  --rule: #d4d4d8;
+  --rule-strong: #a1a1aa;
+  --text: #111113;
+  --text-muted: #4b4b52;
+  --text-dim: #6b6b73;
+  --accent: #475569;
+  --on-accent: #ffffff;
+  --accent-strong: #334155;
+  --accent-dim: #94a3b8;
+  --accent-wash: rgba(71, 85, 105, 0.08);
+  --accent-line: rgba(71, 85, 105, 0.3);
+  --heat-0: #e2e2e6;
+  --heat-1: rgba(71, 85, 105, 0.22);
+  --heat-2: rgba(71, 85, 105, 0.45);
+  --heat-3: rgba(71, 85, 105, 0.7);
+  --heat-4: #475569;
+}
+
 /* ===== BASE ===== */
 
 @layer base {
