@@ -440,6 +440,56 @@
   --heat-4: #db2777;
 }
 
+/* ===================================================================
+   NOIR COLLECTION — true-black palettes with neutral (untinted) surfaces
+   =================================================================== */
+
+/* Obsidian — Pure Monochrome */
+.palette-obsidian {
+  --bg: #000000;
+  --surface-1: #0a0a0a;
+  --surface-2: #111111;
+  --surface-3: #1a1a1a;
+  --rule: #232323;
+  --rule-strong: #343434;
+  --text: #fafafa;
+  --text-muted: #a3a3a3;
+  --text-dim: #6e6e6e;
+  --accent: #ffffff;
+  --on-accent: #000000;
+  --accent-strong: #e5e5e5;
+  --accent-dim: #a3a3a3;
+  --accent-wash: rgba(255, 255, 255, 0.07);
+  --accent-line: rgba(255, 255, 255, 0.28);
+  --heat-0: #111111;
+  --heat-1: rgba(255, 255, 255, 0.18);
+  --heat-2: rgba(255, 255, 255, 0.38);
+  --heat-3: rgba(255, 255, 255, 0.62);
+  --heat-4: #ffffff;
+}
+.theme-light.palette-obsidian {
+  --bg: #fafafa;
+  --surface-1: #ffffff;
+  --surface-2: #f2f2f2;
+  --surface-3: #e8e8e8;
+  --rule: #dcdcdc;
+  --rule-strong: #bdbdbd;
+  --text: #0a0a0a;
+  --text-muted: #525252;
+  --text-dim: #737373;
+  --accent: #000000;
+  --on-accent: #ffffff;
+  --accent-strong: #262626;
+  --accent-dim: #525252;
+  --accent-wash: rgba(0, 0, 0, 0.05);
+  --accent-line: rgba(0, 0, 0, 0.25);
+  --heat-0: #e8e8e8;
+  --heat-1: rgba(0, 0, 0, 0.18);
+  --heat-2: rgba(0, 0, 0, 0.38);
+  --heat-3: rgba(0, 0, 0, 0.62);
+  --heat-4: #000000;
+}
+
 /* ===== BASE ===== */
 
 @layer base {

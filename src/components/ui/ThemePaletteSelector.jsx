@@ -65,6 +65,14 @@ export const THEMES = [
         label: 'Laser Magenta',
         color: '#ff007f',
         dotClass: 'bg-[#ff007f]'
+    },
+    {
+        id: 'obsidian',
+        name: 'Obsidian Mono',
+        label: 'Pure Monochrome',
+        color: '#ffffff',
+        dotClass: 'bg-[#ffffff]',
+        group: 'noir'
     }
 ];
 
