@@ -14,7 +14,13 @@
  * Eager: AvatarGuide.jsx imports this directly, so it may only touch ./config.
  */
 import { useEffect, useRef, useState } from 'react';
-import { AVATAR_ENTER_MS, AVATAR_EXIT_MS } from './config';
+import { AVATAR_ENTER_MS, AVATAR_EXIT_MS, AVATAR_PHASE_SLOW } from './config';
+
+// ?vgslow=1: the keyframes in voice-guide.css multiply every duration and
+// delay by --vg-slow, matching the slowed timers above.
+if (AVATAR_PHASE_SLOW !== 1 && typeof document !== 'undefined') {
+  document.documentElement.style.setProperty('--vg-slow', String(AVATAR_PHASE_SLOW));
+}
 
 /**
  * @param {string | null} section committed section id, null until the guide is ready

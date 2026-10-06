@@ -1834,105 +1834,192 @@
    Every element that runs a phase animation also carries .vg-ph, which is the
    single hook reduced motion uses to switch them all off (bottom of section).
 
-   Budget: enter <= AVATAR_ENTER_MS (550ms), exit <= AVATAR_EXIT_MS (300ms), and
-   nothing travels outside the 130px avatar box. `stay` is deliberately empty
-   here — each visual's existing idle and --vg-level motion IS the stay state.
-   Exit animations end invisible and hold (`both`) until the enter replaces
-   them, so the guide is never seen mid-move.
+   Budget: enter = AVATAR_ENTER_MS (900ms), exit = AVATAR_EXIT_MS (420ms). The
+   motion is meant to be noticed: parts travel 30–60px, rings and glows reach
+   about twice the avatar's size, so nothing on the way up clips it. `stay` is
+   deliberately empty here — each visual's existing idle and --vg-level motion
+   IS the stay state. Exit animations end invisible and hold (`both`) until the
+   enter replaces them, so the guide is never seen mid-move.
+
+   Every duration and delay is written as a multiple of --vg-ms, which is 1ms
+   unless ?vgslow=1 sets --vg-slow (useAvatarPhase.js) to slow it all 4x.
    ------------------------------------------------------------------------- */
 
+.vg-avatar-wrap {
+  --vg-ms: calc(1ms * var(--vg-slow, 1));
+}
+
+/* Rings, glows and split parts are allowed out of the 130px box. */
+.vg-levitate,
+.vg-avatar-wrap,
+.vg-persona-avatar,
+.vg-ashwin-holo,
+.vg-optimus,
+.vg-jarvis,
+.vg-megatron {
+  overflow: visible;
+}
+
+/* ------------------------------------------------- shared landing ring --- */
+/* A ring in the persona's colour pulses out from behind the avatar as it
+   lands. `forwards`, not `both`: nothing shows before the delay. */
+.vg-ashwin-holo {
+  --vg-ring: var(--accent);
+}
+
+.vg-optimus {
+  --vg-ring: #38bdf8;
+}
+
+.vg-jarvis {
+  --vg-ring: #00f2fe;
+}
+
+.vg-megatron {
+  --vg-ring: #c084fc;
+}
+
+.vg-ashwin-holo.vg-phase-enter::after,
+.vg-optimus.vg-phase-enter::after,
+.vg-jarvis.vg-phase-enter::after,
+.vg-megatron.vg-phase-enter::after {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  z-index: -1;
+  border: 2px solid var(--vg-ring);
+  border-radius: 50%;
+  box-shadow:
+    0 0 18px var(--vg-ring),
+    inset 0 0 12px var(--vg-ring);
+  pointer-events: none;
+  opacity: 0;
+  animation: vg-land-ring calc(700 * var(--vg-ms)) cubic-bezier(0.2, 0.7, 0.3, 1) calc(180 * var(--vg-ms)) forwards;
+}
+
+@keyframes vg-land-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
 /* ----------------------------------------------------- Ashwin (memoji) --- */
-/* Enter: pops up into the beam, then a quick two-swing wave. */
+/* Enter: the projection rig switches on, the memoji rises 60px into the beam,
+   overshoots to 1.12 and settles, then waves three times (±15°) about its
+   base. Exit: a clear nod, then it drops, shrinks and blurs out. */
 .vg-ashwin-holo.vg-phase-enter {
-  animation: vg-ashwin-pop 550ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  animation: vg-phase-fade-in calc(160 * var(--vg-ms)) ease-out both;
 }
 
 .vg-ashwin-holo.vg-phase-enter .vg-persona-avatar {
-  transform-origin: 50% 90%;
-  animation: vg-ashwin-wave 430ms ease-in-out 120ms both;
+  transform-origin: 50% 100%;
+  animation: vg-ashwin-arrive calc(900 * var(--vg-ms)) linear both;
 }
 
-/* Exit: a small nod, then the projection fades. */
 .vg-ashwin-holo.vg-phase-exit {
-  animation: vg-ashwin-out 300ms ease-in both;
+  animation: vg-ashwin-rig-out calc(420 * var(--vg-ms)) ease-in both;
 }
 
 .vg-ashwin-holo.vg-phase-exit .vg-persona-avatar {
-  transform-origin: 50% 80%;
-  animation: vg-ashwin-nod 220ms ease-in-out both;
+  transform-origin: 50% 100%;
+  animation: vg-ashwin-leave calc(420 * var(--vg-ms)) linear both;
 }
 
-@keyframes vg-ashwin-pop {
+@keyframes vg-ashwin-arrive {
   0% {
+    opacity: 0.15;
+    transform: translateY(60px) scale(0.5) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  8% {
+    opacity: 1;
+  }
+  34% {
+    transform: translateY(-4px) scale(1.12) rotate(0deg);
+    animation-timing-function: ease-in-out;
+  }
+  46% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+    animation-timing-function: ease-in-out;
+  }
+  60% {
+    transform: translateY(0) scale(1) rotate(-15deg);
+    animation-timing-function: ease-in-out;
+  }
+  74% {
+    transform: translateY(0) scale(1) rotate(15deg);
+    animation-timing-function: ease-in-out;
+  }
+  88% {
+    transform: translateY(0) scale(1) rotate(-15deg);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes vg-ashwin-leave {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+    animation-timing-function: ease-in-out;
+  }
+  20% {
+    transform: translateY(8px) scale(1);
+    animation-timing-function: ease-in-out;
+  }
+  40% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(-3px) scale(1);
+    animation-timing-function: ease-in;
+  }
+  100% {
     opacity: 0;
-    transform: translateY(18px) scale(0.85);
-  }
-  55% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: none;
+    filter: blur(4px);
+    transform: translateY(30px) scale(0.6);
   }
 }
 
-@keyframes vg-ashwin-wave {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-7deg);
-  }
-  55% {
-    transform: rotate(6deg);
-  }
-  80% {
-    transform: rotate(-3deg);
-  }
-}
-
-@keyframes vg-ashwin-nod {
-  0%,
-  100% {
-    transform: none;
-  }
-  50% {
-    transform: translateY(5px) scaleY(0.97);
-  }
-}
-
-@keyframes vg-ashwin-out {
+/* The halo, motes and pedestal go once the memoji has started to drop. */
+@keyframes vg-ashwin-rig-out {
   0%,
   45% {
     opacity: 1;
-    transform: none;
   }
   100% {
     opacity: 0;
-    transform: translateY(6px) scale(0.94);
   }
 }
 
 /* ---------------------------------------------- shared robot roots --- */
 /* The aura and ring divs sit outside the SVG, so the root carries the overall
-   fade: in quickly on enter while the parts assemble, out at the very end of
+   fade: in quickly on enter while the parts arrive, out at the very end of
    exit once the parts have already broken away. */
 .vg-optimus.vg-phase-enter,
 .vg-jarvis.vg-phase-enter,
 .vg-megatron.vg-phase-enter {
-  animation: vg-phase-fade-in 160ms ease-out both;
+  animation: vg-phase-fade-in calc(120 * var(--vg-ms)) ease-out both;
 }
 
 .vg-optimus.vg-phase-exit,
 .vg-jarvis.vg-phase-exit,
 .vg-megatron.vg-phase-exit {
-  animation: vg-phase-hold-out 300ms ease-in both;
+  animation: vg-phase-hold-out calc(420 * var(--vg-ms)) ease-in both;
 }
 
 @keyframes vg-phase-hold-out {
   0%,
-  50% {
+  75% {
     opacity: 1;
   }
   100% {
@@ -1942,8 +2029,9 @@
 
 /* --------------------------------------------------------- Optimus --- */
 /* Enter: the faceplate assembles piece by piece — chassis, antennae, crown,
-   cheeks, mask, collar — each sliding in from its own side (--dx/--dy/--s set
-   inline per part), then the optics light up last. Exit runs it backwards. */
+   cheeks, mask, collar. Each part starts 4x its inline --dx/--dy away (about
+   35–47px on screen) and snaps home on an overshoot, 60ms apart; then the
+   optics flash to full brightness and settle. Exit splits them apart again. */
 .vg-optimus .vg-opt-part,
 .vg-optimus .vg-opt-optics {
   transform-box: view-box;
@@ -1951,19 +2039,20 @@
 }
 
 .vg-optimus.vg-phase-enter .vg-opt-part {
-  animation: vg-opt-assemble 280ms cubic-bezier(0.2, 0.9, 0.3, 1) calc(var(--i) * 40ms) both;
+  animation: vg-opt-assemble calc(420 * var(--vg-ms)) cubic-bezier(0.34, 1.56, 0.64, 1)
+    calc(var(--i) * 60 * var(--vg-ms)) both;
 }
 
 .vg-optimus.vg-phase-enter .vg-opt-optics {
-  animation: vg-opt-optics-on 220ms ease-out 320ms both;
+  animation: vg-opt-optics-on calc(360 * var(--vg-ms)) ease-out calc(520 * var(--vg-ms)) both;
 }
 
 .vg-optimus.vg-phase-exit .vg-opt-part {
-  animation: vg-opt-split 200ms ease-in calc((6 - var(--i)) * 15ms) both;
+  animation: vg-opt-split calc(360 * var(--vg-ms)) ease-out calc((6 - var(--i)) * 10 * var(--vg-ms)) both;
 }
 
 .vg-optimus.vg-phase-exit .vg-opt-optics {
-  animation: vg-opt-optics-off 120ms ease-in both;
+  animation: vg-opt-optics-off calc(200 * var(--vg-ms)) ease-in both;
 }
 
 /* Stay: a slow breathing glow on the optics, on top of the voice response. */
@@ -1974,7 +2063,11 @@
 @keyframes vg-opt-assemble {
   from {
     opacity: 0;
-    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--s, 1));
+    transform: translate(calc(var(--dx, 0px) * 4), calc(var(--dy, 0px) * 4))
+      scale(calc(1 - (1 - var(--s, 1)) * 3));
+  }
+  20% {
+    opacity: 1;
   }
   to {
     opacity: 1;
@@ -1983,28 +2076,34 @@
 }
 
 @keyframes vg-opt-split {
-  from {
+  0% {
     opacity: 1;
     transform: none;
   }
-  to {
+  65% {
+    opacity: 1;
+    transform: translate(calc(var(--dx, 0px) * 4), calc(var(--dy, 0px) * 4))
+      scale(calc(1 - (1 - var(--s, 1)) * 3));
+  }
+  100% {
     opacity: 0;
-    transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(var(--s, 1));
+    transform: translate(calc(var(--dx, 0px) * 4), calc(var(--dy, 0px) * 4))
+      scale(calc(1 - (1 - var(--s, 1)) * 3));
   }
 }
 
 @keyframes vg-opt-optics-on {
   0% {
     opacity: 0;
-    filter: brightness(1);
+    filter: brightness(1) drop-shadow(0 0 0 #38bdf8);
   }
-  60% {
+  35% {
     opacity: 1;
-    filter: brightness(2.2);
+    filter: brightness(2.6) drop-shadow(0 0 14px #38bdf8);
   }
   100% {
     opacity: 1;
-    filter: brightness(1);
+    filter: brightness(1) drop-shadow(0 0 0 #38bdf8);
   }
 }
 
@@ -2015,7 +2114,7 @@
   }
   to {
     opacity: 0;
-    filter: brightness(0.3);
+    filter: brightness(0.2);
   }
 }
 
@@ -2030,10 +2129,10 @@
 }
 
 /* ---------------------------------------------------------- JARVIS --- */
-/* Enter: the rings spin up from still (a decelerating quarter-and-a-half turn
-   out of a small scale) while the frame grows in behind them and the core
-   flares. Exit: rings and frame collapse into the core, which shrinks to a
-   dot. Every group scales about the reactor centre. */
+/* Enter: the rings spin up a full turn out of nothing, overshoot to 1.3x and
+   settle, while the frame grows in behind them and the core flares with a
+   20px glow. Exit: everything collapses into a 4px dot that flashes white and
+   is gone. Every group scales about the reactor centre. */
 .vg-jarvis .vg-jarvis-rings,
 .vg-jarvis .vg-jarvis-frame,
 .vg-jarvis .vg-jarvis-core,
@@ -2043,27 +2142,27 @@
 }
 
 .vg-jarvis.vg-phase-enter .vg-jarvis-rings {
-  animation: vg-jarvis-spinup 500ms cubic-bezier(0.15, 0.85, 0.3, 1) both;
+  animation: vg-jarvis-spinup calc(800 * var(--vg-ms)) linear both;
 }
 
 .vg-jarvis.vg-phase-enter .vg-jarvis-frame {
-  animation: vg-jarvis-grow 300ms ease-out 120ms both;
+  animation: vg-jarvis-grow calc(520 * var(--vg-ms)) cubic-bezier(0.34, 1.56, 0.64, 1) calc(160 * var(--vg-ms)) both;
 }
 
 .vg-jarvis.vg-phase-enter .vg-jarvis-core {
-  animation: vg-jarvis-flare 550ms ease-out both;
+  animation: vg-jarvis-flare calc(780 * var(--vg-ms)) ease-out calc(100 * var(--vg-ms)) both;
 }
 
 .vg-jarvis.vg-phase-exit .vg-jarvis-rings {
-  animation: vg-jarvis-collapse 260ms ease-in both;
+  animation: vg-jarvis-collapse calc(240 * var(--vg-ms)) ease-in both;
 }
 
 .vg-jarvis.vg-phase-exit .vg-jarvis-frame {
-  animation: vg-jarvis-collapse 220ms ease-in both;
+  animation: vg-jarvis-collapse calc(200 * var(--vg-ms)) ease-in both;
 }
 
 .vg-jarvis.vg-phase-exit .vg-jarvis-core {
-  animation: vg-jarvis-dot 300ms ease-in both;
+  animation: vg-jarvis-dot calc(420 * var(--vg-ms)) linear both;
 }
 
 /* Stay: one scan sweep circling the reactor, on top of the existing orbit. */
@@ -2073,27 +2172,32 @@
 }
 
 @keyframes vg-jarvis-spinup {
-  from {
+  0% {
     opacity: 0;
-    transform: rotate(-200deg) scale(0.2);
+    transform: rotate(-360deg) scale(0);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
   }
-  40% {
+  15% {
     opacity: 1;
   }
-  to {
+  60% {
+    transform: rotate(-20deg) scale(1.3);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
     opacity: 1;
-    transform: none;
+    transform: rotate(0deg) scale(1);
   }
 }
 
 @keyframes vg-jarvis-grow {
   from {
     opacity: 0;
-    transform: scale(0.6);
+    transform: scale(0.3);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: scale(1);
   }
 }
 
@@ -2101,44 +2205,55 @@
   0% {
     opacity: 0;
     transform: scale(0);
-    filter: brightness(1);
+    filter: brightness(1) drop-shadow(0 0 0 #00f2fe);
   }
-  35% {
+  40% {
     opacity: 1;
-    transform: scale(1.35);
-    filter: brightness(2.4);
+    transform: scale(1.5);
+    filter: brightness(2.6) drop-shadow(0 0 20px #00f2fe);
   }
   100% {
     opacity: 1;
-    transform: none;
-    filter: brightness(1);
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 #00f2fe);
   }
 }
 
 @keyframes vg-jarvis-collapse {
-  from {
+  0% {
     opacity: 1;
-    transform: none;
+    transform: rotate(0deg) scale(1);
   }
-  to {
+  85% {
+    opacity: 1;
+  }
+  100% {
     opacity: 0;
-    transform: rotate(120deg) scale(0.05);
+    transform: rotate(180deg) scale(0.04);
   }
 }
 
+/* Shrinks to a ~4px point (the core is ~36px across), flashes, vanishes. */
 @keyframes vg-jarvis-dot {
   0% {
-    transform: none;
-    filter: brightness(1);
-  }
-  70% {
     opacity: 1;
-    transform: scale(0.25);
-    filter: brightness(2);
+    transform: scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 #ffffff);
+    animation-timing-function: ease-in;
+  }
+  50% {
+    transform: scale(0.11);
+    filter: brightness(1) drop-shadow(0 0 0 #ffffff);
+  }
+  68% {
+    opacity: 1;
+    transform: scale(0.16);
+    filter: brightness(3.5) drop-shadow(0 0 12px #ffffff);
   }
   100% {
     opacity: 0;
     transform: scale(0);
+    filter: brightness(1) drop-shadow(0 0 0 #ffffff);
   }
 }
 
@@ -2149,35 +2264,38 @@
 }
 
 /* -------------------------------------------------------- Megatron --- */
-/* Enter: the crest glitches in — horizontal slices with sideways jitter on
-   hard steps — and the optics flare blood-red once it locks. Exit: a glitch
-   burst, a last eye flare, then a hard cut to black rather than a fade.
+/* Enter: the crest glitches in over five hard steps — horizontal slices,
+   jumps of up to ~40px and a ±6px red/cyan channel split — then locks and the
+   optics flare blood-red with a 20px glow. Exit: a glitch burst, the eyes cut,
+   then a hard cut to black rather than a fade.
    "Unclipped" is inset(-40%), not inset(0): the svg's drop-shadow glow spills
-   past its box, and a zero inset would shave it off until the phase ended. */
+   past its box, and a zero inset would shave it off. The glitch replaces the
+   svg's inline filter while it runs, so the settled frames restate that glow
+   exactly; the hand-back to the inline style at `stay` is then invisible. */
 .vg-megatron .vg-meg-eyes {
   transform-box: view-box;
   transform-origin: 50% 46%;
 }
 
 .vg-megatron.vg-phase-enter .vg-megatron-svg {
-  animation: vg-meg-glitch-in 420ms steps(1, end) both;
+  animation: vg-meg-glitch-in calc(900 * var(--vg-ms)) steps(1, end) both;
 }
 
 .vg-megatron.vg-phase-enter .vg-meg-eyes {
-  animation: vg-meg-eye-flare 280ms ease-out 260ms both;
+  animation: vg-meg-eye-flare calc(400 * var(--vg-ms)) ease-out calc(470 * var(--vg-ms)) both;
 }
 
 .vg-megatron.vg-phase-exit .vg-megatron-svg {
-  animation: vg-meg-glitch-out 225ms steps(1, end) both;
+  animation: vg-meg-glitch-out calc(300 * var(--vg-ms)) steps(1, end) both;
 }
 
 .vg-megatron.vg-phase-exit .vg-meg-eyes {
-  animation: vg-meg-eye-cut 225ms ease-in both;
+  animation: vg-meg-eye-cut calc(300 * var(--vg-ms)) ease-in both;
 }
 
 /* Overrides the shared hold-out: Megatron cuts, it does not fade. */
 .vg-megatron.vg-phase-exit {
-  animation: vg-meg-cut 300ms linear both;
+  animation: vg-meg-cut calc(420 * var(--vg-ms)) linear both;
 }
 
 /* Stay: a slow, menacing pulse in the plasma aura. The blur is restated
@@ -2188,32 +2306,37 @@
 
 @keyframes vg-meg-glitch-in {
   0% {
-    opacity: 0;
-    clip-path: inset(42% 0 44% 0);
-    transform: translateX(-6px);
-  }
-  12% {
     opacity: 1;
-    clip-path: inset(8% 0 70% 0);
-    transform: translateX(5px);
+    clip-path: inset(40% 0 44% 0);
+    transform: translate(-26px, -36px) scale(1.3);
+    filter: drop-shadow(-6px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(6px 0 0 rgba(0, 242, 254, 0.85));
   }
-  24% {
-    clip-path: inset(58% 0 10% 0);
-    transform: translateX(-4px);
+  10% {
+    clip-path: inset(6% 0 68% 0);
+    transform: translate(20px, -12px) scale(1.2);
+    filter: drop-shadow(6px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(-6px 0 0 rgba(0, 242, 254, 0.85));
   }
-  36% {
-    clip-path: inset(22% 0 34% 0);
-    transform: translateX(3px);
+  20% {
+    clip-path: inset(56% 0 10% 0);
+    transform: translate(-14px, 18px) scale(1.12);
+    filter: drop-shadow(-5px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(5px 0 0 rgba(0, 242, 254, 0.85));
   }
-  50% {
+  30% {
+    clip-path: inset(20% 0 36% 0);
+    transform: translate(10px, -6px) scale(1.06);
+    filter: drop-shadow(4px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(-4px 0 0 rgba(0, 242, 254, 0.85));
+  }
+  40% {
     clip-path: inset(-40%);
-    transform: translateX(-2px);
+    transform: translate(-4px, 2px) scale(1.02);
+    filter: drop-shadow(-3px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(3px 0 0 rgba(0, 242, 254, 0.85));
   }
-  62%,
+  50%,
   100% {
     opacity: 1;
     clip-path: inset(-40%);
     transform: none;
+    filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.7)) drop-shadow(0 0 8px rgba(255, 0, 60, 0.5));
   }
 }
 
@@ -2221,50 +2344,55 @@
   0% {
     clip-path: inset(-40%);
     transform: none;
+    filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.7)) drop-shadow(0 0 8px rgba(255, 0, 60, 0.5));
   }
   20% {
     clip-path: inset(30% 0 28% 0);
-    transform: translateX(4px);
+    transform: translate(10px, 0);
+    filter: drop-shadow(6px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(-6px 0 0 rgba(0, 242, 254, 0.85));
   }
   40% {
     clip-path: inset(0 0 62% 0);
-    transform: translateX(-5px);
+    transform: translate(-14px, -4px);
+    filter: drop-shadow(-6px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(6px 0 0 rgba(0, 242, 254, 0.85));
   }
   60% {
     clip-path: inset(55% 0 12% 0);
-    transform: translateX(6px);
+    transform: translate(16px, 4px);
+    filter: drop-shadow(5px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(-5px 0 0 rgba(0, 242, 254, 0.85));
   }
   80%,
   100% {
     clip-path: inset(48% 0 48% 0);
-    transform: translateX(-3px);
+    transform: translate(-6px, 0);
+    filter: drop-shadow(-4px 0 0 rgba(255, 0, 60, 0.85)) drop-shadow(4px 0 0 rgba(0, 242, 254, 0.85));
   }
 }
 
 @keyframes vg-meg-eye-flare {
   0% {
-    filter: brightness(1);
-    transform: none;
+    filter: brightness(1) drop-shadow(0 0 0 #ff003c);
+    transform: scale(1);
   }
-  40% {
-    filter: brightness(2.6) drop-shadow(0 0 4px #ff003c);
-    transform: scale(1.08);
+  35% {
+    filter: brightness(2.8) drop-shadow(0 0 20px #ff003c);
+    transform: scale(1.25);
   }
   100% {
-    filter: brightness(1);
-    transform: none;
+    filter: brightness(1) drop-shadow(0 0 0 #ff003c);
+    transform: scale(1);
   }
 }
 
 @keyframes vg-meg-eye-cut {
   0% {
-    filter: brightness(1);
+    filter: brightness(1) drop-shadow(0 0 0 #ff003c);
   }
   45% {
-    filter: brightness(3) drop-shadow(0 0 5px #ff003c);
+    filter: brightness(3) drop-shadow(0 0 12px #ff003c);
   }
   100% {
-    filter: brightness(0);
+    filter: brightness(0) drop-shadow(0 0 0 #ff003c);
   }
 }
 
@@ -2290,8 +2418,8 @@
 }
 
 /* --------------------------------------------- reduced motion, phases --- */
-/* A plain fade for every persona: no assembly, no glitch, no wave, and none
-   of the phase-specific stay loops either. */
+/* A plain fade for every persona: no assembly, no glitch, no wave, no landing
+   ring, and none of the phase-specific stay loops either. */
 @media (prefers-reduced-motion: reduce) {
   .vg-ph {
     animation: none !important;
@@ -2300,6 +2428,10 @@
   /* Without its rotation the sweep is a stray wedge, not a scan. */
   .vg-jarvis-sweep {
     display: none !important;
+  }
+
+  .vg-phase-enter::after {
+    content: none !important;
   }
 
   .vg-phase-enter {

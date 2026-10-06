@@ -15,10 +15,17 @@ export const SETTLED_VELOCITY = 60;
 export const COOLDOWN_MS = 600;
 
 // --- Avatar phases -------------------------------------------------------------
+/**
+ * ?vgslow=1 — debug aid: every avatar phase plays 4x slower so the motion can
+ * be checked by eye. useAvatarPhase.js hands the same factor to the CSS as
+ * --vg-slow, so the timers and the keyframes stay in step.
+ */
+export const AVATAR_PHASE_SLOW =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('vgslow') === '1' ? 4 : 1;
 /** Enter animation when a section commits or the persona changes. */
-export const AVATAR_ENTER_MS = 550;
+export const AVATAR_ENTER_MS = 900 * AVATAR_PHASE_SLOW;
 /** Exit animation for the outgoing section, played in place before the move. */
-export const AVATAR_EXIT_MS = 300;
+export const AVATAR_EXIT_MS = 420 * AVATAR_PHASE_SLOW;
 
 // --- Scroll tracking (§4.1)--------------------------------------------------
 /** EMA smoothing factor for velocity. Higher = twitchier. */

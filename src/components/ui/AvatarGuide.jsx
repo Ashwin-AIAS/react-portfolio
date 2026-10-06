@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
 import { PersonaAvatar } from '../../voice-guide/components/PersonaAvatar';
 import { useAvatarPhase } from '../../voice-guide/useAvatarPhase';
+import { AVATAR_ENTER_MS } from '../../voice-guide/config';
 import { CaptionText, AgentControls } from '../../voice-guide/components/CaptionBubble';
 
 const tourSteps = [
@@ -195,7 +196,12 @@ export const AvatarGuide = () => {
                             /* Fades out with the avatar's exit, so the old caption
                                is already gone when the guide cuts to its next spot. */
                             animate={phase === 'exit' ? { opacity: 0, y: 10, scale: 1 } : { opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10 }}
+                            /* On enter the avatar lands on its own first; the
+                               card follows about halfway through. */
+                            transition={{ delay: phase === 'enter' ? (AVATAR_ENTER_MS / 2) / 1000 : 0 }}
+                            /* A card replaced after an exit is already invisible,
+                               so it leaves at once instead of holding up the next. */
+                            exit={{ opacity: 0, y: 10, transition: { duration: phase === 'exit' ? 0 : 0.3 } }}
                             className="vg-hud-card"
                             /* The whole terminal takes the active character's
                                palette from here (holo spec §2.4). voice-guide.css
