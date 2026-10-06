@@ -2029,12 +2029,136 @@
   }
 }
 
+/* ---------------------------------------------------------- JARVIS --- */
+/* Enter: the rings spin up from still (a decelerating quarter-and-a-half turn
+   out of a small scale) while the frame grows in behind them and the core
+   flares. Exit: rings and frame collapse into the core, which shrinks to a
+   dot. Every group scales about the reactor centre. */
+.vg-jarvis .vg-jarvis-rings,
+.vg-jarvis .vg-jarvis-frame,
+.vg-jarvis .vg-jarvis-core,
+.vg-jarvis .vg-jarvis-sweep {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+
+.vg-jarvis.vg-phase-enter .vg-jarvis-rings {
+  animation: vg-jarvis-spinup 500ms cubic-bezier(0.15, 0.85, 0.3, 1) both;
+}
+
+.vg-jarvis.vg-phase-enter .vg-jarvis-frame {
+  animation: vg-jarvis-grow 300ms ease-out 120ms both;
+}
+
+.vg-jarvis.vg-phase-enter .vg-jarvis-core {
+  animation: vg-jarvis-flare 550ms ease-out both;
+}
+
+.vg-jarvis.vg-phase-exit .vg-jarvis-rings {
+  animation: vg-jarvis-collapse 260ms ease-in both;
+}
+
+.vg-jarvis.vg-phase-exit .vg-jarvis-frame {
+  animation: vg-jarvis-collapse 220ms ease-in both;
+}
+
+.vg-jarvis.vg-phase-exit .vg-jarvis-core {
+  animation: vg-jarvis-dot 300ms ease-in both;
+}
+
+/* Stay: one scan sweep circling the reactor, on top of the existing orbit. */
+.vg-jarvis.vg-phase-stay .vg-jarvis-sweep {
+  opacity: 1;
+  animation: vg-jarvis-sweep 4.8s linear infinite;
+}
+
+@keyframes vg-jarvis-spinup {
+  from {
+    opacity: 0;
+    transform: rotate(-200deg) scale(0.2);
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vg-jarvis-grow {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vg-jarvis-flare {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+    filter: brightness(1);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.35);
+    filter: brightness(2.4);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: brightness(1);
+  }
+}
+
+@keyframes vg-jarvis-collapse {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: rotate(120deg) scale(0.05);
+  }
+}
+
+@keyframes vg-jarvis-dot {
+  0% {
+    transform: none;
+    filter: brightness(1);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.25);
+    filter: brightness(2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+@keyframes vg-jarvis-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* --------------------------------------------- reduced motion, phases --- */
 /* A plain fade for every persona: no assembly, no glitch, no wave, and none
    of the phase-specific stay loops either. */
 @media (prefers-reduced-motion: reduce) {
   .vg-ph {
     animation: none !important;
+  }
+
+  /* Without its rotation the sweep is a stray wedge, not a scan. */
+  .vg-jarvis-sweep {
+    display: none !important;
   }
 
   .vg-phase-enter {
