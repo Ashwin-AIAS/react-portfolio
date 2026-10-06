@@ -628,6 +628,52 @@
   --heat-4: #4d7c0f;
 }
 
+/* Ember — Molten Forge Orange */
+.palette-ember {
+  --bg: #000000;
+  --surface-1: #0a0908;
+  --surface-2: #12100e;
+  --surface-3: #1a1714;
+  --rule: #26211d;
+  --rule-strong: #3a322b;
+  --text: #faf5f2;
+  --text-muted: #b0a49c;
+  --text-dim: #756961;
+  --accent: #ff4d00;
+  --on-accent: #000000;
+  --accent-strong: #ff7a3d;
+  --accent-dim: #c23a00;
+  --accent-wash: rgba(255, 77, 0, 0.12);
+  --accent-line: rgba(255, 77, 0, 0.4);
+  --heat-0: #12100e;
+  --heat-1: rgba(255, 77, 0, 0.22);
+  --heat-2: rgba(255, 77, 0, 0.45);
+  --heat-3: rgba(255, 77, 0, 0.7);
+  --heat-4: #ff4d00;
+}
+.theme-light.palette-ember {
+  --bg: #faf7f5;
+  --surface-1: #ffffff;
+  --surface-2: #f4eeea;
+  --surface-3: #ebe2dc;
+  --rule: #ddd0c7;
+  --rule-strong: #c0ad9f;
+  --text: #170c06;
+  --text-muted: #5c4a3f;
+  --text-dim: #7d6a5e;
+  --accent: #c2410c;
+  --on-accent: #ffffff;
+  --accent-strong: #9a3412;
+  --accent-dim: #f97316;
+  --accent-wash: rgba(194, 65, 12, 0.08);
+  --accent-line: rgba(194, 65, 12, 0.3);
+  --heat-0: #ebe2dc;
+  --heat-1: rgba(194, 65, 12, 0.22);
+  --heat-2: rgba(194, 65, 12, 0.45);
+  --heat-3: rgba(194, 65, 12, 0.7);
+  --heat-4: #c2410c;
+}
+
 /* ===== BASE ===== */
 
 @layer base {

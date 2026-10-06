@@ -97,6 +97,14 @@ export const THEMES = [
         color: '#c6ff00',
         dotClass: 'bg-[#c6ff00]',
         group: 'noir'
+    },
+    {
+        id: 'ember',
+        name: 'Molten Ember',
+        label: 'Forge Orange',
+        color: '#ff4d00',
+        dotClass: 'bg-[#ff4d00]',
+        group: 'noir'
     }
 ];
 
