@@ -1242,6 +1242,12 @@
 .theme-light .ambient-grid { mix-blend-mode: multiply; }
 .theme-light .ambient-grain { opacity: 0.035; }
 
+/* Noir palettes are about the black itself. The grain lifts #000 to ~#060606
+   across the whole viewport and the full-strength orbs fog it to charcoal, so
+   in dark mode drop the grain and keep the orbs to a faint accent glow. */
+.theme-dark:is(.palette-obsidian, .palette-titanium, .palette-onyx, .palette-venom, .palette-ember) .ambient-orb { opacity: 0.3; }
+.theme-dark:is(.palette-obsidian, .palette-titanium, .palette-onyx, .palette-venom, .palette-ember) .ambient-grain { display: none; }
+
 /* ===================================================================
    HERO SCROLL CUE — a hairline that keeps draining downward.
    =================================================================== */
