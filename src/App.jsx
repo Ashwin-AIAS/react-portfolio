@@ -334,7 +334,8 @@ export default function App() {
             'palette-cyberpunk',
             'palette-obsidian',
             'palette-titanium',
-            'palette-onyx'
+            'palette-onyx',
+            'palette-venom'
         ];
         allPalettes.forEach(cls => root.classList.remove(cls));
         root.classList.add(`palette-${palette}`);

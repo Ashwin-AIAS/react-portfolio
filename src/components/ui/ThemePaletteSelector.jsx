@@ -89,6 +89,14 @@ export const THEMES = [
         color: '#d4af37',
         dotClass: 'bg-[#d4af37]',
         group: 'noir'
+    },
+    {
+        id: 'venom',
+        name: 'Venom Acid',
+        label: 'Symbiote Lime',
+        color: '#c6ff00',
+        dotClass: 'bg-[#c6ff00]',
+        group: 'noir'
     }
 ];
 
