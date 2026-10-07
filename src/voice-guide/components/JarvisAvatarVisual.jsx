@@ -43,10 +43,12 @@ const GYRO_RINGS = [
  * @param {number}  [props.size]     px, square
  * @param {boolean} [props.speaking] brightens the reactor while speaking
  * @param {string}  [props.phase]    'enter' | 'stay' | 'exit' — see useAvatarPhase
+ * @param {string}  [props.mode]     'guide' | 'stage' — stage drops the phase
+ *   class, so none of the phase CSS runs and StatementSection drives the parts
  */
-export const JarvisAvatarVisual = ({ size = 130, speaking = false, phase = 'stay' }) => (
+export const JarvisAvatarVisual = ({ size = 130, speaking = false, phase = 'stay', mode = 'guide' }) => (
   <div
-    className={`vg-jarvis vg-phase-${phase}${speaking ? ' vg-jarvis-live' : ''}`}
+    className={`vg-jarvis ${mode === 'stage' ? 'vg-mode-stage' : `vg-phase-${phase}`}${speaking ? ' vg-jarvis-live' : ''}`}
     style={{ width: size, height: size }}
     aria-hidden="true"
   >

@@ -19,6 +19,8 @@ export const translations = {
       audioTourActive: "Audio Tour Active",
       askAssistant: "Ask AI Assistant",
       statement: "I teach machines to see.",
+      // The word the statement scene lights up; must appear in `statement`.
+      statementAccent: "see.",
       statementSub: "Perception, sensor fusion and LLM systems for vehicles that drive themselves.",
       scrollCue: "Scroll"
     },
@@ -111,6 +113,7 @@ export const translations = {
       audioTourActive: "Audio-Tour aktiv",
       askAssistant: "KI-Assistent fragen",
       statement: "Ich bringe Maschinen das Sehen bei.",
+      statementAccent: "Sehen",
       statementSub: "Perception, Sensorfusion und LLM-Systeme für Fahrzeuge, die selbst fahren.",
       scrollCue: "Scrollen"
     },

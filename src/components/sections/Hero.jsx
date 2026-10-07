@@ -3,8 +3,6 @@ import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { LidarSweep } from '../ui/LidarSweep';
 import { useCanPin, usePrefersReducedMotion } from '../../hooks/useMediaQuery';
 
-const EASE = [0.16, 1, 0.3, 1];
-
 // The typewriter ticks every 60ms. It lives in its own component so those
 // ticks re-render one <p>, not the whole stage.
 const RoleTicker = ({ badge }) => {
@@ -119,17 +117,6 @@ const Portrait = () => (
     </figure>
 );
 
-const Statement = ({ t }) => (
-    <>
-        <p className="font-display text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-ink leading-[0.95]">
-            {t.hero.statement}
-        </p>
-        <p className="mt-6 text-base md:text-lg text-ink-muted font-light leading-relaxed max-w-xl mx-auto">
-            {t.hero.statementSub}
-        </p>
-    </>
-);
-
 const ScrollCue = ({ t, style }) => (
     <motion.div className="hero-cue" style={style} aria-hidden="true">
         <span className="label">{t.hero.scrollCue}</span>
@@ -144,8 +131,12 @@ const toBlur = (px) => (px < 0.05 ? 'none' : `blur(${px}px)`);
 /**
  * Desktop: a camera dolly. The section is a tall runway and the stage pins to
  * the viewport while you scroll through it — the LiDAR field flies past, the
- * intro lifts away out of focus, the portrait pushes in, and one statement
- * takes over the frame before the page releases into the next section.
+ * intro lifts away out of focus and the portrait pushes in, then the page
+ * releases into StatementSection, which runs its own pinned scene.
+ *
+ * The runway used to be 240vh with the statement taking over its back half.
+ * It is 190vh now; every range below is the old one rescaled by 140/90, so
+ * each move still takes the same distance of scroll as before.
  */
 const PinnedHero = ({ t }) => {
     const runwayRef = useRef(null);
@@ -153,26 +144,22 @@ const PinnedHero = ({ t }) => {
     // A little inertia so wheel steps read as a camera move, not a slideshow.
     const p = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.4 });
 
-    const lidarScale = useTransform(p, [0, 0.75], [1, 2.6]);
-    const lidarOpacity = useTransform(p, [0, 0.5, 0.85], [1, 0.75, 0.2]);
+    const lidarScale = useTransform(p, [0, 1], [1, 2.4]);
+    const lidarOpacity = useTransform(p, [0, 0.78, 1], [1, 0.75, 0.2]);
 
-    const copyY = useTransform(p, [0, 0.42], [0, -140]);
-    const copyOpacity = useTransform(p, [0.04, 0.36], [1, 0]);
-    const copyFilter = useTransform(useTransform(p, [0, 0.36], [0, 10]), toBlur);
-    const copyPointer = useTransform(p, (v) => (v > 0.3 ? 'none' : 'auto'));
+    const copyY = useTransform(p, [0, 0.65], [0, -140]);
+    const copyOpacity = useTransform(p, [0.06, 0.56], [1, 0]);
+    const copyFilter = useTransform(useTransform(p, [0, 0.56], [0, 10]), toBlur);
+    const copyPointer = useTransform(p, (v) => (v > 0.47 ? 'none' : 'auto'));
 
-    const portraitScale = useTransform(p, [0, 0.5], [1, 1.35]);
-    const portraitY = useTransform(p, [0, 0.5], [0, -50]);
-    const portraitOpacity = useTransform(p, [0.22, 0.5], [1, 0]);
+    const portraitScale = useTransform(p, [0, 0.78], [1, 1.35]);
+    const portraitY = useTransform(p, [0, 0.78], [0, -50]);
+    const portraitOpacity = useTransform(p, [0.34, 0.78], [1, 0]);
 
-    const statementOpacity = useTransform(p, [0.42, 0.62], [0, 1]);
-    const statementScale = useTransform(p, [0.42, 0.82], [0.86, 1]);
-    const statementY = useTransform(p, [0.42, 0.72], [60, 0]);
-
-    const cueOpacity = useTransform(p, [0, 0.08], [1, 0]);
+    const cueOpacity = useTransform(p, [0, 0.12], [1, 0]);
 
     return (
-        <section id="hero" data-narrate="hero" ref={runwayRef} className="relative" style={{ height: '240vh' }}>
+        <section id="hero" data-narrate="hero" ref={runwayRef} className="relative" style={{ height: '190vh' }}>
             <div className="sticky top-0 h-screen overflow-hidden flex items-center px-6 pt-16">
                 <motion.div
                     className="absolute inset-0 overflow-hidden"
@@ -199,13 +186,6 @@ const PinnedHero = ({ t }) => {
                     </div>
                 </div>
 
-                <motion.div
-                    className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
-                    style={{ opacity: statementOpacity, scale: statementScale, y: statementY }}
-                >
-                    <Statement t={t} />
-                </motion.div>
-
                 <ScrollCue t={t} style={{ opacity: cueOpacity }} />
             </div>
         </section>
@@ -214,7 +194,7 @@ const PinnedHero = ({ t }) => {
 
 /**
  * Phones and short windows: there is no room to pin, so the same scene runs
- * as parallax while the hero scrolls out, and the statement arrives in flow.
+ * as parallax while the hero scrolls out.
  * Reduced motion: the same layout with every value at rest.
  */
 const FlowHero = ({ t, still }) => {
@@ -245,16 +225,6 @@ const FlowHero = ({ t, still }) => {
                         <Portrait />
                     </motion.div>
                 </div>
-
-                <motion.div
-                    className="mt-24 md:mt-32 text-center"
-                    initial={still ? false : { opacity: 0, y: 40, scale: 0.94 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true, margin: '-15% 0px' }}
-                    transition={{ duration: 0.8, ease: EASE }}
-                >
-                    <Statement t={t} />
-                </motion.div>
             </div>
 
             {!still && <ScrollCue t={t} style={{ opacity: cueOpacity }} />}

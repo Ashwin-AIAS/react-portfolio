@@ -1,0 +1,85 @@
+/* ============================================================================
+   STATEMENT STAGE — the three guide robots, scrubbed by scroll
+   ============================================================================
+   StatementSection renders the voice-guide visuals with mode="stage", which
+   drops their vg-phase-* class, so none of the enter/exit CSS matches. Their
+   parts are posed from scroll progress by statementRigs.js, as inline
+   transform and opacity; this file only sets the stage up for that.
+
+   Every timer-driven loop (spins, gyros, scan rake, ring pulses) is switched
+   off, so the scene stands still whenever the scroll does.
+
+   This file is eager, while voice-guide.css is lazy, so everything the stage
+   relies on (layout, transform origins) is restated rather than inherited.
+   ------------------------------------------------------------------------- */
+
+.vg-mode-stage {
+  /* Narration level is set high up the tree; the stage must not lip-sync. */
+  --vg-level: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vg-mode-stage,
+.vg-mode-stage * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.vg-mode-stage > svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* The parts move while scrolling, so the svg repaints every frame, and at
+   stage size each of the visuals' ~20 drop-shadow glows is a large blur on
+   that path. At 0.22 opacity behind a masked headline they barely register,
+   so the stage goes without them; that is what keeps a scrub at 60fps. */
+.vg-mode-stage svg,
+.vg-mode-stage svg * {
+  filter: none !important;
+}
+
+/* The auras keep their static blur; on their own layer it is drawn once and
+   only their opacity changes. */
+.vg-mode-stage .vg-optimus-aura,
+.vg-mode-stage .vg-jarvis-aura,
+.vg-mode-stage .vg-megatron-aura,
+.vg-mode-stage .vg-optimus-ring {
+  will-change: opacity;
+}
+
+/* Every posed SVG group pivots on the viewBox, not on user-space 0,0. */
+.vg-mode-stage .vg-opt-part,
+.vg-mode-stage .vg-opt-optics,
+.vg-mode-stage .vg-jarvis-rings,
+.vg-mode-stage .vg-jarvis-spin,
+.vg-mode-stage .vg-jarvis-spin-rev,
+.vg-mode-stage .vg-jarvis-frame,
+.vg-mode-stage .vg-jarvis-core,
+.vg-mode-stage .vg-jarvis-sweep,
+.vg-mode-stage .vg-megatron-reticle,
+.vg-mode-stage .vg-megatron-crosshair {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+
+.vg-mode-stage .vg-meg-eyes {
+  transform-box: view-box;
+  transform-origin: 50% 46%;
+}
+
+/* ------------------------------------------------- floating guide --- */
+/* While the stage is pinned the guide's avatar steps aside so it doesn't
+   compete with the scene; its caption card stays. */
+.vg-avatar-wrap {
+  transition: opacity 0.35s ease;
+}
+
+html[data-statement-stage] .vg-avatar-wrap {
+  opacity: 0;
+  pointer-events: none !important;
+}

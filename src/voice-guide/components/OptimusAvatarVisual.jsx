@@ -26,10 +26,12 @@ const SCANLINES = [16, 24, 32, 40, 48, 56, 64, 72, 80, 88];
  * @param {number}  [props.size]     px, square
  * @param {boolean} [props.speaking] brightens the crest while speaking
  * @param {string}  [props.phase]    'enter' | 'stay' | 'exit' — see useAvatarPhase
+ * @param {string}  [props.mode]     'guide' | 'stage' — stage drops the phase
+ *   class, so none of the phase CSS runs and StatementSection drives the parts
  */
-export const OptimusAvatarVisual = ({ size = 130, speaking = false, phase = 'stay' }) => (
+export const OptimusAvatarVisual = ({ size = 130, speaking = false, phase = 'stay', mode = 'guide' }) => (
   <div
-    className={`vg-optimus vg-phase-${phase}${speaking ? ' vg-optimus-live' : ''}`}
+    className={`vg-optimus ${mode === 'stage' ? 'vg-mode-stage' : `vg-phase-${phase}`}${speaking ? ' vg-optimus-live' : ''}`}
     style={{ width: size, height: size }}
     aria-hidden="true"
   >

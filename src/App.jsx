@@ -26,6 +26,7 @@ import { SectionSeam } from './components/ui/SectionSeam';
 
 // Section Components
 import { Hero } from './components/sections/Hero';
+import { StatementSection } from './components/sections/StatementSection';
 import { CareerRoadmapSection } from './components/sections/CareerRoadmapSection';
 import { SkillsSection } from './components/sections/SkillsSection';
 import { GitHubSection } from './components/sections/GitHubSection';
@@ -348,6 +349,7 @@ export default function App() {
                 
                 <main>
                     <Hero t={t} />
+                    <StatementSection t={t} />
                     <SectionSeam />
                     <AIAssistantSection t={t} />
                     <SectionSeam />
