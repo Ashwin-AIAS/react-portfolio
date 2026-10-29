@@ -2,16 +2,6 @@ import React, { useState, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 
 // ─── Proficiency data (0–100 scale) ────────────────────────────
-// Each area used to carry its own hue (blue/purple/pink/cyan/green/amber),
-// which put six more colours on a page that has one. The reading is the
-// polygon; hover is what singles an axis out.
-//
-// The six axes are the 60/40 split of portfolioData.skills read as a shape.
-// Vision and the deep-learning core it rests on are the two longest spokes —
-// that asymmetry IS the 60%, and it is the first thing the polygon says before
-// anyone reads a label. The remaining four cover the generative-AI, agent,
-// retrieval and robotics 40% at a deliberately tighter spread, so the chart
-// reads as one specialism with real breadth rather than six equal claims.
 const skillAreas = [
   { label: 'Computer Vision',       short: 'CV',      value: 94, skills: ['OpenCV', 'YOLOv8 / YOLO26', 'MediaPipe', '3D Reconstruction', 'Pose Biomechanics'] },
   { label: 'GenAI & Agents',        short: 'GenAI',   value: 88, skills: ['LangChain', 'Claude / Gemini / GPT-4', 'Autonomous AI Agents', 'OpenAI Whisper', 'Prompt Engineering'] },
@@ -56,8 +46,6 @@ const ringPoints = (level, total, cx, cy, maxR) => {
     .join(' ');
 };
 
-// var() is not reliable inside SVG presentation attributes, so every token
-// below is applied through `style` instead of `fill=` / `stroke=`.
 const RULE = { stroke: 'var(--rule)' };
 
 // ─── Component ────────────────────────────────────────────────
@@ -87,6 +75,17 @@ export const SkillsRadarChart = () => {
       {/* ── SVG Radar ──────────────────────────────────────── */}
       <div className="relative w-full" style={{ maxWidth: SIZE + 80 }}>
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full h-auto">
+          <defs>
+            <linearGradient id="radar-stroke-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: 'var(--accent)' }} />
+              <stop offset="100%" style={{ stopColor: 'var(--accent-2)' }} />
+            </linearGradient>
+            <linearGradient id="radar-fill-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: 'var(--accent)', stopOpacity: 0.16 }} />
+              <stop offset="100%" style={{ stopColor: 'var(--accent-2)', stopOpacity: 0.16 }} />
+            </linearGradient>
+          </defs>
+
           {/* ── Grid rings ──────────────────────────────────── */}
           {Array.from({ length: LEVELS }).map((_, lvl) => (
             <polygon
@@ -132,12 +131,13 @@ export const SkillsRadarChart = () => {
           {/* ── Data polygon (animated) ────────────────────── */}
           <motion.polygon
             points={dataPolygon}
-            strokeWidth="1.5"
+            strokeWidth="1.75"
             strokeLinejoin="round"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            style={{ fill: 'var(--accent-wash)', stroke: 'var(--accent)' }}
+            fill="url(#radar-fill-grad)"
+            stroke="url(#radar-stroke-grad)"
           />
 
           {/* ── Data vertices ──────────────────────────────── */}
@@ -147,6 +147,7 @@ export const SkillsRadarChart = () => {
             const p = pointOnCircle(CX, CY, r, angle);
             const isHov = hovered === i;
             const s = isHov ? 5 : 3.5;
+            const vertexColor = isHov || i % 2 === 1 ? 'var(--accent-2)' : 'var(--accent)';
             return (
               <motion.rect
                 key={`vertex-${i}`}
@@ -157,8 +158,8 @@ export const SkillsRadarChart = () => {
                 animate={isInView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.3, delay: 0.35 + i * 0.06 }}
                 style={{
-                  fill: isHov ? 'var(--accent)' : 'var(--bg)',
-                  stroke: 'var(--accent)',
+                  fill: isHov ? vertexColor : 'var(--bg)',
+                  stroke: vertexColor,
                   cursor: 'pointer',
                 }}
                 onMouseEnter={() => setHovered(i)}
@@ -193,7 +194,7 @@ export const SkillsRadarChart = () => {
                   dominantBaseline="central"
                   fontSize="10"
                   style={{
-                    fill: isHov ? 'var(--accent)' : 'var(--text-dim)',
+                    fill: isHov ? 'var(--accent-2)' : 'var(--text-dim)',
                     fontFamily: 'var(--font-mono)',
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
@@ -218,7 +219,7 @@ export const SkillsRadarChart = () => {
             );
           })}
 
-          <rect x={CX - 1.5} y={CY - 1.5} width="3" height="3" style={{ fill: 'var(--accent)' }} />
+          <rect x={CX - 1.5} y={CY - 1.5} width="3" height="3" style={{ fill: 'var(--accent-2)' }} />
         </svg>
 
         {/* ── Hover readout (HTML overlay) ─────────────────── */}

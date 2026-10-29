@@ -69,7 +69,8 @@ export const Header = ({ activeSection, lang, t, toggleLang }) => {
                             {activeSection === link && (
                                 <motion.span
                                     layoutId="nav-marker"
-                                    className="absolute -bottom-0.5 left-0 right-0 h-px bg-accent"
+                                    className="absolute -bottom-0.5 left-0 right-0 h-px"
+                                    style={{ background: 'linear-gradient(90deg, var(--accent), var(--accent-2))' }}
                                 />
                             )}
                         </a>

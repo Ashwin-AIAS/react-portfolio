@@ -130,7 +130,7 @@ const RoleTicker = ({ badge }) => {
                 aria-hidden="true"
                 animate={{ opacity: [1, 0] }}
                 transition={{ duration: 0.53, repeat: Infinity }}
-                className="label-accent"
+                className="label-accent-2"
             >_</motion.span>
         </p>
     );
@@ -195,7 +195,7 @@ const IntroCopy = ({ t, onPreviewCv }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
                         {facts.map((fact) => (
                             <div key={fact.label} className="flex items-baseline justify-between sm:justify-start gap-2 text-xs">
-                                <span className="label text-[10px] flex-shrink-0">{fact.label}:</span>
+                                <span className="label label-accent-2 text-[10px] flex-shrink-0">{fact.label}:</span>
                                 <span className="font-mono text-[11px] text-ink truncate">{fact.value}</span>
                             </div>
                         ))}
@@ -218,7 +218,7 @@ const Portrait = () => (
         />
         <figcaption className="flex items-center justify-between px-3 py-2 border-t border-rule">
             <span className="label">Ashwin Vignesh M</span>
-            <span className="label label-accent">AI ENG</span>
+            <span className="label label-accent-2">AI ENG</span>
         </figcaption>
     </figure>
 );

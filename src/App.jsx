@@ -248,8 +248,8 @@ export default function App() {
     });
 
     const [palette, setPalette] = useState(() => {
-        const saved = localStorage.getItem('theme-palette');
-        return saved || 'cyan';
+        const saved = localStorage.getItem('theme-palette-v2');
+        return saved || 'viper';
     });
     const [splashDone, setSplashDone] = useState(() => sessionStorage.getItem('splashSeen') === '1');
     const activeSection = useActiveSection();
@@ -317,25 +317,11 @@ export default function App() {
     // so the .theme-light.palette-x rules can out-specify the dark defaults.
     useEffect(() => {
         const root = document.documentElement;
-        const allPalettes = [
-            'palette-cyan',
-            'palette-amber',
-            'palette-indigo',
-            'palette-emerald',
-            'palette-crimson',
-            'palette-ironman',
-            'palette-vibranium',
-            'palette-batman',
-            'palette-cyberpunk',
-            'palette-obsidian',
-            'palette-titanium',
-            'palette-onyx',
-            'palette-venom',
-            'palette-ember'
-        ];
-        allPalettes.forEach(cls => root.classList.remove(cls));
+        Array.from(root.classList).forEach(cls => {
+            if (cls.startsWith('palette-')) root.classList.remove(cls);
+        });
         root.classList.add(`palette-${palette}`);
-        localStorage.setItem('theme-palette', palette);
+        localStorage.setItem('theme-palette-v2', palette);
     }, [palette]);
 
     return (

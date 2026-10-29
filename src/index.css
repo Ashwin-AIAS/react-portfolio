@@ -6,7 +6,7 @@
    INSTRUMENT PANEL — DESIGN TOKENS & MULTI-THEME PALETTES
    =================================================================== */
 
-/* Default / Cyber-Optic Cyan (Dark) */
+/* Default / Cyber-Optic Cyan (Dark — Cyan × Electric Violet) */
 :root,
 .palette-cyan {
   --bg: #05080f;
@@ -24,13 +24,16 @@
   --accent-dim: #0284c7;
   --accent-wash: rgba(0, 242, 254, 0.1);
   --accent-line: rgba(0, 242, 254, 0.35);
+  --accent-2: #a855f7;
+  --accent-2-wash: rgba(168, 85, 247, 0.12);
+  --accent-2-line: rgba(168, 85, 247, 0.38);
   --ok: #35d6a0;
   --ok-wash: rgba(53, 214, 160, 0.1);
   --err: #ff6b5e;
   --heat-0: #0f182a;
-  --heat-1: rgba(0, 242, 254, 0.22);
-  --heat-2: rgba(0, 242, 254, 0.45);
-  --heat-3: rgba(0, 242, 254, 0.7);
+  --heat-1: rgba(168, 85, 247, 0.28);
+  --heat-2: rgba(168, 85, 247, 0.55);
+  --heat-3: rgba(0, 242, 254, 0.68);
   --heat-4: #00f2fe;
   --r-sm: 2px;
   --r-md: 4px;
@@ -59,18 +62,461 @@
   --accent-dim: #38bdf8;
   --accent-wash: rgba(2, 132, 199, 0.08);
   --accent-line: rgba(2, 132, 199, 0.3);
+  --accent-2: #7e22ce;
+  --accent-2-wash: rgba(126, 34, 206, 0.08);
+  --accent-2-line: rgba(126, 34, 206, 0.3);
   --ok: #0f7a56;
   --ok-wash: rgba(15, 122, 86, 0.1);
   --err: #b3261e;
   --heat-0: #dbe5f0;
-  --heat-1: rgba(2, 132, 199, 0.22);
-  --heat-2: rgba(2, 132, 199, 0.45);
+  --heat-1: rgba(126, 34, 206, 0.22);
+  --heat-2: rgba(126, 34, 206, 0.45);
   --heat-3: rgba(2, 132, 199, 0.7);
   --heat-4: #0284c7;
   color-scheme: light;
 }
 
-/* Amber — Signal Telemetry */
+/* ===================================================================
+   TRI-NEON COLLECTION — Dark Base + Primary Neon + Secondary Neon
+   =================================================================== */
+
+/* 1. Cyber-Viper — Obsidian Black + Neon Matrix Green + Laser Hot Pink */
+.palette-viper {
+  --bg: #050709;
+  --surface-1: #090d12;
+  --surface-2: #0f151d;
+  --surface-3: #161f2b;
+  --rule: #1e2a38;
+  --rule-strong: #2d3f54;
+  --text: #eefcf5;
+  --text-muted: #98b5a8;
+  --text-dim: #607d70;
+  --accent: #00ff87;
+  --on-accent: #050709;
+  --accent-strong: #ff007f;
+  --accent-dim: #059669;
+  --accent-wash: rgba(0, 255, 135, 0.11);
+  --accent-line: rgba(0, 255, 135, 0.38);
+  --accent-2: #ff007f;
+  --accent-2-wash: rgba(255, 0, 127, 0.12);
+  --accent-2-line: rgba(255, 0, 127, 0.4);
+  --ok: #00ff87;
+  --ok-wash: rgba(0, 255, 135, 0.12);
+  --heat-0: #0f151d;
+  --heat-1: rgba(255, 0, 127, 0.28);
+  --heat-2: rgba(255, 0, 127, 0.58);
+  --heat-3: rgba(0, 255, 135, 0.68);
+  --heat-4: #00ff87;
+}
+.theme-light.palette-viper {
+  --bg: #f2f9f5;
+  --surface-1: #ffffff;
+  --surface-2: #e7f4ed;
+  --surface-3: #d6ebe0;
+  --rule: #c0dfd0;
+  --rule-strong: #96c5ae;
+  --text: #071710;
+  --text-muted: #3f5e50;
+  --text-dim: #628273;
+  --accent: #047857;
+  --on-accent: #ffffff;
+  --accent-strong: #db2777;
+  --accent-dim: #10b981;
+  --accent-wash: rgba(4, 120, 87, 0.08);
+  --accent-line: rgba(4, 120, 87, 0.3);
+  --accent-2: #db2777;
+  --accent-2-wash: rgba(219, 39, 119, 0.08);
+  --accent-2-line: rgba(219, 39, 119, 0.32);
+  --heat-0: #d6ebe0;
+  --heat-1: rgba(219, 39, 119, 0.25);
+  --heat-2: rgba(219, 39, 119, 0.5);
+  --heat-3: rgba(4, 120, 87, 0.7);
+  --heat-4: #047857;
+}
+
+/* 2. Synthwave Sunset — Midnight Indigo + Laser Pink + Electric Cyan */
+.palette-synthwave {
+  --bg: #080412;
+  --surface-1: #100821;
+  --surface-2: #180d31;
+  --surface-3: #231444;
+  --rule: #331d61;
+  --rule-strong: #4c2b8c;
+  --text: #fdf4ff;
+  --text-muted: #cbb2e6;
+  --text-dim: #886ca8;
+  --accent: #ff2a85;
+  --on-accent: #ffffff;
+  --accent-strong: #00f2fe;
+  --accent-dim: #be185d;
+  --accent-wash: rgba(255, 42, 133, 0.13);
+  --accent-line: rgba(255, 42, 133, 0.42);
+  --accent-2: #00f2fe;
+  --accent-2-wash: rgba(0, 242, 254, 0.12);
+  --accent-2-line: rgba(0, 242, 254, 0.4);
+  --ok: #00f2fe;
+  --ok-wash: rgba(0, 242, 254, 0.12);
+  --heat-0: #180d31;
+  --heat-1: rgba(0, 242, 254, 0.28);
+  --heat-2: rgba(0, 242, 254, 0.56);
+  --heat-3: rgba(255, 42, 133, 0.72);
+  --heat-4: #ff2a85;
+}
+.theme-light.palette-synthwave {
+  --bg: #fbf4f9;
+  --surface-1: #ffffff;
+  --surface-2: #f6e8f3;
+  --surface-3: #edd6e9;
+  --rule: #e0bedb;
+  --rule-strong: #c894c0;
+  --text: #1c0721;
+  --text-muted: #65436e;
+  --text-dim: #876391;
+  --accent: #be185d;
+  --on-accent: #ffffff;
+  --accent-strong: #0284c7;
+  --accent-dim: #ec4899;
+  --accent-wash: rgba(190, 24, 93, 0.08);
+  --accent-line: rgba(190, 24, 93, 0.3);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
+  --heat-0: #edd6e9;
+  --heat-1: rgba(2, 132, 199, 0.25);
+  --heat-2: rgba(2, 132, 199, 0.5);
+  --heat-3: rgba(190, 24, 93, 0.7);
+  --heat-4: #be185d;
+}
+
+/* 3. EVA-01 Mecha — Abyssal Violet-Black + Acid Green + Mecha Purple */
+.palette-eva01 {
+  --bg: #090514;
+  --surface-1: #120a24;
+  --surface-2: #1b1035;
+  --surface-3: #26174a;
+  --rule: #38226b;
+  --rule-strong: #53329c;
+  --text: #f3fff0;
+  --text-muted: #b5a8d9;
+  --text-dim: #7968a6;
+  --accent: #39ff14;
+  --on-accent: #090514;
+  --accent-strong: #b026ff;
+  --accent-dim: #16a34a;
+  --accent-wash: rgba(57, 255, 20, 0.11);
+  --accent-line: rgba(57, 255, 20, 0.38);
+  --accent-2: #b026ff;
+  --accent-2-wash: rgba(176, 38, 255, 0.14);
+  --accent-2-line: rgba(176, 38, 255, 0.44);
+  --ok: #39ff14;
+  --ok-wash: rgba(57, 255, 20, 0.12);
+  --heat-0: #1b1035;
+  --heat-1: rgba(176, 38, 255, 0.3);
+  --heat-2: rgba(176, 38, 255, 0.6);
+  --heat-3: rgba(57, 255, 20, 0.7);
+  --heat-4: #39ff14;
+}
+.theme-light.palette-eva01 {
+  --bg: #f6f3fc;
+  --surface-1: #ffffff;
+  --surface-2: #ede7f8;
+  --surface-3: #e0d6f2;
+  --rule: #cdbfe8;
+  --rule-strong: #b09ad9;
+  --text: #120824;
+  --text-muted: #524270;
+  --text-dim: #746294;
+  --accent: #15803d;
+  --on-accent: #ffffff;
+  --accent-strong: #7e22ce;
+  --accent-dim: #22c55e;
+  --accent-wash: rgba(21, 128, 61, 0.08);
+  --accent-line: rgba(21, 128, 61, 0.3);
+  --accent-2: #7e22ce;
+  --accent-2-wash: rgba(126, 34, 206, 0.08);
+  --accent-2-line: rgba(126, 34, 206, 0.3);
+  --heat-0: #e0d6f2;
+  --heat-1: rgba(126, 34, 206, 0.25);
+  --heat-2: rgba(126, 34, 206, 0.5);
+  --heat-3: rgba(21, 128, 61, 0.7);
+  --heat-4: #15803d;
+}
+
+/* 4. Night City 2077 — Void Dark + Cyber Yellow + Electric Cyan */
+.palette-nightcity {
+  --bg: #07060e;
+  --surface-1: #0e0d1a;
+  --surface-2: #151426;
+  --surface-3: #1e1c36;
+  --rule: #2c294d;
+  --rule-strong: #413c70;
+  --text: #fefce8;
+  --text-muted: #a6adc9;
+  --text-dim: #687091;
+  --accent: #fcee0a;
+  --on-accent: #07060e;
+  --accent-strong: #00f0ff;
+  --accent-dim: #ca8a04;
+  --accent-wash: rgba(252, 238, 10, 0.12);
+  --accent-line: rgba(252, 238, 10, 0.4);
+  --accent-2: #00f0ff;
+  --accent-2-wash: rgba(0, 240, 255, 0.12);
+  --accent-2-line: rgba(0, 240, 255, 0.4);
+  --ok: #00f0ff;
+  --ok-wash: rgba(0, 240, 255, 0.12);
+  --heat-0: #151426;
+  --heat-1: rgba(0, 240, 255, 0.28);
+  --heat-2: rgba(0, 240, 255, 0.56);
+  --heat-3: rgba(252, 238, 10, 0.72);
+  --heat-4: #fcee0a;
+}
+.theme-light.palette-nightcity {
+  --bg: #f8f7f2;
+  --surface-1: #ffffff;
+  --surface-2: #f1efe4;
+  --surface-3: #e6e3d3;
+  --rule: #d6d1bc;
+  --rule-strong: #b8b196;
+  --text: #12111a;
+  --text-muted: #525066;
+  --text-dim: #73708a;
+  --accent: #a16207;
+  --on-accent: #ffffff;
+  --accent-strong: #0284c7;
+  --accent-dim: #eab308;
+  --accent-wash: rgba(161, 98, 7, 0.08);
+  --accent-line: rgba(161, 98, 7, 0.3);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
+  --heat-0: #e6e3d3;
+  --heat-1: rgba(2, 132, 199, 0.25);
+  --heat-2: rgba(2, 132, 199, 0.5);
+  --heat-3: rgba(161, 98, 7, 0.7);
+  --heat-4: #a16207;
+}
+
+/* 5. Toxic Berry — Carbon Pitch + Acid Lime + Neon Fuchsia */
+.palette-toxicberry {
+  --bg: #050507;
+  --surface-1: #0b0a10;
+  --surface-2: #12101b;
+  --surface-3: #1b1729;
+  --rule: #28223d;
+  --rule-strong: #3c325c;
+  --text: #f7fee7;
+  --text-muted: #b3a8c9;
+  --text-dim: #74688f;
+  --accent: #c6ff00;
+  --on-accent: #050507;
+  --accent-strong: #d946ef;
+  --accent-dim: #84cc16;
+  --accent-wash: rgba(198, 255, 0, 0.11);
+  --accent-line: rgba(198, 255, 0, 0.38);
+  --accent-2: #d946ef;
+  --accent-2-wash: rgba(217, 70, 239, 0.13);
+  --accent-2-line: rgba(217, 70, 239, 0.42);
+  --ok: #c6ff00;
+  --ok-wash: rgba(198, 255, 0, 0.12);
+  --heat-0: #12101b;
+  --heat-1: rgba(217, 70, 239, 0.28);
+  --heat-2: rgba(217, 70, 239, 0.56);
+  --heat-3: rgba(198, 255, 0, 0.7);
+  --heat-4: #c6ff00;
+}
+.theme-light.palette-toxicberry {
+  --bg: #f8f9f4;
+  --surface-1: #ffffff;
+  --surface-2: #f0f2e8;
+  --surface-3: #e4e8d8;
+  --rule: #d3d9c3;
+  --rule-strong: #b4be9d;
+  --text: #110d17;
+  --text-muted: #544b61;
+  --text-dim: #746a82;
+  --accent: #4d7c0f;
+  --on-accent: #ffffff;
+  --accent-strong: #a21caf;
+  --accent-dim: #65a30d;
+  --accent-wash: rgba(77, 124, 15, 0.08);
+  --accent-line: rgba(77, 124, 15, 0.3);
+  --accent-2: #a21caf;
+  --accent-2-wash: rgba(162, 28, 175, 0.08);
+  --accent-2-line: rgba(162, 28, 175, 0.3);
+  --heat-0: #e4e8d8;
+  --heat-1: rgba(162, 28, 175, 0.25);
+  --heat-2: rgba(162, 28, 175, 0.5);
+  --heat-3: rgba(77, 124, 15, 0.7);
+  --heat-4: #4d7c0f;
+}
+
+/* 6. Plasma Fusion — Deep Space + Electric Cyan + Laser Crimson */
+.palette-plasma {
+  --bg: #040711;
+  --surface-1: #091021;
+  --surface-2: #0f1830;
+  --surface-3: #162242;
+  --rule: #20315c;
+  --rule-strong: #304882;
+  --text: #edf7ff;
+  --text-muted: #94acc9;
+  --text-dim: #5d7594;
+  --accent: #00f2fe;
+  --on-accent: #040711;
+  --accent-strong: #ff3366;
+  --accent-dim: #0284c7;
+  --accent-wash: rgba(0, 242, 254, 0.11);
+  --accent-line: rgba(0, 242, 254, 0.38);
+  --accent-2: #ff3366;
+  --accent-2-wash: rgba(255, 51, 102, 0.13);
+  --accent-2-line: rgba(255, 51, 102, 0.42);
+  --ok: #00f2fe;
+  --ok-wash: rgba(0, 242, 254, 0.12);
+  --heat-0: #0f1830;
+  --heat-1: rgba(255, 51, 102, 0.28);
+  --heat-2: rgba(255, 51, 102, 0.56);
+  --heat-3: rgba(0, 242, 254, 0.7);
+  --heat-4: #00f2fe;
+}
+.theme-light.palette-plasma {
+  --bg: #f0f5fb;
+  --surface-1: #ffffff;
+  --surface-2: #e6eef8;
+  --surface-3: #d6e3f2;
+  --rule: #c2d4ea;
+  --rule-strong: #9cb7d9;
+  --text: #081221;
+  --text-muted: #455873;
+  --text-dim: #667b96;
+  --accent: #0284c7;
+  --on-accent: #ffffff;
+  --accent-strong: #e11d48;
+  --accent-dim: #38bdf8;
+  --accent-wash: rgba(2, 132, 199, 0.08);
+  --accent-line: rgba(2, 132, 199, 0.3);
+  --accent-2: #e11d48;
+  --accent-2-wash: rgba(225, 29, 72, 0.08);
+  --accent-2-line: rgba(225, 29, 72, 0.3);
+  --heat-0: #d6e3f2;
+  --heat-1: rgba(225, 29, 72, 0.25);
+  --heat-2: rgba(225, 29, 72, 0.5);
+  --heat-3: rgba(2, 132, 199, 0.7);
+  --heat-4: #0284c7;
+}
+
+/* 7. Akira Telemetry — Asphalt Black + Laser Red + Neon Teal */
+.palette-akira {
+  --bg: #070709;
+  --surface-1: #100d11;
+  --surface-2: #19131a;
+  --surface-3: #241b26;
+  --rule: #362738;
+  --rule-strong: #523954;
+  --text: #fff0f3;
+  --text-muted: #c29da8;
+  --text-dim: #82626d;
+  --accent: #ff1e42;
+  --on-accent: #ffffff;
+  --accent-strong: #00ffcc;
+  --accent-dim: #be123c;
+  --accent-wash: rgba(255, 30, 66, 0.13);
+  --accent-line: rgba(255, 30, 66, 0.42);
+  --accent-2: #00ffcc;
+  --accent-2-wash: rgba(0, 255, 204, 0.11);
+  --accent-2-line: rgba(0, 255, 204, 0.38);
+  --ok: #00ffcc;
+  --ok-wash: rgba(0, 255, 204, 0.12);
+  --heat-0: #19131a;
+  --heat-1: rgba(0, 255, 204, 0.26);
+  --heat-2: rgba(0, 255, 204, 0.54);
+  --heat-3: rgba(255, 30, 66, 0.72);
+  --heat-4: #ff1e42;
+}
+.theme-light.palette-akira {
+  --bg: #fbf2f4;
+  --surface-1: #ffffff;
+  --surface-2: #f6e6e9;
+  --surface-3: #ecd5da;
+  --rule: #dec0c7;
+  --rule-strong: #c498a2;
+  --text: #1c080c;
+  --text-muted: #69424b;
+  --text-dim: #8c616b;
+  --accent: #be123c;
+  --on-accent: #ffffff;
+  --accent-strong: #0d9488;
+  --accent-dim: #f43f5e;
+  --accent-wash: rgba(190, 18, 60, 0.08);
+  --accent-line: rgba(190, 18, 60, 0.3);
+  --accent-2: #0d9488;
+  --accent-2-wash: rgba(13, 148, 136, 0.08);
+  --accent-2-line: rgba(13, 148, 136, 0.3);
+  --heat-0: #ecd5da;
+  --heat-1: rgba(13, 148, 136, 0.25);
+  --heat-2: rgba(13, 148, 136, 0.5);
+  --heat-3: rgba(190, 18, 60, 0.7);
+  --heat-4: #be123c;
+}
+
+/* 8. Neural Aurora — Abyssal Dark + Neon Mint + Ultraviolet */
+.palette-aurora {
+  --bg: #03090c;
+  --surface-1: #071318;
+  --surface-2: #0c1d24;
+  --surface-3: #122933;
+  --rule: #1b3b47;
+  --rule-strong: #285566;
+  --text: #ebfff8;
+  --text-muted: #8cbdb0;
+  --text-dim: #578277;
+  --accent: #00ffa3;
+  --on-accent: #03090c;
+  --accent-strong: #a855f7;
+  --accent-dim: #059669;
+  --accent-wash: rgba(0, 255, 163, 0.11);
+  --accent-line: rgba(0, 255, 163, 0.38);
+  --accent-2: #a855f7;
+  --accent-2-wash: rgba(168, 85, 247, 0.13);
+  --accent-2-line: rgba(168, 85, 247, 0.42);
+  --ok: #00ffa3;
+  --ok-wash: rgba(0, 255, 163, 0.12);
+  --heat-0: #0c1d24;
+  --heat-1: rgba(168, 85, 247, 0.28);
+  --heat-2: rgba(168, 85, 247, 0.56);
+  --heat-3: rgba(0, 255, 163, 0.7);
+  --heat-4: #00ffa3;
+}
+.theme-light.palette-aurora {
+  --bg: #f0faf7;
+  --surface-1: #ffffff;
+  --surface-2: #e4f5ef;
+  --surface-3: #d3ebe3;
+  --rule: #beded3;
+  --rule-strong: #96c4b5;
+  --text: #061712;
+  --text-muted: #3e6157;
+  --text-dim: #5f857a;
+  --accent: #047857;
+  --on-accent: #ffffff;
+  --accent-strong: #7e22ce;
+  --accent-dim: #10b981;
+  --accent-wash: rgba(4, 120, 87, 0.08);
+  --accent-line: rgba(4, 120, 87, 0.3);
+  --accent-2: #7e22ce;
+  --accent-2-wash: rgba(126, 34, 206, 0.08);
+  --accent-2-line: rgba(126, 34, 206, 0.3);
+  --heat-0: #d3ebe3;
+  --heat-1: rgba(126, 34, 206, 0.25);
+  --heat-2: rgba(126, 34, 206, 0.5);
+  --heat-3: rgba(4, 120, 87, 0.7);
+  --heat-4: #047857;
+}
+
+/* ===================================================================
+   SCI-FI & INSTRUMENT COLLECTION (Upgraded to 3-Color)
+   =================================================================== */
+
+/* Amber — Signal Telemetry (Amber × Radar Cyan) */
 .palette-amber {
   --bg: #06080b;
   --surface-1: #0b0e13;
@@ -83,13 +529,16 @@
   --text-dim: #5d6a7a;
   --accent: #ff9f1c;
   --on-accent: #0a0a0a;
-  --accent-strong: #ffb54d;
+  --accent-strong: #00f2fe;
   --accent-dim: #a86a10;
   --accent-wash: rgba(255, 159, 28, 0.1);
   --accent-line: rgba(255, 159, 28, 0.35);
+  --accent-2: #00f2fe;
+  --accent-2-wash: rgba(0, 242, 254, 0.11);
+  --accent-2-line: rgba(0, 242, 254, 0.38);
   --heat-0: #131a22;
-  --heat-1: rgba(255, 159, 28, 0.22);
-  --heat-2: rgba(255, 159, 28, 0.45);
+  --heat-1: rgba(0, 242, 254, 0.25);
+  --heat-2: rgba(0, 242, 254, 0.5);
   --heat-3: rgba(255, 159, 28, 0.7);
   --heat-4: #ff9f1c;
 }
@@ -105,18 +554,21 @@
   --text-dim: #667080;
   --accent: #b25e00;
   --on-accent: #ffffff;
-  --accent-strong: #8f4b00;
+  --accent-strong: #0284c7;
   --accent-dim: #d9922f;
   --accent-wash: rgba(178, 94, 0, 0.08);
   --accent-line: rgba(178, 94, 0, 0.3);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
   --heat-0: #e4e9ef;
-  --heat-1: rgba(178, 94, 0, 0.22);
-  --heat-2: rgba(178, 94, 0, 0.45);
+  --heat-1: rgba(2, 132, 199, 0.22);
+  --heat-2: rgba(2, 132, 199, 0.45);
   --heat-3: rgba(178, 94, 0, 0.7);
   --heat-4: #b25e00;
 }
 
-/* Indigo — Neural Titanium */
+/* Indigo — Neural Titanium (Indigo × Neon Aqua) */
 .palette-indigo {
   --bg: #08090f;
   --surface-1: #0e101b;
@@ -129,13 +581,16 @@
   --text-dim: #606887;
   --accent: #6366f1;
   --on-accent: #ffffff;
-  --accent-strong: #818cf8;
+  --accent-strong: #22d3ee;
   --accent-dim: #4338ca;
   --accent-wash: rgba(99, 102, 241, 0.12);
   --accent-line: rgba(99, 102, 241, 0.35);
+  --accent-2: #22d3ee;
+  --accent-2-wash: rgba(34, 211, 238, 0.11);
+  --accent-2-line: rgba(34, 211, 238, 0.38);
   --heat-0: #141726;
-  --heat-1: rgba(99, 102, 241, 0.22);
-  --heat-2: rgba(99, 102, 241, 0.45);
+  --heat-1: rgba(34, 211, 238, 0.25);
+  --heat-2: rgba(34, 211, 238, 0.5);
   --heat-3: rgba(99, 102, 241, 0.7);
   --heat-4: #6366f1;
 }
@@ -151,18 +606,21 @@
   --text-dim: #6d7696;
   --accent: #4338ca;
   --on-accent: #ffffff;
-  --accent-strong: #3730a3;
+  --accent-strong: #0891b2;
   --accent-dim: #6366f1;
   --accent-wash: rgba(67, 56, 202, 0.08);
   --accent-line: rgba(67, 56, 202, 0.3);
+  --accent-2: #0891b2;
+  --accent-2-wash: rgba(8, 145, 178, 0.08);
+  --accent-2-line: rgba(8, 145, 178, 0.3);
   --heat-0: #dfe4f4;
-  --heat-1: rgba(67, 56, 202, 0.22);
-  --heat-2: rgba(67, 56, 202, 0.45);
+  --heat-1: rgba(8, 145, 178, 0.22);
+  --heat-2: rgba(8, 145, 178, 0.45);
   --heat-3: rgba(67, 56, 202, 0.7);
   --heat-4: #4338ca;
 }
 
-/* Emerald — CUDA Matrix */
+/* Emerald — CUDA Matrix (Emerald × Laser Sky) */
 .palette-emerald {
   --bg: #040806;
   --surface-1: #08120c;
@@ -175,13 +633,16 @@
   --text-dim: #59856a;
   --accent: #00ff87;
   --on-accent: #040806;
-  --accent-strong: #34d399;
+  --accent-strong: #38bdf8;
   --accent-dim: #059669;
   --accent-wash: rgba(0, 255, 135, 0.1);
   --accent-line: rgba(0, 255, 135, 0.35);
+  --accent-2: #38bdf8;
+  --accent-2-wash: rgba(56, 189, 248, 0.11);
+  --accent-2-line: rgba(56, 189, 248, 0.38);
   --heat-0: #0e1c13;
-  --heat-1: rgba(0, 255, 135, 0.22);
-  --heat-2: rgba(0, 255, 135, 0.45);
+  --heat-1: rgba(56, 189, 248, 0.25);
+  --heat-2: rgba(56, 189, 248, 0.5);
   --heat-3: rgba(0, 255, 135, 0.7);
   --heat-4: #00ff87;
 }
@@ -197,18 +658,21 @@
   --text-dim: #658371;
   --accent: #047857;
   --on-accent: #ffffff;
-  --accent-strong: #065f46;
+  --accent-strong: #0284c7;
   --accent-dim: #10b981;
   --accent-wash: rgba(4, 120, 87, 0.08);
   --accent-line: rgba(4, 120, 87, 0.3);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
   --heat-0: #d5e9df;
-  --heat-1: rgba(4, 120, 87, 0.22);
-  --heat-2: rgba(4, 120, 87, 0.45);
+  --heat-1: rgba(2, 132, 199, 0.22);
+  --heat-2: rgba(2, 132, 199, 0.45);
   --heat-3: rgba(4, 120, 87, 0.7);
   --heat-4: #047857;
 }
 
-/* Crimson — Aerospace HUD */
+/* Crimson — Aerospace HUD (Crimson × Afterburner Amber) */
 .palette-crimson {
   --bg: #0b0708;
   --surface-1: #130c0e;
@@ -221,13 +685,16 @@
   --text-dim: #875f66;
   --accent: #ff3366;
   --on-accent: #ffffff;
-  --accent-strong: #fb7185;
+  --accent-strong: #ffb703;
   --accent-dim: #be123c;
   --accent-wash: rgba(255, 51, 102, 0.12);
   --accent-line: rgba(255, 51, 102, 0.35);
+  --accent-2: #ffb703;
+  --accent-2-wash: rgba(255, 183, 3, 0.12);
+  --accent-2-line: rgba(255, 183, 3, 0.38);
   --heat-0: #1d1215;
-  --heat-1: rgba(255, 51, 102, 0.22);
-  --heat-2: rgba(255, 51, 102, 0.45);
+  --heat-1: rgba(255, 183, 3, 0.25);
+  --heat-2: rgba(255, 183, 3, 0.5);
   --heat-3: rgba(255, 51, 102, 0.7);
   --heat-4: #ff3366;
 }
@@ -243,18 +710,21 @@
   --text-dim: #8e636b;
   --accent: #be123c;
   --on-accent: #ffffff;
-  --accent-strong: #9f1239;
+  --accent-strong: #d97706;
   --accent-dim: #f43f5e;
   --accent-wash: rgba(190, 18, 60, 0.08);
   --accent-line: rgba(190, 18, 60, 0.3);
+  --accent-2: #d97706;
+  --accent-2-wash: rgba(217, 119, 6, 0.08);
+  --accent-2-line: rgba(217, 119, 6, 0.3);
   --heat-0: #ebd5d9;
-  --heat-1: rgba(190, 18, 60, 0.22);
-  --heat-2: rgba(190, 18, 60, 0.45);
+  --heat-1: rgba(217, 119, 6, 0.22);
+  --heat-2: rgba(217, 119, 6, 0.45);
   --heat-3: rgba(190, 18, 60, 0.7);
   --heat-4: #be123c;
 }
 
-/* Ironman — Stark Arc-Reactor (Marvel) */
+/* Ironman — Stark Arc-Reactor (Hot-Rod Red × Arc Gold) */
 .palette-ironman {
   --bg: #080406;
   --surface-1: #12090d;
@@ -267,15 +737,18 @@
   --text-dim: #995e68;
   --accent: #e63946;
   --on-accent: #ffffff;
-  --accent-strong: #ff5964;
+  --accent-strong: #ffb703;
   --accent-dim: #ba1826;
   --accent-wash: rgba(230, 57, 70, 0.12);
   --accent-line: rgba(230, 57, 70, 0.4);
+  --accent-2: #ffb703;
+  --accent-2-wash: rgba(255, 183, 3, 0.12);
+  --accent-2-line: rgba(255, 183, 3, 0.4);
   --ok: #ffb703;
   --ok-wash: rgba(255, 183, 3, 0.12);
   --heat-0: #1c0d13;
-  --heat-1: rgba(230, 57, 70, 0.22);
-  --heat-2: rgba(230, 57, 70, 0.45);
+  --heat-1: rgba(230, 57, 70, 0.25);
+  --heat-2: rgba(230, 57, 70, 0.5);
   --heat-3: rgba(255, 183, 3, 0.7);
   --heat-4: #ffb703;
 }
@@ -291,18 +764,21 @@
   --text-dim: #8c5d62;
   --accent: #b91c1c;
   --on-accent: #ffffff;
-  --accent-strong: #991b1b;
+  --accent-strong: #d97706;
   --accent-dim: #dc2626;
   --accent-wash: rgba(185, 28, 28, 0.08);
   --accent-line: rgba(185, 28, 28, 0.3);
+  --accent-2: #d97706;
+  --accent-2-wash: rgba(217, 119, 6, 0.08);
+  --accent-2-line: rgba(217, 119, 6, 0.3);
   --heat-0: #ebd5d5;
-  --heat-1: rgba(185, 28, 28, 0.22);
-  --heat-2: rgba(185, 28, 28, 0.45);
+  --heat-1: rgba(217, 119, 6, 0.22);
+  --heat-2: rgba(217, 119, 6, 0.45);
   --heat-3: rgba(185, 28, 28, 0.7);
   --heat-4: #b91c1c;
 }
 
-/* Vibranium — Wakanda Royal Energy */
+/* Vibranium — Wakanda Royal Energy (Purple × Kinetic Blue) */
 .palette-vibranium {
   --bg: #06040a;
   --surface-1: #0d0917;
@@ -315,13 +791,16 @@
   --text-dim: #7c6a9e;
   --accent: #a855f7;
   --on-accent: #ffffff;
-  --accent-strong: #c084fc;
+  --accent-strong: #38bdf8;
   --accent-dim: #7e22ce;
   --accent-wash: rgba(168, 85, 247, 0.12);
   --accent-line: rgba(168, 85, 247, 0.4);
+  --accent-2: #38bdf8;
+  --accent-2-wash: rgba(56, 189, 248, 0.12);
+  --accent-2-line: rgba(56, 189, 248, 0.4);
   --heat-0: #140e24;
-  --heat-1: rgba(168, 85, 247, 0.22);
-  --heat-2: rgba(168, 85, 247, 0.45);
+  --heat-1: rgba(56, 189, 248, 0.25);
+  --heat-2: rgba(56, 189, 248, 0.5);
   --heat-3: rgba(168, 85, 247, 0.7);
   --heat-4: #a855f7;
 }
@@ -337,18 +816,21 @@
   --text-dim: #76648e;
   --accent: #7e22ce;
   --on-accent: #ffffff;
-  --accent-strong: #6b21a8;
+  --accent-strong: #0284c7;
   --accent-dim: #a855f7;
   --accent-wash: rgba(126, 34, 206, 0.08);
   --accent-line: rgba(126, 34, 206, 0.3);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
   --heat-0: #e1d6ee;
-  --heat-1: rgba(126, 34, 206, 0.22);
-  --heat-2: rgba(126, 34, 206, 0.45);
+  --heat-1: rgba(2, 132, 199, 0.22);
+  --heat-2: rgba(2, 132, 199, 0.45);
   --heat-3: rgba(126, 34, 206, 0.7);
   --heat-4: #7e22ce;
 }
 
-/* Batman — Gotham Tactical (WayneTech) */
+/* Batman — Gotham Tactical (Wayne Gold × Sonar Blue) */
 .palette-batman {
   --bg: #060708;
   --surface-1: #0c0d10;
@@ -361,13 +843,16 @@
   --text-dim: #6b7280;
   --accent: #eab308;
   --on-accent: #060708;
-  --accent-strong: #facc15;
+  --accent-strong: #38bdf8;
   --accent-dim: #a16207;
   --accent-wash: rgba(234, 179, 8, 0.12);
   --accent-line: rgba(234, 179, 8, 0.38);
+  --accent-2: #38bdf8;
+  --accent-2-wash: rgba(56, 189, 248, 0.11);
+  --accent-2-line: rgba(56, 189, 248, 0.38);
   --heat-0: #121418;
-  --heat-1: rgba(234, 179, 8, 0.22);
-  --heat-2: rgba(234, 179, 8, 0.45);
+  --heat-1: rgba(56, 189, 248, 0.25);
+  --heat-2: rgba(56, 189, 248, 0.5);
   --heat-3: rgba(234, 179, 8, 0.7);
   --heat-4: #eab308;
 }
@@ -383,18 +868,21 @@
   --text-dim: #6b7280;
   --accent: #ca8a04;
   --on-accent: #ffffff;
-  --accent-strong: #a16207;
+  --accent-strong: #0284c7;
   --accent-dim: #eab308;
   --accent-wash: rgba(202, 138, 4, 0.08);
   --accent-line: rgba(202, 138, 4, 0.3);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
   --heat-0: #d1d5db;
-  --heat-1: rgba(202, 138, 4, 0.22);
-  --heat-2: rgba(202, 138, 4, 0.45);
+  --heat-1: rgba(2, 132, 199, 0.22);
+  --heat-2: rgba(2, 132, 199, 0.45);
   --heat-3: rgba(202, 138, 4, 0.7);
   --heat-4: #ca8a04;
 }
 
-/* Cyberpunk — Neo Tokyo Synthwave */
+/* Cyberpunk — Neo Tokyo Synthwave (Laser Magenta × Cyber Yellow) */
 .palette-cyberpunk {
   --bg: #07030e;
   --surface-1: #0f071e;
@@ -407,13 +895,16 @@
   --text-dim: #985ba6;
   --accent: #ff007f;
   --on-accent: #ffffff;
-  --accent-strong: #ff3898;
+  --accent-strong: #fcee0a;
   --accent-dim: #c20061;
   --accent-wash: rgba(255, 0, 127, 0.14);
   --accent-line: rgba(255, 0, 127, 0.42);
+  --accent-2: #fcee0a;
+  --accent-2-wash: rgba(252, 238, 10, 0.12);
+  --accent-2-line: rgba(252, 238, 10, 0.4);
   --heat-0: #170b2e;
-  --heat-1: rgba(255, 0, 127, 0.22);
-  --heat-2: rgba(255, 0, 127, 0.45);
+  --heat-1: rgba(252, 238, 10, 0.26);
+  --heat-2: rgba(252, 238, 10, 0.54);
   --heat-3: rgba(255, 0, 127, 0.7);
   --heat-4: #ff007f;
 }
@@ -429,22 +920,25 @@
   --text-dim: #86198f;
   --accent: #db2777;
   --on-accent: #ffffff;
-  --accent-strong: #be185d;
+  --accent-strong: #ca8a04;
   --accent-dim: #f472b6;
   --accent-wash: rgba(219, 39, 119, 0.08);
   --accent-line: rgba(219, 39, 119, 0.3);
+  --accent-2: #ca8a04;
+  --accent-2-wash: rgba(202, 138, 4, 0.08);
+  --accent-2-line: rgba(202, 138, 4, 0.3);
   --heat-0: #fbcfe8;
-  --heat-1: rgba(219, 39, 119, 0.22);
-  --heat-2: rgba(219, 39, 119, 0.45);
+  --heat-1: rgba(202, 138, 4, 0.22);
+  --heat-2: rgba(202, 138, 4, 0.45);
   --heat-3: rgba(219, 39, 119, 0.7);
   --heat-4: #db2777;
 }
 
 /* ===================================================================
-   NOIR COLLECTION — true-black palettes with neutral (untinted) surfaces
+   NOIR COLLECTION — true-black palettes with dual-accent highlights
    =================================================================== */
 
-/* Obsidian — Pure Monochrome */
+/* Obsidian — Pure Monochrome + Ice Cyan */
 .palette-obsidian {
   --bg: #000000;
   --surface-1: #0a0a0a;
@@ -457,13 +951,16 @@
   --text-dim: #6e6e6e;
   --accent: #ffffff;
   --on-accent: #000000;
-  --accent-strong: #e5e5e5;
+  --accent-strong: #38bdf8;
   --accent-dim: #a3a3a3;
   --accent-wash: rgba(255, 255, 255, 0.07);
   --accent-line: rgba(255, 255, 255, 0.28);
+  --accent-2: #38bdf8;
+  --accent-2-wash: rgba(56, 189, 248, 0.11);
+  --accent-2-line: rgba(56, 189, 248, 0.38);
   --heat-0: #111111;
-  --heat-1: rgba(255, 255, 255, 0.18);
-  --heat-2: rgba(255, 255, 255, 0.38);
+  --heat-1: rgba(56, 189, 248, 0.22);
+  --heat-2: rgba(56, 189, 248, 0.45);
   --heat-3: rgba(255, 255, 255, 0.62);
   --heat-4: #ffffff;
 }
@@ -479,18 +976,21 @@
   --text-dim: #737373;
   --accent: #000000;
   --on-accent: #ffffff;
-  --accent-strong: #262626;
+  --accent-strong: #0284c7;
   --accent-dim: #525252;
   --accent-wash: rgba(0, 0, 0, 0.05);
   --accent-line: rgba(0, 0, 0, 0.25);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
   --heat-0: #e8e8e8;
-  --heat-1: rgba(0, 0, 0, 0.18);
-  --heat-2: rgba(0, 0, 0, 0.38);
+  --heat-1: rgba(2, 132, 199, 0.2);
+  --heat-2: rgba(2, 132, 199, 0.42);
   --heat-3: rgba(0, 0, 0, 0.62);
   --heat-4: #000000;
 }
 
-/* Titanium — Carbon / Brushed Steel */
+/* Titanium — Carbon / Brushed Steel + Signal Orange */
 .palette-titanium {
   --bg: #0a0a0b;
   --surface-1: #0f0f11;
@@ -503,13 +1003,16 @@
   --text-dim: #6b6b73;
   --accent: #a8b3c4;
   --on-accent: #0a0a0b;
-  --accent-strong: #cbd5e1;
+  --accent-strong: #f97316;
   --accent-dim: #64748b;
   --accent-wash: rgba(168, 179, 196, 0.1);
   --accent-line: rgba(168, 179, 196, 0.35);
+  --accent-2: #f97316;
+  --accent-2-wash: rgba(249, 115, 22, 0.12);
+  --accent-2-line: rgba(249, 115, 22, 0.38);
   --heat-0: #151518;
-  --heat-1: rgba(168, 179, 196, 0.22);
-  --heat-2: rgba(168, 179, 196, 0.45);
+  --heat-1: rgba(249, 115, 22, 0.25);
+  --heat-2: rgba(249, 115, 22, 0.5);
   --heat-3: rgba(168, 179, 196, 0.7);
   --heat-4: #a8b3c4;
 }
@@ -525,18 +1028,21 @@
   --text-dim: #6b6b73;
   --accent: #475569;
   --on-accent: #ffffff;
-  --accent-strong: #334155;
+  --accent-strong: #ea580c;
   --accent-dim: #94a3b8;
   --accent-wash: rgba(71, 85, 105, 0.08);
   --accent-line: rgba(71, 85, 105, 0.3);
+  --accent-2: #ea580c;
+  --accent-2-wash: rgba(234, 88, 12, 0.08);
+  --accent-2-line: rgba(234, 88, 12, 0.3);
   --heat-0: #e2e2e6;
-  --heat-1: rgba(71, 85, 105, 0.22);
-  --heat-2: rgba(71, 85, 105, 0.45);
+  --heat-1: rgba(234, 88, 12, 0.22);
+  --heat-2: rgba(234, 88, 12, 0.45);
   --heat-3: rgba(71, 85, 105, 0.7);
   --heat-4: #475569;
 }
 
-/* Onyx — Champagne Gold on Warm Black */
+/* Onyx — Champagne Gold + Imperial Emerald */
 .palette-onyx {
   --bg: #0a0908;
   --surface-1: #100f0d;
@@ -549,13 +1055,16 @@
   --text-dim: #756e62;
   --accent: #d4af37;
   --on-accent: #0a0908;
-  --accent-strong: #e6c65c;
+  --accent-strong: #10b981;
   --accent-dim: #9c7f22;
   --accent-wash: rgba(212, 175, 55, 0.1);
   --accent-line: rgba(212, 175, 55, 0.35);
+  --accent-2: #10b981;
+  --accent-2-wash: rgba(16, 185, 129, 0.11);
+  --accent-2-line: rgba(16, 185, 129, 0.38);
   --heat-0: #171513;
-  --heat-1: rgba(212, 175, 55, 0.22);
-  --heat-2: rgba(212, 175, 55, 0.45);
+  --heat-1: rgba(16, 185, 129, 0.25);
+  --heat-2: rgba(16, 185, 129, 0.5);
   --heat-3: rgba(212, 175, 55, 0.7);
   --heat-4: #d4af37;
 }
@@ -571,18 +1080,21 @@
   --text-dim: #786f5d;
   --accent: #8a6d10;
   --on-accent: #ffffff;
-  --accent-strong: #6e5609;
+  --accent-strong: #047857;
   --accent-dim: #c9a227;
   --accent-wash: rgba(138, 109, 16, 0.08);
   --accent-line: rgba(138, 109, 16, 0.3);
+  --accent-2: #047857;
+  --accent-2-wash: rgba(4, 120, 87, 0.08);
+  --accent-2-line: rgba(4, 120, 87, 0.3);
   --heat-0: #e9e3d6;
-  --heat-1: rgba(138, 109, 16, 0.22);
-  --heat-2: rgba(138, 109, 16, 0.45);
+  --heat-1: rgba(4, 120, 87, 0.22);
+  --heat-2: rgba(4, 120, 87, 0.45);
   --heat-3: rgba(138, 109, 16, 0.7);
   --heat-4: #8a6d10;
 }
 
-/* Venom — Symbiote Acid Lime */
+/* Venom — Symbiote Acid Lime + Bio Cyan */
 .palette-venom {
   --bg: #000000;
   --surface-1: #080808;
@@ -595,13 +1107,16 @@
   --text-dim: #6b6b6b;
   --accent: #c6ff00;
   --on-accent: #000000;
-  --accent-strong: #d9ff4d;
+  --accent-strong: #00f2fe;
   --accent-dim: #84a800;
   --accent-wash: rgba(198, 255, 0, 0.1);
   --accent-line: rgba(198, 255, 0, 0.35);
+  --accent-2: #00f2fe;
+  --accent-2-wash: rgba(0, 242, 254, 0.11);
+  --accent-2-line: rgba(0, 242, 254, 0.38);
   --heat-0: #0f0f0f;
-  --heat-1: rgba(198, 255, 0, 0.22);
-  --heat-2: rgba(198, 255, 0, 0.45);
+  --heat-1: rgba(0, 242, 254, 0.25);
+  --heat-2: rgba(0, 242, 254, 0.5);
   --heat-3: rgba(198, 255, 0, 0.7);
   --heat-4: #c6ff00;
 }
@@ -617,18 +1132,21 @@
   --text-dim: #6f6f69;
   --accent: #4d7c0f;
   --on-accent: #ffffff;
-  --accent-strong: #3f6212;
+  --accent-strong: #0284c7;
   --accent-dim: #84cc16;
   --accent-wash: rgba(77, 124, 15, 0.08);
   --accent-line: rgba(77, 124, 15, 0.3);
+  --accent-2: #0284c7;
+  --accent-2-wash: rgba(2, 132, 199, 0.08);
+  --accent-2-line: rgba(2, 132, 199, 0.3);
   --heat-0: #e4e4e0;
-  --heat-1: rgba(77, 124, 15, 0.22);
-  --heat-2: rgba(77, 124, 15, 0.45);
+  --heat-1: rgba(2, 132, 199, 0.22);
+  --heat-2: rgba(2, 132, 199, 0.45);
   --heat-3: rgba(77, 124, 15, 0.7);
   --heat-4: #4d7c0f;
 }
 
-/* Ember — Molten Forge Orange */
+/* Ember — Molten Forge Orange + Plasma Magenta */
 .palette-ember {
   --bg: #000000;
   --surface-1: #0a0908;
@@ -641,13 +1159,16 @@
   --text-dim: #756961;
   --accent: #ff4d00;
   --on-accent: #000000;
-  --accent-strong: #ff7a3d;
+  --accent-strong: #ff007f;
   --accent-dim: #c23a00;
   --accent-wash: rgba(255, 77, 0, 0.12);
   --accent-line: rgba(255, 77, 0, 0.4);
+  --accent-2: #ff007f;
+  --accent-2-wash: rgba(255, 0, 127, 0.12);
+  --accent-2-line: rgba(255, 0, 127, 0.4);
   --heat-0: #12100e;
-  --heat-1: rgba(255, 77, 0, 0.22);
-  --heat-2: rgba(255, 77, 0, 0.45);
+  --heat-1: rgba(255, 0, 127, 0.25);
+  --heat-2: rgba(255, 0, 127, 0.5);
   --heat-3: rgba(255, 77, 0, 0.7);
   --heat-4: #ff4d00;
 }
@@ -663,13 +1184,16 @@
   --text-dim: #7d6a5e;
   --accent: #c2410c;
   --on-accent: #ffffff;
-  --accent-strong: #9a3412;
+  --accent-strong: #db2777;
   --accent-dim: #f97316;
   --accent-wash: rgba(194, 65, 12, 0.08);
   --accent-line: rgba(194, 65, 12, 0.3);
+  --accent-2: #db2777;
+  --accent-2-wash: rgba(219, 39, 119, 0.08);
+  --accent-2-line: rgba(219, 39, 119, 0.3);
   --heat-0: #ebe2dc;
-  --heat-1: rgba(194, 65, 12, 0.22);
-  --heat-2: rgba(194, 65, 12, 0.45);
+  --heat-1: rgba(219, 39, 119, 0.22);
+  --heat-2: rgba(219, 39, 119, 0.45);
   --heat-3: rgba(194, 65, 12, 0.7);
   --heat-4: #c2410c;
 }
@@ -778,6 +1302,10 @@
 
   .label-accent {
     color: var(--accent);
+  }
+
+  .label-accent-2 {
+    color: var(--accent-2);
   }
 
   /* ===== READOUT =====
@@ -906,9 +1434,9 @@
   }
 
   .btn-secondary:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-wash);
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+    background: var(--accent-2-wash);
   }
 
   /* ===== INPUT ===== */
@@ -956,9 +1484,9 @@
   }
 
   .tech-tag:hover {
-    color: var(--accent);
-    border-color: var(--accent-line);
-    background: transparent;
+    color: var(--accent-2);
+    border-color: var(--accent-2-line);
+    background: var(--accent-2-wash);
   }
 
   /* ===== CHIP =====
@@ -983,8 +1511,8 @@
   }
 
   .chip:hover:not(:disabled) {
-    color: var(--accent);
-    border-color: var(--accent-line);
+    color: var(--accent-2);
+    border-color: var(--accent-2-line);
   }
 
   .chip-active {
@@ -1155,15 +1683,15 @@
 
 .ambient-orb--b {
   background: radial-gradient(circle at center,
-      color-mix(in srgb, var(--accent-strong) 22%, transparent) 0%,
-      color-mix(in srgb, var(--accent-strong) 6%, transparent) 40%,
+      color-mix(in srgb, var(--accent-2) 25%, transparent) 0%,
+      color-mix(in srgb, var(--accent-2) 8%, transparent) 40%,
       transparent 66%);
 }
 
 .ambient-orb--c {
   background: radial-gradient(circle at center,
-      color-mix(in srgb, var(--accent-dim) 24%, transparent) 0%,
-      color-mix(in srgb, var(--accent-dim) 7%, transparent) 40%,
+      color-mix(in srgb, var(--accent-2) 20%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 7%, transparent) 40%,
       transparent 66%);
 }
 
@@ -1194,8 +1722,8 @@
   right: 15%;
   bottom: 30vh;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
-  box-shadow: 0 0 60px 10px var(--accent-wash);
+  background: linear-gradient(90deg, transparent, var(--accent-line), var(--accent-2-line), transparent);
+  box-shadow: 0 0 60px 10px var(--accent-wash), 0 0 45px 6px var(--accent-2-wash);
 }
 
 .ambient-plane {
@@ -1217,7 +1745,7 @@
   bottom: -64px;
   background-image:
     linear-gradient(var(--accent-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--accent-line) 1px, transparent 1px);
+    linear-gradient(90deg, var(--accent-2-line) 1px, transparent 1px);
   background-size: 64px 64px;
   opacity: 0.42;
   will-change: transform, opacity;
@@ -1276,7 +1804,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent, var(--accent));
+  background: linear-gradient(to bottom, transparent, var(--accent-2), var(--accent));
   transform: translateY(-100%);
   animation: hero-cue-drain 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
@@ -1305,7 +1833,7 @@
 
 /* The index hairline draws itself from the number outward, with a lit tip. */
 .section-index::after {
-  background: linear-gradient(90deg, var(--accent-line), var(--rule) 22%);
+  background: linear-gradient(90deg, var(--accent-line), var(--accent-2-line) 22%, var(--rule) 48%);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
@@ -1346,7 +1874,7 @@
   top: 50%;
   width: 40%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
   will-change: transform, opacity;
 }
 
@@ -1357,7 +1885,7 @@
   right: 10%;
   top: -14px;
   height: 28px;
-  background: radial-gradient(ellipse at center, var(--accent-wash) 0%, transparent 70%);
+  background: radial-gradient(ellipse at center, var(--accent-wash) 0%, var(--accent-2-wash) 45%, transparent 75%);
 }
 
 /* ===================================================================

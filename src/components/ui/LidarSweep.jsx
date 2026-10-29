@@ -49,9 +49,9 @@ export const LidarSweep = () => {
         // Parsing hex 60x/s is wasted work — the palette only changes on click,
         // so cache the parse and redo it when the raw token value differs.
         let lastAccent = '';
-        let accentRGB = [0, 242, 254];
-        let lastAccentStrong = '';
-        let accentStrongRGB = [56, 189, 248];
+        let accentRGB = [0, 255, 135];
+        let lastAccent2 = '';
+        let accent2RGB = [255, 0, 127];
 
         const resize = () => {
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -64,11 +64,12 @@ export const LidarSweep = () => {
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             cx = w / 2; cy = h / 2;
             maxR = Math.hypot(w, h) / 2;
-            points = Array.from({ length: 110 }, () => ({
+            points = Array.from({ length: 110 }, (_, idx) => ({
                 angle: Math.random() * TWO_PI,
                 dist: (0.12 + Math.random() * 0.88) * maxR,
                 size: 0.8 + Math.random() * 1.6,
                 glow: 0,
+                secondary: idx % 3 === 0,
             }));
         };
 
@@ -81,57 +82,63 @@ export const LidarSweep = () => {
             ctx.clearRect(0, 0, w, h);
 
             const computedStyle = getComputedStyle(canvas);
-            const accentColor = computedStyle.getPropertyValue('--accent').trim() || '#00f2fe';
-            const accentWash = computedStyle.getPropertyValue('--accent-wash').trim() || 'rgba(0,242,254,0.1)';
-            const accentStrong = computedStyle.getPropertyValue('--accent-strong').trim() || accentColor;
+            const accentColor = computedStyle.getPropertyValue('--accent').trim() || '#00ff87';
+            const accentWash = computedStyle.getPropertyValue('--accent-wash').trim() || 'rgba(0,255,135,0.1)';
+            const accent2Color = computedStyle.getPropertyValue('--accent-2').trim() || accentColor;
+            const accent2Wash = computedStyle.getPropertyValue('--accent-2-wash').trim() || accentWash;
 
             if (accentColor !== lastAccent) {
                 lastAccent = accentColor;
-                accentRGB = toRGB(accentColor) || [0, 242, 254];
+                accentRGB = toRGB(accentColor) || [0, 255, 135];
             }
-            if (accentStrong !== lastAccentStrong) {
-                lastAccentStrong = accentStrong;
-                accentStrongRGB = toRGB(accentStrong) || accentRGB;
+            if (accent2Color !== lastAccent2) {
+                lastAccent2 = accent2Color;
+                accent2RGB = toRGB(accent2Color) || accentRGB;
             }
             const [ar, ag, ab] = accentRGB;
-            const [sr, sg, sb] = accentStrongRGB;
+            const [sr, sg, sb] = accent2RGB;
 
-            // Range rings
-            ctx.strokeStyle = accentWash;
+            // Range rings — alternating primary and secondary neon wash
             ctx.lineWidth = 1;
-            for (const f of [0.22, 0.42, 0.62, 0.82]) {
+            const rings = [0.22, 0.42, 0.62, 0.82];
+            for (let rIdx = 0; rIdx < rings.length; rIdx++) {
+                ctx.strokeStyle = rIdx % 2 === 0 ? accentWash : accent2Wash;
                 ctx.beginPath();
-                ctx.arc(cx, cy, maxR * f, 0, TWO_PI);
+                ctx.arc(cx, cy, maxR * rings[rIdx], 0, TWO_PI);
                 ctx.stroke();
             }
 
-            // Sweep trail: thin sectors fading out behind the beam
+            // Sweep trail: thin sectors fading out behind the beam (primary -> secondary blend)
             const SEGMENTS = 36;
             for (let i = 0; i < SEGMENTS; i++) {
                 const a = sweep + i * 0.009;
+                const t = i / SEGMENTS;
+                const rMix = Math.round(ar * (1 - t * 0.5) + sr * (t * 0.5));
+                const gMix = Math.round(ag * (1 - t * 0.5) + sg * (t * 0.5));
+                const bMix = Math.round(ab * (1 - t * 0.5) + sb * (t * 0.5));
                 ctx.beginPath();
                 ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, maxR, a, a + 0.011);
                 ctx.closePath();
-                ctx.fillStyle = `rgba(${ar},${ag},${ab},${0.10 * (1 - i / SEGMENTS)})`;
+                ctx.fillStyle = `rgba(${rMix},${gMix},${bMix},${0.11 * (1 - t)})`;
                 ctx.fill();
             }
 
-            // Beam line
+            // Leading laser beam line in secondary neon
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.lineTo(cx + Math.cos(sweep) * maxR, cy + Math.sin(sweep) * maxR);
-            ctx.strokeStyle = `rgba(${sr},${sg},${sb},0.32)`;
+            ctx.strokeStyle = `rgba(${sr},${sg},${sb},0.42)`;
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
             // Center hub
             ctx.beginPath();
             ctx.arc(cx, cy, 2.5, 0, TWO_PI);
-            ctx.fillStyle = `rgba(${sr},${sg},${sb},0.45)`;
+            ctx.fillStyle = `rgba(${sr},${sg},${sb},0.65)`;
             ctx.fill();
 
-            // Detected points: flash when the beam passes, then decay
+            // Detected points: flash in primary or secondary neon when the beam passes, then decay
             const decay = Math.pow(0.9985, dt);
             for (const p of points) {
                 const d = (p.angle - sweep + TWO_PI) % TWO_PI;
@@ -140,16 +147,18 @@ export const LidarSweep = () => {
 
                 const px = cx + Math.cos(p.angle) * p.dist;
                 const py = cy + Math.sin(p.angle) * p.dist;
+                const [pr, pg, pb] = p.secondary ? accent2RGB : accentRGB;
+                const ptColor = p.secondary ? accent2Color : accentColor;
 
                 if (p.glow > 0.4) {
                     ctx.beginPath();
-                    ctx.arc(px, py, p.size * 3, 0, TWO_PI);
-                    ctx.fillStyle = `rgba(${ar},${ag},${ab},${p.glow * 0.14})`;
+                    ctx.arc(px, py, p.size * 3.2, 0, TWO_PI);
+                    ctx.fillStyle = `rgba(${pr},${pg},${pb},${p.glow * 0.16})`;
                     ctx.fill();
                 }
                 ctx.beginPath();
                 ctx.arc(px, py, p.size, 0, TWO_PI);
-                ctx.fillStyle = p.glow > 0.05 ? accentColor : 'rgba(255,255,255,0.2)';
+                ctx.fillStyle = p.glow > 0.05 ? ptColor : 'rgba(255,255,255,0.2)';
                 ctx.fill();
             }
 

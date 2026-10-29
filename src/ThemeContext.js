@@ -8,6 +8,6 @@ import { createContext } from 'react';
 export const ThemeContext = createContext({
     isDark: true,
     setIsDark: () => {},
-    palette: 'cyan',
+    palette: 'viper',
     setPalette: () => {}
 });

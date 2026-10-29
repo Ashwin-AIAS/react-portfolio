@@ -40,6 +40,11 @@ export default {
           wash: 'var(--accent-wash)',
           line: 'var(--accent-line)',
         },
+        accent2: {
+          DEFAULT: 'var(--accent-2)',
+          wash: 'var(--accent-2-wash)',
+          line: 'var(--accent-2-line)',
+        },
         ok: {
           DEFAULT: 'var(--ok)',
           wash: 'var(--ok-wash)',
