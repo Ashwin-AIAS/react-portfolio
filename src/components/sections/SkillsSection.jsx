@@ -4,6 +4,7 @@ import { portfolioData } from '../../data/portfolioData';
 import { Section } from '../ui/Section';
 import { SkillBadge } from '../ui/SkillBadge';
 import { SkillsRadarChart } from '../ui/SkillsRadarChart';
+import { NeuralSandbox } from '../ui/NeuralSandbox';
 
 // Was five competing accent colors (blue/purple/cyan/amber/emerald), five
 // emoji icons, and five corner glows pulsing forever on a 4s loop. Now the
@@ -62,5 +63,8 @@ export const SkillsSection = ({ t }) => (
         <SkillCard key={category} category={category} skills={skills} index={index} />
       ))}
     </div>
+
+    {/* Interactive AI Micro-Playground: CNN Int8 Quantization + Kalman Sensor Fusion */}
+    <NeuralSandbox t={t} />
   </Section>
 );

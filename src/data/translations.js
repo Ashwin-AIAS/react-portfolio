@@ -40,6 +40,13 @@ export const translations = {
         experience: "Years Exp"
       }
     },
+    sandbox: {
+      eyebrow: "Interactive In-Browser AI Micro-Playground",
+      title: "Live Edge Inference & Sensor Fusion Telemetry",
+      subtitle: "Zero-backend client-side execution: test symmetric Int8 weight quantization and Im2Col memory unrolling, or stress-test a real-time LiDAR + RADAR Kalman tracker.",
+      cnnTab: "Edge CNN Quantization & Im2Col",
+      fusionTab: "LiDAR + RADAR Kalman Sensor Fusion"
+    },
     projects: {
       title: "Projects",
       subtitle: "Featured work & technical explorations",
@@ -132,6 +139,13 @@ export const translations = {
         certifications: "Zertifikate",
         experience: "Jahre Erfahrung"
       }
+    },
+    sandbox: {
+      eyebrow: "Interaktives In-Browser KI-Labor",
+      title: "Live Edge-Inferenz & Sensorfusion-Telemetrie",
+      subtitle: "Clientseitige Echtzeit-Ausführung: Teste symmetrische Int8-Quantisierung und Im2Col-Speicherlayout oder simuliere einen LiDAR + RADAR Kalman-Tracker unter Wetterstress.",
+      cnnTab: "Edge CNN Quantisierung & Im2Col",
+      fusionTab: "LiDAR + RADAR Kalman-Sensorfusion"
     },
     projects: {
       title: "Projekte",
