@@ -6,13 +6,15 @@ export const translations = {
       projects: "Projects",
       assistant: "Assistant",
       certifications: "Certifications",
-      contact: "Contact"
+      contact: "Contact",
+      cv: "Resume"
     },
     hero: {
       badge: "AI Engineer for Autonomous Systems",
       greeting: "Hi, I'm",
       bio: "Master's student in AI Engineering for Autonomous Systems at THI Germany, specializing in Computer Vision, Deep Learning perception, and LLM/RAG systems. Experienced in deploying real-time vision pipelines and edge inference. Actively seeking roles as a Computer Vision Engineer, AI Engineer, or Autonomous Driving / Perception Engineer.",
-      downloadCv: "Download Resume",
+      downloadCv: "Download CV",
+      previewCv: "Preview CV",
       viewProjects: "View Projects",
       getInTouch: "Get in Touch",
       startAudioTour: "Start Audio Tour",
@@ -22,7 +24,13 @@ export const translations = {
       // The word the statement scene lights up; must appear in `statement`.
       statementAccent: "see.",
       statementSub: "Perception, sensor fusion and LLM systems for vehicles that drive themselves.",
-      scrollCue: "Scroll"
+      scrollCue: "Scroll",
+      recruiterFacts: [
+        { label: "Target Roles", value: "Computer Vision • ADAS Perception • GenAI" },
+        { label: "Availability", value: "Full-Time • Working Student • Thesis" },
+        { label: "Location", value: "Ingolstadt, DE (Munich / EU / Remote)" },
+        { label: "Experience", value: "2+ Yrs Enterprise IT (DXC)" }
+      ]
     },
     roadmap: {
       title: "Career Roadmap",
@@ -51,7 +59,15 @@ export const translations = {
       title: "Projects",
       subtitle: "Featured work & technical explorations",
       showMore: "Show all projects",
-      showLess: "Show fewer projects"
+      showLess: "Show fewer projects",
+      architectureBtn: "Architecture & Benchmarks",
+      closeArchitecture: "Close",
+      pipelineTitle: "System Dataflow Pipeline",
+      problemTitle: "Engineering Bottleneck",
+      tradeoffTitle: "Architectural Trade-Off & Solution",
+      highlightsTitle: "Implementation Highlights",
+      benchmarksTitle: "Verified System Telemetry",
+      filterAll: "All Deployments"
     },
     assistant: {
       title: "Talk to my Portfolio",
@@ -63,7 +79,8 @@ export const translations = {
       generating: "Analyzing Match...",
       reportLabel: "Candidate Fit Report",
       disclaimer: "This report is an automated technical evaluation based on the candidate's verified portfolio data.",
-      initialMessage: "Hi! I'm Ashwin's AI assistant. Paste a job description for a fit analysis, or ask me anything about his background and projects."
+      initialMessage: "Hi! I'm Ashwin's AI assistant. Paste a job description for a fit analysis, or ask me anything about his background and projects.",
+      presetLabel: "Instant Recruiter JD Fit Presets:"
     },
     certifications: {
       title: "Certifications",
@@ -107,13 +124,15 @@ export const translations = {
       projects: "Projekte",
       assistant: "Assistent",
       certifications: "Zertifikate",
-      contact: "Kontakt"
+      contact: "Kontakt",
+      cv: "Lebenslauf"
     },
     hero: {
       badge: "KI-Ingenieur für Autonome Systeme",
       greeting: "Hallo, ich bin",
       bio: "Masterstudent im Bereich KI-Engineering für Autonome Systeme an der THI, spezialisiert auf Computer Vision, Deep Learning Perception und LLM/RAG-Systeme. Erfahren in der Bereitstellung von Echtzeit-Vision-Pipelines und Edge-Inferenz. Aktiv auf der Suche nach Positionen als Computer Vision Engineer, KI-Ingenieur oder Perception / Autonomous Driving Engineer.",
-      downloadCv: "Lebenslauf herunterladen",
+      downloadCv: "CV Herunterladen",
+      previewCv: "CV Vorschau",
       viewProjects: "Projekte ansehen",
       getInTouch: "Kontakt aufnehmen",
       startAudioTour: "Audio-Tour starten",
@@ -122,7 +141,13 @@ export const translations = {
       statement: "Ich bringe Maschinen das Sehen bei.",
       statementAccent: "Sehen",
       statementSub: "Perception, Sensorfusion und LLM-Systeme für Fahrzeuge, die selbst fahren.",
-      scrollCue: "Scrollen"
+      scrollCue: "Scrollen",
+      recruiterFacts: [
+        { label: "Zielrollen", value: "Computer Vision • ADAS Perception • GenAI" },
+        { label: "Vertragsart", value: "Vollzeit • Werkstudent • Masterarbeit" },
+        { label: "Standort", value: "Ingolstadt, DE (München / EU / Remote)" },
+        { label: "Erfahrung", value: "2+ J. Enterprise IT (DXC)" }
+      ]
     },
     roadmap: {
       title: "Werdegang",
@@ -151,7 +176,15 @@ export const translations = {
       title: "Projekte",
       subtitle: "Ausgewählte Arbeiten & technische Entwicklungen",
       showMore: "Alle Projekte anzeigen",
-      showLess: "Weniger anzeigen"
+      showLess: "Weniger anzeigen",
+      architectureBtn: "Architektur & Benchmarks",
+      closeArchitecture: "Schließen",
+      pipelineTitle: "System-Datenfluss-Pipeline",
+      problemTitle: "Technischer Engpass",
+      tradeoffTitle: "Architektur-Abwägung & Lösung",
+      highlightsTitle: "Implementierungs-Highlights",
+      benchmarksTitle: "Verifizierte System-Telemetrie",
+      filterAll: "Alle Projekte"
     },
     assistant: {
       title: "Sprich mit meinem Portfolio",
@@ -163,7 +196,8 @@ export const translations = {
       generating: "Analyse läuft...",
       reportLabel: "Kandidaten-Analysebericht",
       disclaimer: "Dieser Bericht ist eine automatisierte technische Bewertung auf Basis des verifizierten Portfolios.",
-      initialMessage: "Hallo! Ich bin Ashwins KI-Assistent. Füge eine Stellenbeschreibung ein oder stelle mir Fragen zu seinem Hintergrund und seinen Projekten."
+      initialMessage: "Hallo! Ich bin Ashwins KI-Assistent. Füge eine Stellenbeschreibung ein oder stelle mir Fragen zu seinem Hintergrund und seinen Projekten.",
+      presetLabel: "Sofort-Analyse für Beispiel-Stellenprofile:"
     },
     certifications: {
       title: "Zertifikate",

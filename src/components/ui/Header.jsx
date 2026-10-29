@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { portfolioData } from '../../data/portfolioData';
-
-// Assuming ThemeContext will be exported from App.jsx or a separate context file later.
-// For now, we'll keep the context dependency injection pattern used in the original code,
-// but we will import it from App.jsx once App is orchestrator.
 import { ThemeContext } from '../../ThemeContext';
 import { ThemePaletteSelector } from './ThemePaletteSelector';
+import { DownloadIcon } from '../../icons/Icons';
 
 // Replaces the emoji theme toggle (🌙/☀️) — OS-rendered emoji clashed with
 // the SVG icon set used everywhere else.
@@ -60,7 +57,7 @@ export const Header = ({ activeSection, lang, t, toggleLang }) => {
                     {portfolioData.personalInfo.name}<span className="text-accent">.</span>
                 </a>
 
-                <div className="hidden md:flex items-center gap-7">
+                <div className="hidden md:flex items-center gap-6">
                     {navLinks.map(link => (
                         <a
                             key={link}
@@ -78,6 +75,15 @@ export const Header = ({ activeSection, lang, t, toggleLang }) => {
                         </a>
                     ))}
                     <div className="flex items-center gap-2.5 border-l border-rule pl-5">
+                        <a
+                            href={portfolioData.personalInfo.resumeUrl}
+                            download="Ashwin_Vignesh_M_Resume.pdf"
+                            className="label label-accent flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-accent/50 hover:border-accent hover:bg-accent/10 transition-colors cursor-pointer"
+                            title={t.hero.downloadCv || 'Download CV'}
+                        >
+                            <DownloadIcon className="w-3 h-3" />
+                            <span>CV</span>
+                        </a>
                         <ThemePaletteSelector />
                         <LangToggle lang={lang} toggleLang={toggleLang} />
                         <button
@@ -91,6 +97,15 @@ export const Header = ({ activeSection, lang, t, toggleLang }) => {
                 </div>
 
                 <div className="flex items-center gap-2 md:hidden">
+                    <a
+                        href={portfolioData.personalInfo.resumeUrl}
+                        download="Ashwin_Vignesh_M_Resume.pdf"
+                        className="label label-accent flex items-center gap-1 px-2 py-1 rounded border border-accent/50 z-50"
+                        title="Download CV"
+                    >
+                        <DownloadIcon className="w-3 h-3" />
+                        <span>CV</span>
+                    </a>
                     <ThemePaletteSelector compact />
                     <LangToggle lang={lang} toggleLang={toggleLang} compact />
                     <button

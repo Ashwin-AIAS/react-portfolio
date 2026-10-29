@@ -262,6 +262,24 @@ const CONVERSATION_STARTERS = [
   }
 ];
 
+const SAMPLE_JD_PRESETS = [
+  {
+    id: 'adas',
+    label: '🚗 Test Fit: ADAS Perception',
+    prompt: "Please evaluate Ashwin's fit for this role — Role: Autonomous Driving & Sensor Fusion Perception Engineer (Munich/Ingolstadt). Requirements: M.Sc. in AI/Robotics/CS, strong experience in 3D Computer Vision, Camera-LiDAR-RADAR sensor fusion, Kalman filtering, PyTorch, C++ edge deployment/quantization, KITTI/Waymo datasets, and simulation tools like SUMO or Simulink."
+  },
+  {
+    id: 'cv',
+    label: '👁️ Test Fit: Edge Computer Vision',
+    prompt: "Please evaluate Ashwin's fit for this role — Role: Real-Time Computer Vision & Edge AI Engineer. Requirements: Deep proficiency in Python and C/C++, OpenCV, YOLO object/pose detection, MediaPipe, model quantization (Int8) for edge hardware, FastAPI streaming over WebSockets, and Docker containerization."
+  },
+  {
+    id: 'genai',
+    label: '🧠 Test Fit: GenAI & RAG Architect',
+    prompt: "Please evaluate Ashwin's fit for this role — Role: Generative AI & Autonomous Agent Engineer. Requirements: Building production Retrieval-Augmented Generation (RAG) and Graph RAG systems, vector databases (pgvector, ChromaDB, Neo4j), cross-encoder reranking, LangChain, LLM APIs (Gemini/Claude), FastAPI, PostgreSQL, Redis, and React."
+  }
+];
+
 const TYPING_STATUSES = {
   jarvis: {
     fitReport: [
@@ -1419,6 +1437,23 @@ export const AIAssistantSection = ({ t }) => {
                             </div>
 
                         <div className="flex-shrink-0 p-4 bg-surface-2 border-t border-rule">
+                            {/* 1-Click Sample Job Description Fit Presets */}
+                            <div className="flex flex-wrap items-center gap-1.5 mb-3 pb-2.5 border-b border-rule">
+                                <span className="label text-[10px] mr-1">
+                                    {t.assistant?.presetLabel || 'Instant JD Fit Presets:'}
+                                </span>
+                                {SAMPLE_JD_PRESETS.map(preset => (
+                                    <button
+                                        key={preset.id}
+                                        type="button"
+                                        disabled={isGenerating}
+                                        onClick={() => handleSuggestionClick(preset.prompt)}
+                                        className="px-2.5 py-1 rounded text-[11px] font-mono bg-surface-1 border border-rule text-ink-muted hover:text-accent hover:border-accent transition-colors disabled:opacity-40 cursor-pointer"
+                                    >
+                                        {preset.label}
+                                    </button>
+                                ))}
+                            </div>
                             <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
                                 <div className="flex items-center gap-2">
                                     <button

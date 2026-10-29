@@ -1,7 +1,80 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion';
 import { LidarSweep } from '../ui/LidarSweep';
 import { useCanPin, usePrefersReducedMotion } from '../../hooks/useMediaQuery';
+import { portfolioData } from '../../data/portfolioData';
+import { DownloadIcon, EyeIcon, ExternalLinkIcon } from '../../icons/Icons';
+
+const ResumeModal = ({ t, onClose }) => {
+    const resumeUrl = portfolioData.personalInfo.resumeUrl;
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.76)' }}
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="panel w-full max-w-4xl flex flex-col overflow-hidden"
+                style={{ maxHeight: '90vh' }}
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="flex items-center justify-between px-5 py-4 border-b border-rule">
+                    <div className="min-w-0">
+                        <p className="label label-accent truncate mb-1">Official Curriculum Vitae</p>
+                        <h3 className="font-display text-sm font-bold tracking-tight text-ink truncate">
+                            Ashwin Vignesh M — M.Sc. AI Engineering for Autonomous Systems (THI Germany)
+                        </h3>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        aria-label="Close"
+                        className="ml-4 w-8 h-8 flex-shrink-0 flex items-center justify-center border border-rule text-ink-dim hover:text-accent hover:border-accent transition-colors text-lg leading-none cursor-pointer"
+                        style={{ borderRadius: 'var(--r-sm)' }}
+                    >
+                        ×
+                    </button>
+                </div>
+
+                <div className="flex-1 relative bg-surface-2" style={{ minHeight: '62vh' }}>
+                    <iframe
+                        src={resumeUrl}
+                        className="w-full h-full absolute inset-0"
+                        title="Ashwin Vignesh M Resume"
+                    />
+                </div>
+
+                <div className="flex flex-wrap justify-between items-center gap-3 px-5 py-4 border-t border-rule">
+                    <span className="label">Ingolstadt, Germany • Open to Relocation & Remote</span>
+                    <div className="flex items-center gap-3">
+                        <a
+                            href={resumeUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-secondary py-2 px-4"
+                        >
+                            <ExternalLinkIcon className="w-3.5 h-3.5" /> Open in Tab
+                        </a>
+                        <a
+                            href={resumeUrl}
+                            download="Ashwin_Vignesh_M_Resume.pdf"
+                            className="btn btn-primary py-2 px-4"
+                        >
+                            <DownloadIcon className="w-3.5 h-3.5" /> {t.hero.downloadCv || 'Download CV'}
+                        </a>
+                    </div>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+};
 
 // The typewriter ticks every 60ms. It lives in its own component so those
 // ticks re-render one <p>, not the whole stage.
@@ -51,7 +124,7 @@ const RoleTicker = ({ badge }) => {
     }, [roleIndex, roles]);
 
     return (
-        <p className="label mb-6 h-5">
+        <p className="label mb-5 h-5">
             <span className="label-accent">{displayText}</span>
             <motion.span
                 aria-hidden="true"
@@ -63,42 +136,75 @@ const RoleTicker = ({ badge }) => {
     );
 };
 
-const IntroCopy = ({ t }) => (
-    <>
-        <RoleTicker badge={t.hero.badge} />
+const IntroCopy = ({ t, onPreviewCv }) => {
+    const facts = t.hero.recruiterFacts || portfolioData.personalInfo.recruiterFacts || [];
 
-        {/* Rendered statically — no opacity:0 mount, so this is a
-            real LCP candidate instead of an invisible one. The scroll
-            choreography starts every value at its resting state. */}
-        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-ink leading-[0.92] mb-7">
-            {t.hero.greeting} Ashwin
-        </h1>
+    return (
+        <>
+            <RoleTicker badge={t.hero.badge} />
 
-        <p className="text-base md:text-lg text-ink-muted font-light leading-relaxed max-w-xl mb-7">
-            {t.hero.bio}
-        </p>
+            {/* Rendered statically — no opacity:0 mount, so this is a
+                real LCP candidate instead of an invisible one. The scroll
+                choreography starts every value at its resting state. */}
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-ink leading-[0.92] mb-6">
+                {t.hero.greeting} Ashwin
+            </h1>
 
-        {/* Minimalist Live Availability Pill */}
-        <div className="flex items-center gap-2 mb-8 text-xs font-mono text-ink-muted">
-            <span className="w-2 h-2 rounded-full bg-ok animate-pulse" />
-            <span>Available for <strong>Computer Vision & Autonomous Systems</strong> roles &middot; Ingolstadt, Germany / Remote</span>
-        </div>
+            <p className="text-base md:text-lg text-ink-muted font-light leading-relaxed max-w-xl mb-6">
+                {t.hero.bio}
+            </p>
 
-        {/* Streamlined Action Deck */}
-        <div className="flex flex-wrap gap-4 items-center">
-            <a href="#projects" className="btn btn-primary group shadow-md hover:shadow-accent/20 cursor-pointer">
-                <span>{t.hero.viewProjects}</span>
-                <svg className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-            </a>
+            {/* Minimalist Live Availability Pill */}
+            <div className="flex items-center gap-2 mb-6 text-xs font-mono text-ink-muted">
+                <span className="w-2 h-2 rounded-full bg-ok animate-pulse flex-shrink-0" />
+                <span>Available for <strong>Computer Vision & Autonomous Systems</strong> roles &middot; Ingolstadt, Germany / Remote</span>
+            </div>
 
-            <a href="#contact" className="btn btn-secondary cursor-pointer">
-                {t.hero.getInTouch || 'Get in Touch'}
-            </a>
-        </div>
-    </>
-);
+            {/* Streamlined Action Deck with Direct CV Download & Preview */}
+            <div className="flex flex-wrap gap-3 items-center mb-7">
+                <a href="#projects" className="btn btn-primary group shadow-md hover:shadow-accent/20 cursor-pointer">
+                    <span>{t.hero.viewProjects}</span>
+                    <svg className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+
+                <a
+                    href={portfolioData.personalInfo.resumeUrl}
+                    download="Ashwin_Vignesh_M_Resume.pdf"
+                    className="btn btn-secondary cursor-pointer"
+                >
+                    <DownloadIcon className="w-3.5 h-3.5" />
+                    <span>{t.hero.downloadCv || 'Download CV'}</span>
+                </a>
+
+                <button
+                    type="button"
+                    onClick={onPreviewCv}
+                    className="btn btn-secondary px-4 cursor-pointer"
+                    title="Preview Resume in Modal"
+                >
+                    <EyeIcon className="w-3.5 h-3.5" />
+                    <span>{t.hero.previewCv || 'Preview CV'}</span>
+                </button>
+            </div>
+
+            {/* Recruiter Quick-Facts Strip (German / EU Tech Readiness) */}
+            {facts.length > 0 && (
+                <div className="panel p-3.5 max-w-xl bg-surface-1/90">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                        {facts.map((fact) => (
+                            <div key={fact.label} className="flex items-baseline justify-between sm:justify-start gap-2 text-xs">
+                                <span className="label text-[10px] flex-shrink-0">{fact.label}:</span>
+                                <span className="font-mono text-[11px] text-ink truncate">{fact.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
 
 // Portrait — sharp panel with a mono caption strip.
 const Portrait = () => (
@@ -138,7 +244,7 @@ const toBlur = (px) => (px < 0.05 ? 'none' : `blur(${px}px)`);
  * It is 190vh now; every range below is the old one rescaled by 140/90, so
  * each move still takes the same distance of scroll as before.
  */
-const PinnedHero = ({ t }) => {
+const PinnedHero = ({ t, onPreviewCv }) => {
     const runwayRef = useRef(null);
     const { scrollYProgress } = useScroll({ target: runwayRef, offset: ['start start', 'end end'] });
     // A little inertia so wheel steps read as a camera move, not a slideshow.
@@ -174,7 +280,7 @@ const PinnedHero = ({ t }) => {
                             className="order-1 md:col-span-7"
                             style={{ y: copyY, opacity: copyOpacity, filter: copyFilter, pointerEvents: copyPointer }}
                         >
-                            <IntroCopy t={t} />
+                            <IntroCopy t={t} onPreviewCv={onPreviewCv} />
                         </motion.div>
 
                         <motion.div
@@ -197,7 +303,7 @@ const PinnedHero = ({ t }) => {
  * as parallax while the hero scrolls out.
  * Reduced motion: the same layout with every value at rest.
  */
-const FlowHero = ({ t, still }) => {
+const FlowHero = ({ t, still, onPreviewCv }) => {
     const sectionRef = useRef(null);
     const { scrollYProgress: p } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
 
@@ -218,7 +324,7 @@ const FlowHero = ({ t, still }) => {
             <div className="container mx-auto max-w-6xl relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-16 items-center">
                     <motion.div className="order-1 md:col-span-7" style={live({ y: copyY, opacity: copyOpacity })}>
-                        <IntroCopy t={t} />
+                        <IntroCopy t={t} onPreviewCv={onPreviewCv} />
                     </motion.div>
 
                     <motion.div className="order-2 md:col-span-5 flex md:justify-end" style={live({ y: portraitY })}>
@@ -233,11 +339,26 @@ const FlowHero = ({ t, still }) => {
 };
 
 export const Hero = ({ t }) => {
+    const [showResumeModal, setShowResumeModal] = useState(false);
     const canPin = useCanPin();
     const reduced = usePrefersReducedMotion();
 
-    // Keyed so a breakpoint change remounts with fresh scroll offsets instead
-    // of re-targeting live motion values mid-flight.
-    if (canPin) return <PinnedHero key="pin" t={t} />;
-    return <FlowHero key={reduced ? 'still' : 'flow'} t={t} still={reduced} />;
+    return (
+        <>
+            {canPin ? (
+                <PinnedHero key="pin" t={t} onPreviewCv={() => setShowResumeModal(true)} />
+            ) : (
+                <FlowHero key={reduced ? 'still' : 'flow'} t={t} still={reduced} onPreviewCv={() => setShowResumeModal(true)} />
+            )}
+            <AnimatePresence>
+                {showResumeModal && (
+                    <ResumeModal
+                        key="hero-resume-modal"
+                        t={t}
+                        onClose={() => setShowResumeModal(false)}
+                    />
+                )}
+            </AnimatePresence>
+        </>
+    );
 };

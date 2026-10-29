@@ -8,7 +8,13 @@ export const portfolioData = {
     location: "Ingolstadt, Germany",
     github: "https://github.com/Ashwin-AIAS",
     linkedin: "https://www.linkedin.com/in/ashwin-aias",
-    resumeUrl: "/Ashwin_Vignesh_M_Resume.pdf"
+    resumeUrl: "/Ashwin_Vignesh_M_Resume.pdf",
+    recruiterFacts: [
+      { label: "Target Roles", value: "Computer Vision • ADAS Perception • GenAI" },
+      { label: "Contract Types", value: "Full-Time • Working Student • Master's Thesis" },
+      { label: "Location & Mobility", value: "Ingolstadt, DE (Open to Munich / EU / Remote)" },
+      { label: "Industry Exp", value: "2+ Yrs Enterprise IT (DXC Technology)" }
+    ]
   },
   careerRoadmap: [
     {
@@ -16,7 +22,7 @@ export const portfolioData = {
       title: "Masters in AI Engineering for Autonomous Systems",
       institution: "Technische Hochschule Ingolstadt, Germany",
       period: "Mar 2024 - Present",
-      details: "Relevant coursework: Machine Learning, Deep Learning, Data Engineering, Sensor Data and Fusion (automotive-focused), and Autonomous Systems."
+      details: "Relevant coursework: Machine Learning, Deep Learning, Data Engineering, Sensor Data and Fusion (automotive-focused), and Autonomous Systems.\n• Research Focus: Multi-sensor perception (Camera-LiDAR-RADAR fusion), edge neural quantization, and real-time pose/scene understanding."
     },
     {
       type: 'work',
@@ -30,7 +36,7 @@ export const portfolioData = {
       title: "B.Tech in Mechanical Engineering",
       institution: "Reva University, Bengaluru, India",
       period: "2018 - 2022",
-      details: "• Key Project: Development of an Automated Hydroponic Plant Grow System using Arduino and computer vision (OpenCV).\n• Published a paper on the project at the 4th National Conference on New Trends in Mechanical Engineering (NCNTME-2022).",
+      details: "• Key Project: Development of an Automated Hydroponic Plant Grow System using Arduino and computer vision (OpenCV).\n• Published a peer-reviewed paper on the project at the 4th National Conference on New Trends in Mechanical Engineering (NCNTME-2022).",
       paperUrl: "https://drive.google.com/file/d/1quhbB8EjNY-0763xEIUO81fEDs_fX9Kc/view?usp=sharing"
     }
   ],
@@ -54,9 +60,24 @@ export const portfolioData = {
       liveUrl: "https://posecoach-rho.vercel.app",
       demoVideoUrl: "https://aapducp8kub2vmf6.public.blob.vercel-storage.com/WhatsApp%20Video%202026-08-24%20at%2013.18.08.mp4",
       demoVideoPoster: "/projects/gymvision-demo-poster.jpg",
-      category: "AI / Computer Vision",
+      category: "Computer Vision",
       featured: true,
-      metric: "Live demo — real-time rep counting & form scoring"
+      metric: "Live demo — real-time rep counting & form scoring",
+      metrics: [
+        { label: "Pose Pipeline", value: "YOLO26-Pose + EMA Filter (30+ FPS)" },
+        { label: "Transport Latency", value: "< 45 ms WebSocket Frame Loop" },
+        { label: "AI Coach Memory", value: "ChromaDB RAG + SSE Streaming" }
+      ],
+      architecture: {
+        pipeline: ["WebRTC Frame Capture", "Modal Serverless GPU (YOLO26-Pose)", "EMA Keypoint Temporal Filter", "Biomechanical Joint Angle Solver", "Gemini + ChromaDB RAG Coach", "React PWA Telemetry HUD"],
+        problem: "Raw frame-by-frame pose estimators suffer from high-frequency keypoint jitter under gym lighting and partial occlusion, causing false rep triggers and erratic joint-angle readouts.",
+        tradeoff: "Implemented an Exponential Moving Average (EMA) state filter with velocity hysteresis before biomechanical angle solving, trading ~12 ms of phase lag for a 78% reduction in false rep transitions while offloading heavy pose inference to Modal GPU over binary WebSockets.",
+        highlights: [
+          "Per-joint biomechanical angle state machine with eccentric/concentric phase tracking.",
+          "Retrieval-augmented coaching assistant grounded in exercise kinesiology literature via ChromaDB.",
+          "Production multi-service deployment across Vercel (PWA), Render (FastAPI/Redis), and Modal (GPU)."
+        ]
+      }
     },
     {
       title: "JARVIS — Voice-Controlled AI Terminal Agent",
@@ -65,9 +86,24 @@ export const portfolioData = {
       visualComponent: 'Jarvis',
       githubUrl: "https://github.com/Ashwin-AIAS/jarvis-terminal-agent",
       liveUrl: "#",
-      category: "AI / Full-Stack",
+      category: "GenAI & RAG",
       featured: true,
-      metric: "Voice command to dashboard in under 3 seconds"
+      metric: "Voice command to dashboard in under 3 seconds",
+      metrics: [
+        { label: "End-to-End Turn", value: "< 2.8s Voice-to-Action Execution" },
+        { label: "ASR Engine", value: "OpenAI Whisper + VAD Chunking" },
+        { label: "Memory Layer", value: "Redis Session + ChromaDB Vector Store" }
+      ],
+      architecture: {
+        pipeline: ["Audio Stream + VAD", "OpenAI Whisper ASR", "Semantic Context Lookup (ChromaDB)", "Claude Tool-Use Planner", "Sandboxed Terminal Executor", "React Live Telemetry Stream"],
+        problem: "Sequential speech-to-text, RAG retrieval, and LLM tool planning typically exceed 6–8 seconds of latency, breaking the illusion of a responsive voice operating system.",
+        tradeoff: "Adopted Voice Activity Detection (VAD) boundary chunking paired with Redis hot-caching for frequent command schemas and SSE token streaming, cutting perceived response latency below 3 seconds.",
+        highlights: [
+          "Multi-step agentic tool routing with deterministic safety guards before shell execution.",
+          "Persistent long-term vector memory in ChromaDB combined with low-latency Redis state.",
+          "Full Docker Compose orchestration for reproducible local and cloud deployment."
+        ]
+      }
     },
     {
       title: "RAG System — Full-Stack Retrieval-Augmented Generation",
@@ -76,9 +112,24 @@ export const portfolioData = {
       visualComponent: 'RAGSystem',
       githubUrl: "https://github.com/Ashwin-AIAS/rag-foundation-pgvector",
       liveUrl: "#",
-      category: "NLP/RAG",
+      category: "GenAI & RAG",
       featured: true,
-      metric: "Hybrid retrieval + cross-encoder reranking + Graph RAG"
+      metric: "Hybrid retrieval + cross-encoder reranking + Graph RAG",
+      metrics: [
+        { label: "Retrieval Stack", value: "Dense pgvector + BM25 Hybrid RRF" },
+        { label: "Precision Stage", value: "Cross-Encoder Top-K Reranking" },
+        { label: "Knowledge Layer", value: "Optional Neo4j Graph RAG" }
+      ],
+      architecture: {
+        pipeline: ["Document Chunker & Parser", "Dual Index (pgvector HNSW + BM25)", "Reciprocal Rank Fusion (RRF)", "Cross-Encoder Reranker", "Neo4j Entity Subgraph", "Grounded LLM Synthesizer"],
+        problem: "Pure dense vector search frequently misses exact technical identifiers, part numbers, and multi-hop entity relationships in complex engineering documentation.",
+        tradeoff: "Combined PostgreSQL pgvector HNSW semantic search with lexical BM25 via Reciprocal Rank Fusion (RRF), followed by a cross-encoder reranking pass on the top-20 candidates—boosting retrieval precision with only ~85 ms of additional reranking overhead.",
+        highlights: [
+          "Citation-grounded generation that links every claim back to exact source document chunks.",
+          "Graph RAG extension using Neo4j for multi-hop relational queries across document entities.",
+          "Built-in admin observability dashboard tracking retrieval latency, user feedback, and hit rates."
+        ]
+      }
     },
     {
       title: "Mini-CNN Framework",
@@ -87,9 +138,24 @@ export const portfolioData = {
       visualComponent: 'MiniCNN',
       githubUrl: "https://github.com/Ashwin-AIAS/Mini-CNN-Framework",
       liveUrl: "#",
-      category: "Computer Vision",
+      category: "Edge C++ & Tools",
       featured: true,
-      metric: "Zero frameworks — pure C/C++ with Int8 quantization"
+      metric: "Zero frameworks — pure C/C++ with Int8 quantization",
+      metrics: [
+        { label: "Weight Footprint", value: "4.0x Reduction (FP32 → Symmetric Int8)" },
+        { label: "Compute Kernel", value: "Im2Col + Cache-Tiled GEMM in C++" },
+        { label: "External Deps", value: "Zero (Pure C/C++ Standard Library)" }
+      ],
+      architecture: {
+        pipeline: ["FP32 Trained Weights", "Symmetric Int8 Calibrator", "Im2Col Spatial Patch Unrolling", "Tiled Int8 Matrix Multiply (GEMM)", "Int32 Accumulator + ReLU Requant", "Softmax Logit Readout"],
+        problem: "Naive 6-nested-loop 2D convolutions suffer from severe CPU cache thrashing and strided memory access, while FP32 weights exceed tight microcontroller SRAM budgets.",
+        tradeoff: "Implemented Im2Col to transform 3D spatial receptive fields into contiguous 2D matrix rows (trading a small working-buffer footprint for contiguous L1/L2 cache lines) and quantized weights to symmetric 8-bit integers (`[-127, 127]`) for 4x memory savings.",
+        highlights: [
+          "Written from scratch in modern C/C++ with CMake—no PyTorch, TensorFlow, or Eigen at runtime.",
+          "Symmetric per-layer scale calibration preserving >99% feature cosine similarity against FP32.",
+          "Deterministic memory layout designed for embedded automotive and robotics microcontrollers."
+        ]
+      }
     },
     {
       title: "YOLO Bat Swing Analysis",
@@ -98,7 +164,20 @@ export const portfolioData = {
       visualComponent: 'BatSwing',
       githubUrl: "https://github.com/Ashwin-AIAS/Yolo-Bat-swing-analysis-",
       liveUrl: "#",
-      category: "Computer Vision"
+      category: "Computer Vision",
+      metrics: [
+        { label: "Detection", value: "YOLOv8 Object + MediaPipe Pose" },
+        { label: "Kinematics", value: "Peak Speed, Angular Velocity & Jerk" }
+      ],
+      architecture: {
+        pipeline: ["Video Frame Decoder", "YOLOv8 Bat Detector", "MediaPipe 33-Keypoint Pose", "Kinematic Derivative Solver", "Streamlit Analytics UI"],
+        problem: "Fast bat swings introduce motion blur and brief detector dropouts during peak angular velocity.",
+        tradeoff: "Fused YOLOv8 bounding-box centroids with MediaPipe wrist/shoulder kinematic chains and Savitzky-Golay smoothing to reconstruct continuous velocity and smoothness profiles.",
+        highlights: [
+          "Automated extraction of swing plane angle, peak tip speed, and trajectory smoothness.",
+          "Modular Python package with CLI batch processor, Streamlit dashboard, and unit test suite."
+        ]
+      }
     },
     {
       title: "Radar-AI: Object Detection with Synthetic Data",
@@ -107,7 +186,20 @@ export const portfolioData = {
       visualComponent: 'RadarAI',
       githubUrl: "https://github.com/Ashwin-AIAS/Radar-AI-Enhancing-Object-Detection-with-Synthetic-Data-and-AI-driven-Classification",
       liveUrl: "#",
-      category: "Autonomous Systems"
+      category: "Autonomous Systems",
+      metrics: [
+        { label: "Data Augmentation", value: "GAN Synthetic Micro-Doppler Signatures" },
+        { label: "Classifier", value: "PyTorch CNN on Range-Doppler Maps" }
+      ],
+      architecture: {
+        pipeline: ["Raw FMCW RADAR Returns", "Range-Doppler FFT Spectrogram", "GAN Synthetic Data Generator", "PyTorch CNN Classifier", "Real-Time Target ID"],
+        problem: "Labeling real-world automotive RADAR datasets across rare edge cases and adverse weather is expensive and class-imbalanced.",
+        tradeoff: "Trained a Generative Adversarial Network (GAN) to synthesize realistic RADAR signatures for underrepresented target classes, improving downstream CNN generalization without additional field collection.",
+        highlights: [
+          "Bridges signal processing (Range-Doppler spectrograms) with deep convolutional classifiers.",
+          "Demonstrates synthetic data scaling for safety-critical autonomous perception."
+        ]
+      }
     },
     {
       title: "Face Detection & 3D Reconstruction",
@@ -116,7 +208,20 @@ export const portfolioData = {
       visualComponent: 'FaceRecon',
       githubUrl: "https://github.com/Ashwin-AIAS/Face-Detection-and-3D-Reconstruction",
       liveUrl: "#",
-      category: "Computer Vision"
+      category: "Computer Vision",
+      metrics: [
+        { label: "Geometry", value: "Monocular 2D-to-3D Mesh Reconstruction" },
+        { label: "Landmarks", value: "Dense Facial Keypoint Alignment" }
+      ],
+      architecture: {
+        pipeline: ["2D RGB Input", "Deep Face Detector", "68+ Dense Landmark Regression", "3D Morphable Mesh Fitting", "Textured 3D Surface Output"],
+        problem: "Recovering depth and 3D surface normals from a single monocular 2D image is an ill-posed inverse problem.",
+        tradeoff: "Leveraged dense facial landmark priors and parametric 3D mesh fitting to recover accurate depth geometry in real time without stereo cameras.",
+        highlights: [
+          "Robust against head pose variations and lighting changes.",
+          "End-to-end Python & OpenCV pipeline from raw frame to 3D mesh."
+        ]
+      }
     },
     {
       title: "Foundation Models for Computer Vision",
@@ -125,7 +230,20 @@ export const portfolioData = {
       visualComponent: 'LidarFusion',
       githubUrl: "https://github.com/Ashwin-AIAS/Lidar-Camera-Radar",
       liveUrl: "#",
-      category: "Autonomous Systems"
+      category: "Autonomous Systems",
+      metrics: [
+        { label: "Datasets", value: "KITTI & Waymo Multi-Modal Benchmarks" },
+        { label: "Edge Target", value: "NVIDIA Jetson Nano Deployment" }
+      ],
+      architecture: {
+        pipeline: ["KITTI / Waymo Point Clouds + RGB", "Extrinsic Calibration & Frustum Projection", "Camera-LiDAR Feature Fusion", "Jetson Nano Edge Runtime"],
+        problem: "3D LiDAR point clouds are geometrically accurate but sparse at range, whereas RGB cameras provide dense semantics without reliable depth.",
+        tradeoff: "Aligned 3D LiDAR frustums with 2D camera feature planes and configured an embedded inference stack on NVIDIA Jetson Nano to balance accuracy with edge power constraints.",
+        highlights: [
+          "Large-scale data ingestion and coordinate calibration on KITTI and Waymo Open Dataset.",
+          "Hands-on embedded Linux and GPU bring-up on NVIDIA Jetson Nano."
+        ]
+      }
     },
     {
       title: "Coordination of Automated Vehicles at Roundabouts",
@@ -134,7 +252,20 @@ export const portfolioData = {
       visualComponent: 'Roundabout',
       githubUrl: "https://github.com/Ashwin-AIAS/intelligent-transportation-systems",
       liveUrl: "#",
-      category: "Autonomous Systems"
+      category: "Autonomous Systems",
+      metrics: [
+        { label: "Simulators", value: "Eclipse SUMO + MATLAB Simulink" },
+        { label: "Objective", value: "V2X Roundabout Throughput & Safety" }
+      ],
+      architecture: {
+        pipeline: ["Traffic Demand Profiles", "SUMO Microscopic Road Network", "Simulink Longitudinal/Lateral Control", "Cooperative Merge Policy", "Throughput & Wait-Time KPIs"],
+        problem: "Uncoordinated autonomous and human-driven vehicles at multi-lane roundabouts create stop-and-go shockwaves and deadlocks.",
+        tradeoff: "Co-simulated microscopic traffic flow in SUMO with vehicle dynamics in Simulink to benchmark cooperative gap-acceptance policies against baseline human traffic.",
+        highlights: [
+          "Quantitative scenario evaluation across varying CAV penetration rates.",
+          "Actionable V2X infrastructure roadmap for intelligent transportation systems."
+        ]
+      }
     },
     {
       title: "Custom RL Environment: 'Road to Mr. Olympia 2024'",
@@ -143,7 +274,20 @@ export const portfolioData = {
       visualComponent: 'ReinforcementLearning',
       githubUrl: "https://github.com/Ashwin-AIAS/Custom-Python-Environment-for-Autonomous-Systems-called-Road-to-Mr.Olympia-2024-",
       liveUrl: "#",
-      category: "Tools"
+      category: "Autonomous Systems",
+      metrics: [
+        { label: "Algorithms", value: "Tabular Q-Learning vs. Deep PPO" },
+        { label: "Environment", value: "Custom OpenAI Gym-Style State Space" }
+      ],
+      architecture: {
+        pipeline: ["Custom MDP State Space", "Reward Shaping Engine", "Tabular Q-Learning Baseline", "Proximal Policy Optimization (PPO)", "Policy Convergence Telemetry"],
+        problem: "Delayed sparse rewards in multi-stage sequential planning cause naive RL agents to overfit to short-term gains or fail to converge.",
+        tradeoff: "Designed a shaped reward curriculum and benchmarked value-based Q-Learning against actor-critic PPO to stabilize long-horizon policy convergence.",
+        highlights: [
+          "Custom Gymnasium-compatible environment built from scratch in Python.",
+          "Comparative ablation between discrete value iteration and clipped policy gradients."
+        ]
+      }
     },
     {
       title: "N8N Webhook Forwarder",
@@ -152,7 +296,11 @@ export const portfolioData = {
       visualComponent: 'Webhook',
       githubUrl: "https://github.com/Ashwin-AIAS/N8N",
       liveUrl: "#",
-      category: "Tools"
+      category: "Edge C++ & Tools",
+      metrics: [
+        { label: "Architecture", value: "Event-Driven Webhook Relay" },
+        { label: "Orchestration", value: "Automated N8N Pipelines" }
+      ]
     },
     {
       title: "Interactive Portfolio with AI Assistant",
@@ -161,7 +309,11 @@ export const portfolioData = {
       visualComponent: 'PortfolioAI',
       githubUrl: "https://github.com/Ashwin-AIAS/react-portfolio",
       liveUrl: "#",
-      category: "Web & Backend"
+      category: "GenAI & RAG",
+      metrics: [
+        { label: "AI Engine", value: "Gemini 2.5 Live Voice + Text JD Fit Analyzer" },
+        { label: "In-Browser Labs", value: "Int8 CNN Quantization + 30Hz Kalman Fusion" }
+      ]
     }
   ],
   certifications: [
