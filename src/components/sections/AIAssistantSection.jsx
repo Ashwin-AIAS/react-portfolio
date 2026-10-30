@@ -640,7 +640,8 @@ export const AIAssistantSection = ({ t }) => {
             setSuggestions(SUGGESTIONS[set]);
             setShowSuggestions(true);
             
-            scrollToBottom(true);
+            if (messages.length > 1) scrollToBottom(true);
+        else if (chatContainerRef.current) chatContainerRef.current.scrollTop = 0;
         }
         // Fires once per finished reply. Listing transcript/messages would re-run
         // the suggestions and the scroll on every streamed update.
@@ -1307,7 +1308,7 @@ export const AIAssistantSection = ({ t }) => {
                                 })}
                                 
                                 <AnimatePresence>
-                                    {showSuggestions && suggestions.length > 0 && (
+                                    {showSuggestions && messages.length > 1 && suggestions.length > 0 && (
                                         <motion.div
                                             key="suggestions"
                                             initial={{ opacity: 0, y: 10 }}
