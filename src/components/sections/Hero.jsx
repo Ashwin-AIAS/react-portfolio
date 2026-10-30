@@ -192,11 +192,11 @@ const IntroCopy = ({ t, onPreviewCv }) => {
             {/* Recruiter Quick-Facts Strip (German / EU Tech Readiness) */}
             {facts.length > 0 && (
                 <div className="panel p-3.5 max-w-xl bg-surface-1/90">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
                         {facts.map((fact) => (
-                            <div key={fact.label} className="flex items-baseline justify-between sm:justify-start gap-2 text-xs">
-                                <span className="label label-accent-2 text-[10px] flex-shrink-0">{fact.label}:</span>
-                                <span className="font-mono text-[11px] text-ink truncate">{fact.value}</span>
+                            <div key={fact.label} className="flex flex-col gap-0.5 text-xs min-w-0">
+                                <span className="label label-accent-2 text-[10px]">{fact.label}</span>
+                                <span className="font-mono text-[11px] text-ink leading-snug">{fact.value}</span>
                             </div>
                         ))}
                     </div>
