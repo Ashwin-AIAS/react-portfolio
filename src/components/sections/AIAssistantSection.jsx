@@ -1119,13 +1119,13 @@ export const AIAssistantSection = ({ t }) => {
                     <Card className="h-[650px] flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
                         {/* Terminal Header Bar */}
                         <div className="flex flex-wrap items-center justify-between px-5 py-3 border-b border-rule bg-surface-2/40 backdrop-blur-sm gap-2">
-                            <div className="flex items-center gap-2.5">
-                                <div className="flex gap-1.5">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="flex gap-1.5 flex-shrink-0">
                                     <span className="w-2.5 h-2.5 rounded-full bg-red-500/70 inline-block" />
                                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70 inline-block" />
                                     <span className="w-2.5 h-2.5 rounded-full bg-green-500/70 inline-block" />
                                 </div>
-                                <span className="font-mono text-xs text-ink-dim hidden sm:inline">{activePersonaConfig.terminalTitle}</span>
+                                <span className="font-mono text-xs text-ink-dim hidden lg:inline truncate">{activePersonaConfig.terminalTitle}</span>
                             </div>
 
                             {/* Persona Switcher Quick Pills */}
@@ -1159,16 +1159,7 @@ export const AIAssistantSection = ({ t }) => {
                                 })}
                             </div>
 
-                            <span
-                                className="text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-medium"
-                                style={{
-                                    borderColor: `${activePersonaConfig.accentColor}40`,
-                                    color: activePersonaConfig.accentColor,
-                                    background: `${activePersonaConfig.accentColor}10`
-                                }}
-                            >
-                                {activePersonaConfig.statusText}
-                            </span>
+
                         </div>
 
                         <div 
