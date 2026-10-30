@@ -997,7 +997,7 @@ export const AIAssistantSection = ({ t }) => {
                             </div>
 
                             {/* Holographic Quantum Core Visualizer */}
-                            <AIAssistantVisual isGenerating={isGenerating} persona={persona} />
+                            <AIAssistantVisual isGenerating={isGenerating || geminiLive.isSpeaking || geminiLive.isUserSpeaking || isListening} persona={persona} />
 
                             {/* Persona Quick Identity Banner */}
                             <div
