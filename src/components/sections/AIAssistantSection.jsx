@@ -979,9 +979,9 @@ export const AIAssistantSection = ({ t }) => {
             <div className="grid md:grid-cols-5 gap-4">
                 <AnimateOnScroll className="md:col-span-2">
                     <Card className="h-full flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
-                        <div className="p-6 h-full flex flex-col">
+                        <div className="p-5 h-full flex flex-col">
                             {/* Terminal Top Badge */}
-                            <div className="flex items-center justify-between mb-4 pb-3 border-b border-rule">
+                            <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-rule">
                                 <span className="label flex items-center gap-2 font-mono text-[11px] tracking-wider uppercase font-semibold" style={{ color: activePersonaConfig.accentColor }}>
                                     <SparklesIcon className="w-3.5 h-3.5" /> {activePersonaConfig.panelTitle}
                                 </span>
@@ -1116,7 +1116,7 @@ export const AIAssistantSection = ({ t }) => {
                 </AnimateOnScroll>
 
                 <AnimateOnScroll delay={120} className="md:col-span-3">
-                    <Card className="h-[650px] flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
+                    <Card className="h-[660px] md:h-[685px] flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
                         {/* Terminal Header Bar */}
                         <div className="flex flex-wrap items-center justify-between px-5 py-3 border-b border-rule bg-surface-2/40 backdrop-blur-sm gap-2">
                             <div className="flex items-center gap-2.5 min-w-0">
