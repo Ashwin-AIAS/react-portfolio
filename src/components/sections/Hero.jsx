@@ -206,17 +206,44 @@ const IntroCopy = ({ t, onPreviewCv }) => {
     );
 };
 
-// Portrait — sharp panel with a mono caption strip.
+// Portrait — cutout silhouette blended into the LiDAR field with a bottom fade and HUD caption strip.
 const Portrait = () => (
-    <figure className="panel overflow-hidden w-full max-w-xs">
-        <img
-            src="/profile.jpg"
-            alt="Ashwin Vignesh M"
-            width="640"
-            height="640"
-            className="w-full aspect-square object-cover"
+    <figure className="relative w-full max-w-sm">
+        {/* Soft theme-aware radial backlight behind the silhouette */}
+        <div
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none"
+            style={{
+                background:
+                    'radial-gradient(circle at 50% 42%, var(--accent-wash) 0%, var(--accent-2-wash) 36%, transparent 70%)',
+                filter: 'blur(18px)',
+            }}
         />
-        <figcaption className="flex items-center justify-between px-3 py-2 border-t border-rule">
+
+        <div className="relative w-full aspect-[4/5] overflow-hidden">
+            <img
+                src="/profile-cutout.webp"
+                alt="Ashwin Vignesh M"
+                width="960"
+                height="1451"
+                className="w-full h-full object-cover object-[50%_10%] select-none pointer-events-none"
+                style={{
+                    WebkitMaskImage:
+                        'linear-gradient(to bottom, #000 0%, #000 66%, rgba(0,0,0,0.45) 84%, transparent 98%)',
+                    maskImage:
+                        'linear-gradient(to bottom, #000 0%, #000 66%, rgba(0,0,0,0.45) 84%, transparent 98%)',
+                    filter: 'drop-shadow(0 0 24px var(--accent-wash)) contrast(1.03)',
+                }}
+            />
+        </div>
+
+        <figcaption
+            className="relative z-10 -mt-3 flex items-center justify-between px-3.5 py-2 border border-rule backdrop-blur-md"
+            style={{
+                background: 'color-mix(in srgb, var(--surface-1) 78%, transparent)',
+                borderRadius: 'var(--r-sm)',
+            }}
+        >
             <span className="label">Ashwin Vignesh M</span>
             <span className="label label-accent-2">AI ENG</span>
         </figcaption>
