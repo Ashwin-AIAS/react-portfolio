@@ -1033,25 +1033,6 @@ export const AIAssistantSection = ({ t }) => {
                                 </div>
                             </div>
 
-                            {/* Candidate Dossier Overview */}
-                            <div className="mt-3 p-3.5 rounded-xl bg-surface-2/70 border border-rule/80">
-                                <div className="flex items-baseline justify-between mb-1">
-                                    <span className="font-display text-sm font-bold tracking-tight text-ink">
-                                        Ashwin Vignesh M
-                                    </span>
-                                    <span className="text-[10px] font-mono text-accent">M.Sc. THI Germany</span>
-                                </div>
-                                <p className="text-xs text-ink-dim leading-relaxed mb-3">
-                                    Autonomous Systems & Computer Vision Engineer specializing in Real-Time Perception, YOLO26, and RAG Pipelines.
-                                </p>
-                                <div className="flex flex-wrap gap-1">
-                                    {['Computer Vision', 'Sensor Fusion', 'RAG & Graph RAG', 'Edge PyTorch'].map(tag => (
-                                        <span key={tag} className="tech-tag text-[10px] py-0.5 px-2">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
 
                             {/* Telemetry Matrix */}
                             <dl className="mt-3 pt-3 border-t border-rule space-y-2">
@@ -1116,7 +1097,7 @@ export const AIAssistantSection = ({ t }) => {
                 </AnimateOnScroll>
 
                 <AnimateOnScroll delay={120} className="md:col-span-3">
-                    <Card className="h-[660px] md:h-[685px] flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
+                    <Card className="h-[630px] flex flex-col relative overflow-hidden border border-rule hover:border-accent/40 transition-colors">
                         {/* Terminal Header Bar */}
                         <div className="flex flex-wrap items-center justify-between px-5 py-3 border-b border-rule bg-surface-2/40 backdrop-blur-sm gap-2">
                             <div className="flex items-center gap-2.5 min-w-0">

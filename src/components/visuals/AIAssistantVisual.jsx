@@ -870,7 +870,7 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             onPointerLeave={handlePointerLeave}
             onClick={handlePulseClick}
             title="Interactive Core — Move cursor or click to trigger energy pulse"
-            className="w-full h-52 rounded-2xl relative overflow-hidden bg-surface-2/60 border border-rule hover:border-accent/50 backdrop-blur-md flex flex-col items-center justify-between p-3 select-none transition-colors duration-500 cursor-crosshair group"
+            className="w-full flex-1 min-h-[14rem] rounded-2xl relative overflow-hidden bg-surface-2/60 border border-rule hover:border-accent/50 backdrop-blur-md flex flex-col items-center justify-between p-3 select-none transition-colors duration-500 cursor-crosshair group"
         >
             {/* Subtle Cyber Grid lines */}
             <div
