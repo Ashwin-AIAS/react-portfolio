@@ -121,16 +121,26 @@ export function getActions() {
 let lastLevel = -1;
 
 /**
- * Publishes the current mouth amplitude as a CSS custom property on <html>.
- * Everything visual (mouth scaleY, glow, head bob) reads var(--vg-level).
+ * Publishes the current mouth amplitude as a CSS custom property scoped ONLY
+ * to the avatar & mobile pill wrappers (.vg-avatar-wrap, .vg-pill-wrap) rather
+ * than <html>, avoiding full-document style recalculation at 60fps.
  * @param {number} level 0..1
  */
 export function setLevel(level) {
   if (typeof document === 'undefined') return;
-  const rounded = Math.round(Math.min(1, Math.max(0, level)) * 100) / 100;
+  const clamped = Math.min(1, Math.max(0, level));
+  const rounded = clamped < 0.01 ? 0 : Math.round(clamped * 50) / 50;
   if (rounded === lastLevel) return;
   lastLevel = rounded;
-  document.documentElement.style.setProperty('--vg-level', String(rounded));
+  const val = String(rounded);
+  const targets = document.querySelectorAll('.vg-avatar-wrap, .vg-pill-wrap');
+  if (targets.length > 0) {
+    for (let i = 0; i < targets.length; i++) {
+      targets[i].style.setProperty('--vg-level', val);
+    }
+  } else {
+    document.documentElement.style.setProperty('--vg-level', val);
+  }
 }
 
 export function getLevel() {

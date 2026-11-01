@@ -1078,17 +1078,34 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             }
         };
 
+        let cachedPersona = '';
+        let cachedThemeClass = '';
+        let cachedAccentRGB = [0, 255, 135];
+        let cachedSecondaryRGB = [56, 189, 248];
+
         const draw = (now) => {
             const dt = Math.min((now - lastTime) / 1000, 0.05);
             lastTime = now;
             const st = stateRef.current;
             const pCfg = PERSONA_CONFIGS[st.persona] || PERSONA_CONFIGS.ashwin;
 
-            const styles = getComputedStyle(canvas);
-            const rawAccent = pCfg.accentHex || styles.getPropertyValue('--accent') || '#00ff87';
-            const rawSecondary = pCfg.secondaryHex || styles.getPropertyValue('--accent-2') || '#38bdf8';
-            const [ar, ag, ab] = parseRGB(rawAccent, [0, 255, 135]);
-            const [sr, sg, sb] = parseRGB(rawSecondary, [56, 189, 248]);
+            const themeClass = document.documentElement.className;
+            if (st.persona !== cachedPersona || themeClass !== cachedThemeClass) {
+                cachedPersona = st.persona;
+                cachedThemeClass = themeClass;
+                if (pCfg.accentHex && pCfg.secondaryHex) {
+                    cachedAccentRGB = parseRGB(pCfg.accentHex, [0, 255, 135]);
+                    cachedSecondaryRGB = parseRGB(pCfg.secondaryHex, [56, 189, 248]);
+                } else {
+                    const styles = getComputedStyle(canvas);
+                    const rawAccent = pCfg.accentHex || styles.getPropertyValue('--accent') || '#00ff87';
+                    const rawSecondary = pCfg.secondaryHex || styles.getPropertyValue('--accent-2') || '#38bdf8';
+                    cachedAccentRGB = parseRGB(rawAccent, [0, 255, 135]);
+                    cachedSecondaryRGB = parseRGB(rawSecondary, [56, 189, 248]);
+                }
+            }
+            const [ar, ag, ab] = cachedAccentRGB;
+            const [sr, sg, sb] = cachedSecondaryRGB;
 
             const targetEnergy = st.isGenerating ? 1.0 : 0.0;
             st.energy += (targetEnergy - st.energy) * Math.min(1, dt * 4.5);
@@ -1172,20 +1189,28 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             }
         };
 
-        const observer = new IntersectionObserver(([entry]) => {
-            visible = entry.isIntersecting && !document.hidden;
+        let inView = true;
+        const updateVisibility = () => {
+            visible = inView && !document.hidden;
             visible ? start() : stop();
+        };
+
+        const observer = new IntersectionObserver(([entry]) => {
+            inView = entry.isIntersecting;
+            updateVisibility();
         });
         observer.observe(canvas);
 
         resize();
         window.addEventListener('resize', resize);
+        document.addEventListener('visibilitychange', updateVisibility);
         start();
 
         return () => {
             stop();
             observer.disconnect();
             window.removeEventListener('resize', resize);
+            document.removeEventListener('visibilitychange', updateVisibility);
         };
     }, []);
 

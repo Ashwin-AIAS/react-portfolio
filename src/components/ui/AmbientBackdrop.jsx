@@ -19,6 +19,41 @@ import { usePrefersReducedMotion } from '../../hooks/useMediaQuery';
 // Grid cell size in px — the floor offset loops modulo this so the roll is seamless.
 const CELL = 64;
 
+// Pre-bake a tiny 64x64 monochrome grain PNG data URI once so the browser
+// composites a cached bitmap tile instead of evaluating a live SVG <feTurbulence>
+// filter across the viewport on every scroll frame.
+let cachedGrainStyle = null;
+function getGrainStyle() {
+    if (cachedGrainStyle) return cachedGrainStyle;
+    if (typeof document === 'undefined') return undefined;
+    try {
+        const size = 64;
+        const c = document.createElement('canvas');
+        c.width = size;
+        c.height = size;
+        const ctx = c.getContext('2d');
+        const img = ctx.createImageData(size, size);
+        const d = img.data;
+        let seed = 1337;
+        for (let i = 0; i < d.length; i += 4) {
+            seed = (seed * 1664525 + 1013904223) >>> 0;
+            const v = seed & 0xff;
+            d[i] = v;
+            d[i + 1] = v;
+            d[i + 2] = v;
+            d[i + 3] = 255;
+        }
+        ctx.putImageData(img, 0, 0);
+        cachedGrainStyle = {
+            backgroundImage: `url(${c.toDataURL('image/png')})`,
+            backgroundSize: '64px 64px',
+        };
+    } catch {
+        cachedGrainStyle = {};
+    }
+    return cachedGrainStyle;
+}
+
 // Page-progress stops shared by the three orb paths.
 const STOPS = [0, 0.18, 0.4, 0.62, 0.82, 1];
 
@@ -82,7 +117,7 @@ export const AmbientBackdrop = () => {
             </div>
 
             <div className="ambient-vignette" />
-            <div className="ambient-grain" />
+            <div className="ambient-grain" style={getGrainStyle()} />
         </div>
     );
 };

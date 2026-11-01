@@ -78,29 +78,44 @@ export const AvatarGuide = () => {
     useEffect(() => {
         if (!tourActive) return;
 
+        let startTimer;
         if (!hasStarted) {
-            setTimeout(() => {
+            startTimer = setTimeout(() => {
                 setHasStarted(true);
                 sessionStorage.setItem('toured', 'true');
             }, 1000);
         }
 
-        const handleScroll = () => {
-            const scrollY = window.scrollY + window.innerHeight * 0.4;
-            tourSteps.forEach((step, index) => {
-                const el = document.getElementById(step.section);
-                if (!el) return;
-                const top = el.offsetTop;
-                const bottom = top + el.offsetHeight;
-                if (scrollY >= top && scrollY < bottom) {
-                    setCurrentStep(index);
-                }
-            });
-        };
+        // Once the lazy voice-guide provider is ready, useActiveNarrationSection
+        // already tracks sections via IntersectionObserver. Before it lands, use
+        // a lightweight IntersectionObserver fallback instead of querying
+        // offsetTop/offsetHeight on every scroll tick (which forces reflows).
+        if (voice.ready || typeof IntersectionObserver === 'undefined') {
+            return () => clearTimeout(startTimer);
+        }
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [tourActive, hasStarted]);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        const idx = tourSteps.findIndex((s) => s.section === entry.target.id);
+                        if (idx >= 0) setCurrentStep(idx);
+                    }
+                }
+            },
+            { rootMargin: '-35% 0px -55% 0px' }
+        );
+
+        tourSteps.forEach((s) => {
+            const el = document.getElementById(s.section);
+            if (el) observer.observe(el);
+        });
+
+        return () => {
+            clearTimeout(startTimer);
+            observer.disconnect();
+        };
+    }, [tourActive, hasStarted, voice.ready]);
 
     // Under 768px MobileVoicePill is the entire guide (personas spec §3.4): a
     // 38px bar that never covers content, instead of this bubble sitting on top

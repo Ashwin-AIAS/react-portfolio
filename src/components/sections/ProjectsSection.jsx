@@ -29,7 +29,7 @@ const VisualComponents = {
 // `fill` stretches it to its parent instead (the showcase media column).
 const ProjectMedia = ({ project, featured, fill = false }) => {
     const ref = useRef(null);
-    const isInView = useInView(ref, { once: true, margin: '0px 0px -100px 0px' });
+    const isInView = useInView(ref, { once: false, margin: '300px 0px 300px 0px' });
     const Visual = VisualComponents[project.visualComponent];
     const height = fill
         ? 'h-full'

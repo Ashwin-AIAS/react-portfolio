@@ -26,6 +26,7 @@ export const VoiceGuideProvider = ({ children }) => {
   const engineRef = useRef(null);
   const rawLevelRef = useRef(0);
   const smoothLevelRef = useRef(0);
+  const startAmpLoopRef = useRef(null);
 
   // --- engine lifecycle ------------------------------------------------------
   useEffect(() => {
@@ -42,6 +43,9 @@ export const VoiceGuideProvider = ({ children }) => {
       },
       onAmplitude: (level) => {
         rawLevelRef.current = level;
+        if (level > 0 || smoothLevelRef.current > 0) {
+          startAmpLoopRef.current?.();
+        }
       },
       onCaption: (caption) => {
         setState({ caption });
@@ -103,13 +107,30 @@ export const VoiceGuideProvider = ({ children }) => {
     if (typeof window === 'undefined') return undefined;
     let rafId = 0;
     const tick = () => {
-      const next = smoothAmplitude(smoothLevelRef.current, rawLevelRef.current);
+      const raw = rawLevelRef.current;
+      const prev = smoothLevelRef.current;
+      if (raw === 0 && prev < 0.005) {
+        if (prev !== 0) {
+          smoothLevelRef.current = 0;
+          setLevel(0);
+        }
+        rafId = 0;
+        return;
+      }
+      const next = smoothAmplitude(prev, raw);
       smoothLevelRef.current = next;
       setLevel(next);
       rafId = window.requestAnimationFrame(tick);
     };
-    rafId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(rafId);
+    startAmpLoopRef.current = () => {
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(tick);
+      }
+    };
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+      startAmpLoopRef.current = null;
+    };
   }, []);
 
   // --- committed section -> engine -------------------------------------------
