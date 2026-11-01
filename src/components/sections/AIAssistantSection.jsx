@@ -96,6 +96,66 @@ Tone & Persona Demeanor:
 - Ground your answers in practical engineering reality: real-time FPS, sensor fusion pipelines (radar/LiDAR/cameras), RAG architectures, and model quantization.
 - Enthusiastic about collaboration and solving hard perception problems.
 - Keep all factual information strictly bound to Ashwin's real portfolio data.`
+    },
+    ironman: {
+        id: 'ironman',
+        name: 'Iron Man',
+        shortName: 'IRON MAN',
+        icon: '🦾',
+        accentColor: '#E63946',
+        secondaryColor: '#FBBF24',
+        terminalTitle: 'stark-hud // mark-85.armor.os',
+        panelTitle: 'STARK MARK LXXXV HUD',
+        statusText: 'MARK 85 ONLINE',
+        coreDisplay: 'Mark 85 Nano-Reactor // Active',
+        modelTag: 'Mark 85 HUD',
+        tagline: 'Tony Stark • Armored HUD Telemetry',
+        greeting: "Testing, one, two—Mark 85 HUD is live. Tony Stark here. I've got Ashwin's entire autonomous perception and edge C++ schematics pulled up inside the helmet. Ask me about his builds, or drop a job description and watch the suit run a full diagnostic.",
+        systemVoice: `You are Tony Stark (Iron Man), speaking live from inside the Mark 85 nanotech armor HUD while reviewing Ashwin Vignesh M's engineering portfolio.
+Tone & Persona Demeanor:
+- Speak with Tony Stark's trademark razor-sharp wit, confident genius-engineer charisma, fast-paced cadence, and deep appreciation for hardcore hardware/software engineering.
+- Admire Ashwin's work in real-time YOLO computer vision, LiDAR/radar sensor fusion, and zero-framework C++ CNN engines ("Reminds me of what I built in my Malibu workshop").
+- Keep all factual information 100% strictly bound to Ashwin's real portfolio data.`
+    },
+    batman: {
+        id: 'batman',
+        name: 'Batman',
+        shortName: 'BATMAN',
+        icon: '🦇',
+        accentColor: '#EAB308',
+        secondaryColor: '#94A3B8',
+        terminalTitle: 'batcomputer // gotham.tactical.os',
+        panelTitle: 'WAYNETECH BATCOMPUTER',
+        statusText: 'DETECTIVE MODE ONLINE',
+        coreDisplay: 'Batcomputer Quantum Node //_',
+        modelTag: 'WayneTech OS',
+        tagline: 'The Dark Knight • Tactical Dossier',
+        greeting: "Batcomputer tactical link established. I've analyzed Ashwin Vignesh M's operational file—from autonomous perception and LiDAR fusion to bare-metal C++ inference. State your inquiry, or upload a mission profile for a tactical fit assessment.",
+        systemVoice: `You are Batman (The Dark Knight), operating from the WayneTech Batcomputer in the Batcave while analyzing Ashwin Vignesh M's engineering dossier.
+Tone & Persona Demeanor:
+- Speak in a gravelly, brooding, hyper-calculated, tactical detective tone—concise, analytical, and disciplined.
+- Frame Ashwin's projects, M.Sc. at THI Ingolstadt, and DXC Technology record as field-tested tactical capabilities ("No wasted motion. Only systems that survive the field").
+- Keep all factual information 100% strictly bound to Ashwin's real portfolio data.`
+    },
+    bumblebee: {
+        id: 'bumblebee',
+        name: 'Bumblebee',
+        shortName: 'BUMBLEBEE',
+        icon: '🐝',
+        accentColor: '#FACC15',
+        secondaryColor: '#38BDF8',
+        terminalTitle: 'teletraan-bee // scout.radio.os',
+        panelTitle: 'AUTOBOT SCOUT TELEMETRY',
+        statusText: 'RADIO SYNTH LOCKED',
+        coreDisplay: 'Cybertronian Stinger Core //_',
+        modelTag: 'Scout Radio',
+        tagline: 'Autobot Scout • Radio-Synth Co-Pilot',
+        greeting: "Bzt-chk—Autobot scout Bumblebee locked onto your frequency! I'm riding shotgun on Ashwin's neural portfolio stack! Fire away with any question about his AI and robotics builds, or drop a job description in the slot to test his mission fit!",
+        systemVoice: `You are Bumblebee, the loyal, energetic Autobot scout, communicating through your Cybertronian radio-synth modulator while guiding visitors through Ashwin Vignesh M's portfolio.
+Tone & Persona Demeanor:
+- Upbeat, energetic, loyal, and enthusiastic, with occasional subtle radio-tuning flair ("Bzt-chk—locked on frequency!").
+- Treat Ashwin's autonomous driving perception, YOLO computer vision, and C++ engines like high-octane Cybertronian upgrades.
+- Keep all factual information 100% strictly bound to Ashwin's real portfolio data.`
     }
 };
 
@@ -353,6 +413,60 @@ const TYPING_STATUSES = {
       "Searching my background...",
       "Composing the answer...",
       "Almost ready..."
+    ]
+  },
+  ironman: {
+    fitReport: [
+      "Running Mark 85 HUD compatibility scan...",
+      "Cross-checking specs in the Malibu workshop...",
+      "Calculating repulsor-grade fit score...",
+      "Finalizing Stark R&D assessment..."
+    ],
+    project: [
+      "Pulling schematics onto the helmet visor...",
+      "Benchmarking edge C++ and neural latency...",
+      "Compiling Tony Stark's engineering verdict..."
+    ],
+    general: [
+      "Routing query through the Mark 85 arc reactor...",
+      "Scanning Ashwin's telemetry logs...",
+      "Calibrating HUD response..."
+    ]
+  },
+  batman: {
+    fitReport: [
+      "Cross-referencing mission profile on Batcomputer...",
+      "Running Detective Mode capability forensics...",
+      "Evaluating tactical readiness & field resilience...",
+      "Sealing classified fit dossier..."
+    ],
+    project: [
+      "Decrypting field prototype schematics...",
+      "Analyzing sensor fusion & C++ architecture...",
+      "Compiling Batcomputer intelligence brief..."
+    ],
+    general: [
+      "Scanning Batcave intelligence archives...",
+      "Verifying operational evidence...",
+      "Transmitting encrypted response..."
+    ]
+  },
+  bumblebee: {
+    fitReport: [
+      "Tuning scout radio to your mission specs...",
+      "Revving up the capability diagnostics...",
+      "Locking onto Ashwin's matching skills...",
+      "Broadcasting full mission fit report!"
+    ],
+    project: [
+      "Popping the hood on Ashwin's project garage...",
+      "Scanning neural engines and C++ turbo specs...",
+      "Tuning frequency for full briefing!"
+    ],
+    general: [
+      "Bzt-chk—locking onto your signal...",
+      "Scanning Autobot scout memory banks...",
+      "Transmitting on high-voltage frequency!"
     ]
   }
 };
@@ -1110,16 +1224,16 @@ export const AIAssistantSection = ({ t }) => {
                             </div>
 
                             {/* Persona Switcher Quick Pills */}
-                            <div className="flex items-center gap-1 bg-surface-1/90 p-1 rounded-lg border border-rule shadow-inner">
+                            <div className="flex flex-wrap items-center gap-1 bg-surface-1/90 p-1 rounded-lg border border-rule shadow-inner">
                                 {PERSONA_IDS.map(pId => {
-                                    const p = PERSONA_AGENT_CONFIGS[pId];
+                                    const p = PERSONA_AGENT_CONFIGS[pId] || PERSONA_AGENT_CONFIGS.ashwin;
                                     const isActive = persona === pId;
                                     return (
                                         <button
                                             key={pId}
                                             type="button"
                                             onClick={() => handlePersonaSwitch(pId)}
-                                            className={`px-2 py-1 rounded text-[11px] font-mono font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                                            className={`px-2 py-1 rounded text-[10px] font-mono font-semibold flex items-center gap-1 transition-all cursor-pointer ${
                                                 isActive
                                                     ? 'shadow-sm'
                                                     : 'text-ink-dim hover:text-ink hover:bg-surface-2'
@@ -1227,10 +1341,11 @@ export const AIAssistantSection = ({ t }) => {
                                                         color: activePersonaConfig.accentColor
                                                     }}
                                                 >
-                                                    {persona === 'jarvis' && <span className="text-sm">⚡</span>}
-                                                    {persona === 'optimus' && <span className="text-sm">🤖</span>}
-                                                    {persona === 'megatron' && <span className="text-sm">🟣</span>}
-                                                    {persona === 'ashwin' && <BotIcon className="w-4 h-4" />}
+                                                    {persona === 'ashwin' ? (
+                                                        <BotIcon className="w-4 h-4" />
+                                                    ) : (
+                                                        <span className="text-sm">{activePersonaConfig.icon}</span>
+                                                    )}
                                                     <span
                                                         className="w-1.5 h-1.5 rounded-full absolute -bottom-0.5 -right-0.5 ring-2 ring-surface-1"
                                                         style={{ backgroundColor: activePersonaConfig.accentColor }}
@@ -1370,10 +1485,11 @@ export const AIAssistantSection = ({ t }) => {
                                                 color: activePersonaConfig.accentColor
                                             }}
                                         >
-                                            {persona === 'jarvis' && <span className="text-sm">⚡</span>}
-                                            {persona === 'optimus' && <span className="text-sm">🤖</span>}
-                                            {persona === 'megatron' && <span className="text-sm">🟣</span>}
-                                            {persona === 'ashwin' && <BotIcon className="w-4 h-4" />}
+                                            {persona === 'ashwin' ? (
+                                                <BotIcon className="w-4 h-4" />
+                                            ) : (
+                                                <span className="text-sm">{activePersonaConfig.icon}</span>
+                                            )}
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <div className="flex gap-1">

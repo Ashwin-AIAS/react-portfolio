@@ -45,6 +45,39 @@ const PERSONA_CONFIGS = {
         topologyLabel: 'SINGULARITY // WAR',
         footerLeft: 'OVERDRIVE',
     },
+    ironman: {
+        title: 'STARK // MARK LXXXV HUD',
+        subtitle: 'Mark 85 Nano-Reactor • Active',
+        generatingText: 'Repulsor Telemetry Streaming...',
+        idleText: 'Mark 85 Nano-Reactor • Ready',
+        accentHex: '#E63946',
+        secondaryHex: '#FBBF24',
+        cornerPrefix: 'MARK-85',
+        topologyLabel: 'REPULSOR // HUD',
+        footerLeft: 'NANO 3000%',
+    },
+    batman: {
+        title: 'WAYNETECH // BATCOMPUTER',
+        subtitle: 'Detective Mode Sonar • Locked',
+        generatingText: 'Batcomputer Tactical Analysis...',
+        idleText: 'Batcomputer Sonar • Online',
+        accentHex: '#EAB308',
+        secondaryHex: '#94A3B8',
+        cornerPrefix: 'BATCOMP',
+        topologyLabel: 'SONAR // 3D',
+        footerLeft: 'GOTHAM LINK',
+    },
+    bumblebee: {
+        title: 'AUTOBOT // SCOUT RADIO',
+        subtitle: 'Stinger Vocoder Core • Locked',
+        generatingText: 'Tuning Cybertronian Frequency...',
+        idleText: 'Scout Radio Core • Online',
+        accentHex: '#FACC15',
+        secondaryHex: '#38BDF8',
+        cornerPrefix: 'SCOUT-BEE',
+        topologyLabel: 'RADIO // SYNTH',
+        footerLeft: 'FM/CYBER 108.8',
+    },
 };
 
 const parseRGB = (value, fallback) => {
@@ -208,21 +241,17 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
 
         /**
          * 1. ASHWIN: Minimalist Hero-Matched LiDAR Radar Sweep & Breathing Core
-         * Clean concentric range rings, rotating laser beam with fading sector trail,
-         * sparse point-cloud detections, and a calm breathing center orb.
          */
         const drawAshwinLidar = (now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st) => {
             const rMax = radius * 1.08;
             const sweepSpeed = (reducedMotion ? 0.2 : 1.05) + st.energy * 1.4 + st.velBoost * 1.5;
             st.sweepAngle = (st.sweepAngle - sweepSpeed * dt + TWO_PI) % TWO_PI;
 
-            // Subtle cursor parallax offset
             const ox = st.pointer.active ? st.pointer.x * 6 : 0;
             const oy = st.pointer.active ? st.pointer.y * 6 : 0;
             const rx = cx + ox;
             const ry = cy + oy;
 
-            // Soft ambient glow
             const bgGrad = ctx.createRadialGradient(rx, ry, 2, rx, ry, rMax * 1.25);
             bgGrad.addColorStop(0, `rgba(${ar},${ag},${ab},${0.16 + st.energy * 0.16})`);
             bgGrad.addColorStop(0.55, `rgba(${sr},${sg},${sb},0.05)`);
@@ -232,7 +261,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.arc(rx, ry, rMax * 1.25, 0, TWO_PI);
             ctx.fill();
 
-            // Crosshair axis ticks
             ctx.strokeStyle = `rgba(${ar},${ag},${ab},0.12)`;
             ctx.lineWidth = 1;
             ctx.beginPath();
@@ -242,7 +270,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.lineTo(rx, ry + rMax * 1.08);
             ctx.stroke();
 
-            // 3 Concentric LiDAR range rings (matching Hero LidarSweep)
             const ringFracs = [0.36, 0.68, 1.0];
             for (let i = 0; i < ringFracs.length; i++) {
                 ctx.beginPath();
@@ -254,7 +281,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 ctx.stroke();
             }
 
-            // Rotating LiDAR sweep sector trail (28 segments, primary -> secondary blend)
             const SEGMENTS = 28;
             for (let i = 0; i < SEGMENTS; i++) {
                 const a = st.sweepAngle + i * 0.018;
@@ -270,7 +296,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 ctx.fill();
             }
 
-            // Leading laser beam line
             ctx.beginPath();
             ctx.moveTo(rx, ry);
             ctx.lineTo(rx + Math.cos(st.sweepAngle) * rMax, ry + Math.sin(st.sweepAngle) * rMax);
@@ -278,7 +303,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            // Detected LiDAR point cloud blips that illuminate as the beam passes
             const decay = Math.pow(0.22, dt);
             for (const pt of st.lidarPoints) {
                 const diff = (pt.angle - st.sweepAngle + TWO_PI) % TWO_PI;
@@ -305,7 +329,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 ctx.fill();
             }
 
-            // Minimalist breathing center core orb
             const corePulse = 1 + Math.sin(now * (0.003 + st.energy * 0.005)) * (0.12 + st.energy * 0.18);
             const coreR = 7 * corePulse;
             ctx.beginPath();
@@ -325,8 +348,7 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
         };
 
         /**
-         * 2. JARVIS: 3D Interactive Stark Hologram Sphere (kept intact!)
-         * 64-node 3D Fibonacci neural globe with synaptic links, data packets, and gyro rings.
+         * 2. JARVIS: 3D Interactive Stark Hologram Sphere
          */
         const drawJarvisHologram = (now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st) => {
             const spinRate = (reducedMotion ? 0.08 : 0.45) + st.energy * 1.15 + st.velBoost * 1.6;
@@ -346,7 +368,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.arc(cx, cy, glowR, 0, TWO_PI);
             ctx.fill();
 
-            // Outer Stark HUD gyroscope rings
             ctx.save();
             ctx.translate(cx, cy);
             for (let ringIdx = 0; ringIdx < 2; ringIdx++) {
@@ -394,7 +415,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 projected.push({ sx, sy, z: z2, scale, layer: n.layer, size: n.size });
             }
 
-            // Synaptic links
             ctx.lineWidth = 0.85;
             const maxDistSq = (radius * 0.56) ** 2;
             for (let i = 0; i < projected.length; i++) {
@@ -421,7 +441,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 }
             }
 
-            // Travelling data pulses
             if (!reducedMotion && Math.random() < (0.06 + st.energy * 0.22) && st.jarvisPulses.length < 14) {
                 const from = Math.floor(Math.random() * JARVIS_NODE_COUNT);
                 const to = (from + 1 + Math.floor(Math.random() * 8)) % JARVIS_NODE_COUNT;
@@ -450,7 +469,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 }
             }
 
-            // Depth-sorted 3D nodes
             const sorted = [...projected].sort((a, b) => b.z - a.z);
             for (const pt of sorted) {
                 const depthAlpha = Math.max(0.2, Math.min(1, 0.65 - pt.z * 0.35));
@@ -473,8 +491,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
 
         /**
          * 3. OPTIMUS PRIME: Cybertronian Matrix of Leadership & Mechanical Gear Iris
-         * Articulated left/right Matrix handles that open with energy, notched Cybertronian
-         * mechanical gear wheel, anamorphic lens flare, and a faceted Energon crystal core.
          */
         const drawOptimusMatrix = (now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st) => {
             const ox = st.pointer.active ? st.pointer.x * 5 : 0;
@@ -483,7 +499,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             const my = cy + oy;
             const gearRot = now * (0.00035 + st.energy * 0.0006);
 
-            // Radiant Energon aura (Blue core -> Crimson outer ring)
             const aura = ctx.createRadialGradient(mx, my, 2, mx, my, radius * 1.45);
             aura.addColorStop(0, `rgba(255,255,255,${0.35 + st.energy * 0.25})`);
             aura.addColorStop(0.28, `rgba(${ar},${ag},${ab},${0.32 + st.energy * 0.2})`);
@@ -494,7 +509,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.arc(mx, my, radius * 1.45, 0, TWO_PI);
             ctx.fill();
 
-            // Outer Cybertronian 16-Tooth Mechanical Gear Ring
             ctx.save();
             ctx.translate(mx, my);
             ctx.rotate(gearRot);
@@ -518,7 +532,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.stroke();
             ctx.restore();
 
-            // Counter-rotating Crimson Autobot Crest Octagon
             ctx.save();
             ctx.translate(mx, my);
             ctx.rotate(-gearRot * 1.4);
@@ -537,14 +550,12 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.stroke();
             ctx.restore();
 
-            // Articulated Matrix Handles (Left & Right mechanical brackets that slide outward)
             const openOffset = (st.pointer.active ? 5 : 0) + st.energy * 9 + st.velBoost * 5 + Math.sin(now * 0.0025) * 2;
             for (const side of [-1, 1]) {
                 ctx.save();
                 ctx.translate(mx + side * (radius * 0.62 + openOffset), my);
                 ctx.scale(side, 1);
 
-                // Outer mechanical handle bracket
                 ctx.beginPath();
                 ctx.moveTo(0, -radius * 0.52);
                 ctx.lineTo(radius * 0.26, -radius * 0.34);
@@ -561,7 +572,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 ctx.fill();
                 ctx.stroke();
 
-                // Crimson Energon conduit slot inside handle
                 ctx.beginPath();
                 ctx.moveTo(radius * 0.08, -radius * 0.3);
                 ctx.lineTo(radius * 0.08, radius * 0.3);
@@ -571,7 +581,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 ctx.restore();
             }
 
-            // Horizontal Anamorphic Matrix Lens Flare
             const flareW = radius * (1.35 + st.energy * 0.45 + st.velBoost * 0.3);
             const flareGrad = ctx.createLinearGradient(mx - flareW, my, mx + flareW, my);
             flareGrad.addColorStop(0, 'rgba(59,130,246,0)');
@@ -584,7 +593,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.ellipse(mx, my, flareW, 2.5 + st.energy * 2, 0, 0, TWO_PI);
             ctx.fill();
 
-            // Central Faceted Crystal Core of the Matrix
             const coreR = radius * (0.42 + Math.sin(now * 0.004) * 0.03 + st.energy * 0.06);
             ctx.save();
             ctx.translate(mx, my);
@@ -609,7 +617,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.lineWidth = 1.2;
             ctx.stroke();
 
-            // Facet internal lattice lines
             ctx.strokeStyle = 'rgba(255,255,255,0.45)';
             ctx.lineWidth = 0.8;
             for (let i = 0; i < 4; i++) {
@@ -624,8 +631,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
 
         /**
          * 4. MEGATRON: Dark Energon Singularity & Jagged High-Voltage Lightning Core
-         * Sharp angular Decepticon chevron war-blades, a pitch-black void singularity core,
-         * and procedural jagged purple/magenta lightning bolts arcing to the outer cage.
          */
         const drawMegatronSingularity = (now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st) => {
             const ox = st.pointer.active ? st.pointer.x * 6 : 0;
@@ -634,7 +639,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             const my = cy + oy;
             const spin = now * (0.0006 + st.energy * 0.0012 + st.velBoost * 0.001);
 
-            // Dark Energon abyssal corona
             const corona = ctx.createRadialGradient(mx, my, radius * 0.12, mx, my, radius * 1.4);
             corona.addColorStop(0, '#05020a');
             corona.addColorStop(0.22, `rgba(${ar},${ag},${ab},${0.48 + st.energy * 0.25})`);
@@ -645,7 +649,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.arc(mx, my, radius * 1.4, 0, TWO_PI);
             ctx.fill();
 
-            // Outer Angular Decepticon 6-Point Star / War Cage
             const vertices = [];
             ctx.save();
             ctx.translate(mx, my);
@@ -658,7 +661,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 const vx = Math.cos(a) * r;
                 const vy = Math.sin(a) * r;
                 if (i % 2 === 0) {
-                    // Store world-space outer spike vertices for lightning targets
                     const cosS = Math.cos(spin);
                     const sinS = Math.sin(spin);
                     vertices.push({
@@ -677,7 +679,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.stroke();
             ctx.restore();
 
-            // Counter-spinning razor triangles (Decepticon insignia motif)
             ctx.save();
             ctx.translate(mx, my);
             ctx.rotate(-spin * 1.35);
@@ -698,7 +699,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             }
             ctx.restore();
 
-            // Procedural Jagged Dark Energon Lightning Arcs (Core -> Outer Spikes / Cursor)
             const boltTargets = [...vertices];
             if (st.pointer.active) {
                 boltTargets.push({ x: st.pointer.rawX, y: st.pointer.rawY, isCursor: true });
@@ -722,20 +722,17 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
                 }
                 ctx.lineTo(target.x, target.y);
 
-                // Outer magenta/purple plasma glow
                 ctx.strokeStyle = b % 2 === 0
                     ? `rgba(${sr},${sg},${sb},0.85)`
                     : `rgba(${ar},${ag},${ab},0.85)`;
                 ctx.lineWidth = 2.2;
                 ctx.stroke();
 
-                // White-hot lightning core
                 ctx.strokeStyle = 'rgba(255,255,255,0.9)';
                 ctx.lineWidth = 0.9;
                 ctx.stroke();
             }
 
-            // Singularity Black Hole Core with Crimson/Violet Accretion Diamond
             const coreR = radius * (0.28 + Math.sin(now * 0.008) * 0.03 + st.energy * 0.05);
             ctx.save();
             ctx.translate(mx, my);
@@ -748,12 +745,337 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             ctx.fill();
             ctx.stroke();
 
-            // Inner glowing Dark Energon pupil
             ctx.fillStyle = `rgb(${sr},${sg},${sb})`;
             ctx.beginPath();
             ctx.rect(-coreR * 0.42, -coreR * 0.42, coreR * 0.84, coreR * 0.84);
             ctx.fill();
             ctx.restore();
+        };
+
+        /**
+         * 5. IRON MAN: Mark 85 Triangular Nano-Arc Reactor & Repulsor Targeting HUD
+         * Hot-rod crimson & gold counter-rotating armor rings, 3 articulated nano-petals,
+         * and a glowing cyan-white triangular Mark 85 chest Arc Reactor core.
+         */
+        const drawIronManMark85 = (now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st) => {
+            const ox = st.pointer.active ? st.pointer.x * 7 : 0;
+            const oy = st.pointer.active ? st.pointer.y * 7 : 0;
+            const mx = cx + ox;
+            const my = cy + oy;
+            const spin = now * (0.0005 + st.energy * 0.001 + st.velBoost * 0.0008);
+
+            // Multi-tone Stark Crimson/Gold/Arc-Cyan radial aura
+            const aura = ctx.createRadialGradient(mx, my, 2, mx, my, radius * 1.4);
+            aura.addColorStop(0, `rgba(56, 189, 248, ${0.42 + st.energy * 0.25})`);
+            aura.addColorStop(0.32, `rgba(${ar},${ag},${ab},${0.28 + st.energy * 0.2})`);
+            aura.addColorStop(0.68, `rgba(${sr},${sg},${sb},${0.16 + st.energy * 0.12})`);
+            aura.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = aura;
+            ctx.beginPath();
+            ctx.arc(mx, my, radius * 1.4, 0, TWO_PI);
+            ctx.fill();
+
+            // Outer Gold Titanium Segmented HUD Ring
+            ctx.save();
+            ctx.translate(mx, my);
+            ctx.rotate(spin);
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 1.05, 0, TWO_PI);
+            ctx.strokeStyle = `rgba(${sr},${sg},${sb},${0.55 + st.energy * 0.3})`;
+            ctx.lineWidth = 1.6;
+            ctx.setLineDash([14, 7, 3, 7]);
+            ctx.stroke();
+            ctx.restore();
+
+            // Counter-Rotating Crimson Armor Bezel
+            ctx.save();
+            ctx.translate(mx, my);
+            ctx.rotate(-spin * 1.3);
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 0.86, 0, TWO_PI);
+            ctx.strokeStyle = `rgba(${ar},${ag},${ab},${0.65 + st.energy * 0.3})`;
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([24, 14]);
+            ctx.stroke();
+            ctx.restore();
+
+            // 3 Articulated Mark 85 Nano-Armor Clamps (at 120-degree intervals)
+            const clampSpread = radius * (0.58 + st.energy * 0.1 + st.velBoost * 0.06 + Math.sin(now * 0.003) * 0.025);
+            for (let k = 0; k < 3; k++) {
+                const a = (k / 3) * TWO_PI - Math.PI / 2 + Math.sin(now * 0.001) * 0.08;
+                ctx.save();
+                ctx.translate(mx + Math.cos(a) * clampSpread, my + Math.sin(a) * clampSpread);
+                ctx.rotate(a + Math.PI / 2);
+
+                ctx.beginPath();
+                ctx.moveTo(-radius * 0.22, 0);
+                ctx.lineTo(-radius * 0.12, -radius * 0.14);
+                ctx.lineTo(radius * 0.12, -radius * 0.14);
+                ctx.lineTo(radius * 0.22, 0);
+                ctx.lineTo(radius * 0.1, radius * 0.08);
+                ctx.lineTo(-radius * 0.1, radius * 0.08);
+                ctx.closePath();
+                ctx.fillStyle = `rgba(${ar},${ag},${ab},0.22)`;
+                ctx.strokeStyle = `rgba(${sr},${sg},${sb},0.85)`;
+                ctx.lineWidth = 1.3;
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Central Triangular Mark 85 Nano-Arc Reactor Core
+            const triR = radius * (0.48 + Math.sin(now * 0.005) * 0.025 + st.energy * 0.06);
+            ctx.save();
+            ctx.translate(mx, my);
+
+            // Outer Rounded Triangle Housing
+            ctx.beginPath();
+            const triAngles = [-Math.PI / 6, Math.PI / 2, (7 * Math.PI) / 6];
+            for (let i = 0; i < 3; i++) {
+                const vx = Math.cos(triAngles[i]) * triR;
+                const vy = Math.sin(triAngles[i]) * triR;
+                if (i === 0) ctx.moveTo(vx, vy);
+                else ctx.lineTo(vx, vy);
+            }
+            ctx.closePath();
+            const coreGrad = ctx.createRadialGradient(0, 0, 1, 0, 0, triR);
+            coreGrad.addColorStop(0, '#ffffff');
+            coreGrad.addColorStop(0.5, '#38bdf8');
+            coreGrad.addColorStop(0.85, '#0284c7');
+            coreGrad.addColorStop(1, `rgb(${sr},${sg},${sb})`);
+            ctx.fillStyle = coreGrad;
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+
+            // Inner White-Hot Repulsor Core & Lattice Lines
+            ctx.beginPath();
+            for (let i = 0; i < 3; i++) {
+                const vx = Math.cos(triAngles[i]) * (triR * 0.52);
+                const vy = Math.sin(triAngles[i]) * (triR * 0.52);
+                if (i === 0) ctx.moveTo(vx, vy);
+                else ctx.lineTo(vx, vy);
+            }
+            ctx.closePath();
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(2, 132, 199, 0.75)';
+            ctx.lineWidth = 1.1;
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(Math.cos(triAngles[i]) * triR, Math.sin(triAngles[i]) * triR);
+                ctx.stroke();
+            }
+            ctx.restore();
+        };
+
+        /**
+         * 6. BATMAN: WayneTech Batcomputer Ultrasonic Sonar & Bat-Signal Tactical Grid
+         * Concentric ultrasonic echo-location rings, rotating stealth compass bezel,
+         * and a glowing Bat-Signal emblem core at the center.
+         */
+        const drawBatmanSonar = (now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st) => {
+            const ox = st.pointer.active ? st.pointer.x * 6 : 0;
+            const oy = st.pointer.active ? st.pointer.y * 6 : 0;
+            const mx = cx + ox;
+            const my = cy + oy;
+            const sweep = (now * (0.0012 + st.energy * 0.0015)) % TWO_PI;
+
+            // Bat-Signal Volumetric Spotlight Glow
+            const spot = ctx.createRadialGradient(mx, my, 2, mx, my, radius * 1.38);
+            spot.addColorStop(0, `rgba(${ar},${ag},${ab},${0.34 + st.energy * 0.22})`);
+            spot.addColorStop(0.45, `rgba(${sr},${sg},${sb},${0.12 + st.energy * 0.08})`);
+            spot.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = spot;
+            ctx.beginPath();
+            ctx.arc(mx, my, radius * 1.38, 0, TWO_PI);
+            ctx.fill();
+
+            // 4 Expanding Ultrasonic Echo-Location Rings
+            for (let i = 0; i < 4; i++) {
+                const phase = ((now * 0.0005 + i * 0.25) % 1);
+                const r = radius * (0.25 + phase * 0.9);
+                const alpha = (1 - phase) * (0.42 + st.energy * 0.25);
+                ctx.beginPath();
+                ctx.arc(mx, my, r, 0, TWO_PI);
+                ctx.strokeStyle = i % 2 === 0
+                    ? `rgba(${ar},${ag},${ab},${alpha})`
+                    : `rgba(${sr},${sg},${sb},${alpha})`;
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+            }
+
+            // Outer WayneTech Tactical Compass Bezel
+            ctx.save();
+            ctx.translate(mx, my);
+            ctx.rotate(-now * 0.0003);
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 1.05, 0, TWO_PI);
+            ctx.strokeStyle = `rgba(${sr},${sg},${sb},0.45)`;
+            ctx.lineWidth = 1.2;
+            ctx.setLineDash([4, 6]);
+            ctx.stroke();
+
+            // 8 Tactical Radar Degree Notches
+            ctx.setLineDash([]);
+            for (let i = 0; i < 8; i++) {
+                const a = (i / 8) * TWO_PI;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(a) * radius * 0.94, Math.sin(a) * radius * 0.94);
+                ctx.lineTo(Math.cos(a) * radius * 1.08, Math.sin(a) * radius * 1.08);
+                ctx.strokeStyle = `rgba(${ar},${ag},${ab},0.65)`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Ultrasonic Sonar Sweep Line
+            ctx.beginPath();
+            ctx.moveTo(mx, my);
+            ctx.lineTo(mx + Math.cos(sweep) * radius * 1.04, my + Math.sin(sweep) * radius * 1.04);
+            ctx.strokeStyle = `rgba(${ar},${ag},${ab},${0.7 + st.energy * 0.25})`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Central Bat-Signal Emblem Core
+            const s = (radius * (0.58 + Math.sin(now * 0.004) * 0.025 + st.energy * 0.05)) / 32;
+            ctx.save();
+            ctx.translate(mx, my);
+            ctx.scale(s, s);
+
+            // Outer Gold Bat-Signal Oval Ring
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 32, 20, 0, 0, TWO_PI);
+            ctx.fillStyle = `rgba(${ar},${ag},${ab},${0.22 + st.energy * 0.18})`;
+            ctx.strokeStyle = `rgb(${ar},${ag},${ab})`;
+            ctx.lineWidth = 2 / s;
+            ctx.fill();
+            ctx.stroke();
+
+            // Iconic Armored Bat Silhouette
+            ctx.beginPath();
+            ctx.moveTo(0, -11);
+            ctx.lineTo(3.5, -6);
+            ctx.lineTo(6, -13); // right ear
+            ctx.lineTo(8, -5);
+            ctx.lineTo(26, -9); // right wingtip
+            ctx.lineTo(19, 2);
+            ctx.lineTo(11, 4);
+            ctx.lineTo(6, 9);
+            ctx.lineTo(0, 14); // tail tip
+            ctx.lineTo(-6, 9);
+            ctx.lineTo(-11, 4);
+            ctx.lineTo(-19, 2);
+            ctx.lineTo(-26, -9); // left wingtip
+            ctx.lineTo(-8, -5);
+            ctx.lineTo(-6, -13); // left ear
+            ctx.lineTo(-3.5, -6);
+            ctx.closePath();
+            ctx.fillStyle = '#090b10';
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 1.3 / s;
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+        };
+
+        /**
+         * 7. BUMBLEBEE: Cybertronian Honeycomb Stinger Core & Radio-Synth Waveform Modulator
+         * 7-cell glowing hexagonal honeycomb lattice, black/yellow turbine rings,
+         * and a live oscillating FM/AM radio-synth waveform ring.
+         */
+        const drawBumblebeeStinger = (now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st) => {
+            const ox = st.pointer.active ? st.pointer.x * 6 : 0;
+            const oy = st.pointer.active ? st.pointer.y * 6 : 0;
+            const mx = cx + ox;
+            const my = cy + oy;
+            const spin = now * (0.00055 + st.energy * 0.001);
+
+            // Cybertronian Yellow & Autobot Cyan Aura
+            const aura = ctx.createRadialGradient(mx, my, 2, mx, my, radius * 1.4);
+            aura.addColorStop(0, `rgba(${sr},${sg},${sb},${0.36 + st.energy * 0.22})`);
+            aura.addColorStop(0.4, `rgba(${ar},${ag},${ab},${0.26 + st.energy * 0.18})`);
+            aura.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = aura;
+            ctx.beginPath();
+            ctx.arc(mx, my, radius * 1.4, 0, TWO_PI);
+            ctx.fill();
+
+            // Outer Black & Yellow Racing Stripe Turbine Ring
+            ctx.save();
+            ctx.translate(mx, my);
+            ctx.rotate(spin);
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 1.04, 0, TWO_PI);
+            ctx.strokeStyle = `rgba(${ar},${ag},${ab},0.75)`;
+            ctx.lineWidth = 2.4;
+            ctx.setLineDash([12, 8]);
+            ctx.stroke();
+            ctx.restore();
+
+            // Live Circular Radio-Synth Waveform Modulator Ring
+            ctx.save();
+            ctx.translate(mx, my);
+            ctx.beginPath();
+            const wavePts = 72;
+            const baseWaveR = radius * 0.82;
+            for (let i = 0; i <= wavePts; i++) {
+                const a = (i / wavePts) * TWO_PI;
+                const mod =
+                    Math.sin(a * 8 + now * 0.008) * (3.5 + st.energy * 7) +
+                    Math.cos(a * 14 - now * 0.012) * (2 + st.velBoost * 4);
+                const r = baseWaveR + mod;
+                const wx = Math.cos(a) * r;
+                const wy = Math.sin(a) * r;
+                if (i === 0) ctx.moveTo(wx, wy);
+                else ctx.lineTo(wx, wy);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = `rgba(${sr},${sg},${sb},${0.75 + st.energy * 0.25})`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+
+            // Central 7-Cell Cybertronian Honeycomb Lattice (1 center + 6 surrounding hexes)
+            const hexR = radius * 0.19;
+            const ringDist = hexR * 1.82;
+            const cells = [{ x: 0, y: 0, idx: 0 }];
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * TWO_PI + spin * 0.5;
+                cells.push({
+                    x: Math.cos(a) * ringDist,
+                    y: Math.sin(a) * ringDist,
+                    idx: i + 1,
+                });
+            }
+
+            for (const cell of cells) {
+                const pulse = 0.5 + 0.5 * Math.sin(now * 0.005 + cell.idx * 0.9);
+                const r = hexR * (0.9 + pulse * 0.12 + st.energy * 0.08);
+                ctx.save();
+                ctx.translate(mx + cell.x, my + cell.y);
+                ctx.beginPath();
+                for (let v = 0; v < 6; v++) {
+                    const va = (v / 6) * TWO_PI + Math.PI / 6;
+                    const vx = Math.cos(va) * r;
+                    const vy = Math.sin(va) * r;
+                    if (v === 0) ctx.moveTo(vx, vy);
+                    else ctx.lineTo(vx, vy);
+                }
+                ctx.closePath();
+                const isCenter = cell.idx === 0;
+                ctx.fillStyle = isCenter
+                    ? `rgba(${sr},${sg},${sb},${0.45 + pulse * 0.35})`
+                    : `rgba(${ar},${ag},${ab},${0.22 + pulse * 0.28})`;
+                ctx.strokeStyle = isCenter ? '#ffffff' : `rgb(${ar},${ag},${ab})`;
+                ctx.lineWidth = isCenter ? 1.8 : 1.2;
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
         };
 
         const draw = (now) => {
@@ -762,7 +1084,6 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             const st = stateRef.current;
             const pCfg = PERSONA_CONFIGS[st.persona] || PERSONA_CONFIGS.ashwin;
 
-            // Resolve live colors (supports theme palette switching for 'ashwin')
             const styles = getComputedStyle(canvas);
             const rawAccent = pCfg.accentHex || styles.getPropertyValue('--accent') || '#00ff87';
             const rawSecondary = pCfg.secondaryHex || styles.getPropertyValue('--accent-2') || '#38bdf8';
@@ -779,13 +1100,18 @@ const AIAssistantVisual = ({ isGenerating, persona = 'ashwin' }) => {
             const cy = h * 0.45;
             const radius = Math.min(w, h) * 0.34;
 
-            // Dispatch to the persona-specific visualizer engine
             if (st.persona === 'jarvis') {
                 drawJarvisHologram(now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st);
             } else if (st.persona === 'optimus') {
                 drawOptimusMatrix(now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st);
             } else if (st.persona === 'megatron') {
                 drawMegatronSingularity(now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st);
+            } else if (st.persona === 'ironman') {
+                drawIronManMark85(now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st);
+            } else if (st.persona === 'batman') {
+                drawBatmanSonar(now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st);
+            } else if (st.persona === 'bumblebee') {
+                drawBumblebeeStinger(now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st);
             } else {
                 drawAshwinLidar(now, dt, cx, cy, radius, ar, ag, ab, sr, sg, sb, st);
             }
