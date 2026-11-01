@@ -1,15 +1,6 @@
 /**
  * The section registry — single source of truth for the voice guide (spec §3.2, §9).
  *
- * ─────────────────────────────────────────────────────────────────────────────
- *  PLACEHOLDER COPY — NEEDS ASHWIN'S REVIEW BEFORE ANYTHING IS RECORDED.
- *
- *  Every line below is either lifted from copy already on the page or written to
- *  be deliberately vague. No claims about employers, results, metrics, or project
- *  outcomes have been invented. Lines marked `// TODO: review` are the ones where
- *  wording was guessed and should be rewritten in Ashwin's own voice.
- * ─────────────────────────────────────────────────────────────────────────────
- *
  * Keep every clip under ~12 s of speech (config.MAX_CLIP_MS) — Chrome silently
  * cancels longer speechSynthesis utterances. Split into multiple clips instead.
  *
@@ -36,6 +27,9 @@ import {
 import { OPTIMUS_NARRATION } from './optimusScript';
 import { JARVIS_NARRATION } from './jarvisScript';
 import { MEGATRON_NARRATION } from './megatronScript';
+import { IRONMAN_NARRATION } from './ironmanScript';
+import { BATMAN_NARRATION } from './batmanScript';
+import { BUMBLEBEE_NARRATION } from './bumblebeeScript';
 
 /** @type {NarratedSection[]} */
 export const NARRATION = [
@@ -202,25 +196,15 @@ export const NARRATION = [
   },
 ];
 
-/* ===========================================================================
-   PERSONAS — OPTIMUS_PRIME_VOICE_SPEC.md §2
-   ===========================================================================
-   The script above is the `ashwin` persona. Three more sit alongside it, each in
-   its own module, each covering the SAME section ids in the SAME order. That
-   invariant is what lets the engine, useActiveSection and the debug overlay
-   stay persona-agnostic — switching voice swaps the copy, never the structure.
-
-   Display metadata (names, badges, speech profiles) deliberately lives in
-   ../config.js instead of here: CaptionBubble.jsx is imported eagerly by
-   AvatarGuide.jsx, and anything it reaches gets pulled out of the lazy chunk
-   (§8). config.js is pure constants; this module imports the other scripts.
-   =========================================================================== */
 /** @type {Record<string, NarratedSection[]>} */
 export const PERSONA_SCRIPTS = {
   optimus: OPTIMUS_NARRATION,
   ashwin: NARRATION,
   jarvis: JARVIS_NARRATION,
   megatron: MEGATRON_NARRATION,
+  ironman: IRONMAN_NARRATION,
+  batman: BATMAN_NARRATION,
+  bumblebee: BUMBLEBEE_NARRATION,
 };
 
 /**
@@ -229,9 +213,6 @@ export const PERSONA_SCRIPTS = {
  */
 export const SECTION_IDS = NARRATION.map((s) => s.id);
 
-// Structural guard. A persona whose ids drift out of sync would fail silently
-// at runtime — sections would simply never speak — so surface it at import
-// time in dev instead. Stripped from production builds by the bundler.
 if (import.meta.env.DEV) {
   for (const id of PERSONA_IDS) {
     const script = PERSONA_SCRIPTS[id];
@@ -250,11 +231,6 @@ if (import.meta.env.DEV) {
   }
 }
 
-/**
- * Active persona, mirrored in memory so every getSection() call is not a
- * localStorage read. Seeded from storage on first use.
- * @type {string | null}
- */
 let activePersona = null;
 
 /** @returns {string} the active persona id, always one of PERSONA_IDS. */
@@ -264,10 +240,9 @@ export function getActivePersona() {
 }
 
 /**
- * Switches persona and persists it. Callers are responsible for stopping any
- * in-flight speech first — narrationEngine.setPersona() does that.
+ * Switches persona and persists it.
  * @param {string} personaId
- * @returns {boolean} false if the id is unknown, in which case nothing changed
+ * @returns {boolean}
  */
 export function setActivePersona(personaId) {
   if (!PERSONA_IDS.includes(personaId)) return false;
@@ -281,22 +256,14 @@ export function getActiveScript() {
   return PERSONA_SCRIPTS[getActivePersona()] ?? PERSONA_SCRIPTS[DEFAULT_PERSONA];
 }
 
-/**
- * Fast lookup by id, for the `ashwin` script only.
- * @deprecated Prefer getSection(), which follows the active persona. Kept
- * because it is part of the module's published surface.
- */
 export const NARRATION_BY_ID = NARRATION.reduce((acc, section) => {
   acc[section.id] = section;
   return acc;
 }, /** @type {Record<string, NarratedSection>} */ ({}));
 
-/** The section the intro fires from on audio unlock (§4.5). */
 export const HERO_SECTION_ID = 'hero';
 
 /**
- * Resolves against the ACTIVE persona, so the engine needs no persona
- * awareness of its own beyond telling us when it changes.
  * @returns {NarratedSection | undefined}
  */
 export function getSection(id) {

@@ -12,7 +12,7 @@
  * straight to a CSS custom property (--vg-level) instead, which is also what
  * §6.1 asks for.
  */
-import { DEFAULT_PERSONA } from './config';
+import { DEFAULT_PERSONA, PERSONA_IDS, STORAGE_KEYS } from './config';
 
 /**
  * @typedef {Object} VoiceGuideSnapshot
@@ -58,9 +58,21 @@ let actions = {
   enable: async () => {},
   disable: async () => {},
   toggle: async () => {},
-  // No-op until the engine installs the real one — the persona control renders
-  // from the eager side and may be clicked before the lazy chunk has landed.
-  setPersona: async () => {},
+  // Pre-mount handler: if the persona control is clicked before the lazy
+  // VoiceGuideMount chunk lands, persist immediately to localStorage and update
+  // the reactive store so all portfolio surfaces stay synchronized without
+  // dropping the click.
+  setPersona: async (personaId) => {
+    if (!PERSONA_IDS.includes(personaId)) return;
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage?.setItem(STORAGE_KEYS.persona, personaId);
+      }
+    } catch {
+      /* ignore storage errors */
+    }
+    setState({ persona: personaId });
+  },
 };
 
 function emit() {

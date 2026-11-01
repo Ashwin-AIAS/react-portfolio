@@ -86,13 +86,21 @@ export const ESTIMATED_WORD_MS = 320;
  * module it touches lands in the initial bundle. config.js is pure constants;
  * the narration scripts are not. Keeping the badge text and speech profiles
  * here lets the eager caption render a persona badge without dragging all
- * three scripts out of the lazy chunk (§8).
+ * scripts out of the lazy chunk (§8).
  */
-export const PERSONA_IDS = ['optimus', 'ashwin', 'jarvis', 'megatron'];
+export const PERSONA_IDS = [
+  'optimus',
+  'ashwin',
+  'jarvis',
+  'megatron',
+  'ironman',
+  'batman',
+  'bumblebee',
+];
 
 /**
  * The creator's own voice is the default preview: a first-time visitor should
- * meet Ashwin before they meet a character. The Optimus/JARVIS/Megatron
+ * meet Ashwin before they meet a character. The Optimus/JARVIS/Megatron/Hero
  * personas stay one click away in the persona menu, and whichever the visitor
  * picks is remembered in vg:persona from then on (§7).
  */
@@ -130,6 +138,30 @@ export const PERSONA_META = {
     tagline: 'Decepticon leader',
     icon: '🟣',
     badge: '[ DECEPTICON WAR MATRIX // LORD MEGATRON ]',
+  },
+  ironman: {
+    id: 'ironman',
+    name: 'Iron Man',
+    short: 'IRON MAN',
+    tagline: 'Mark 85 Armored HUD',
+    icon: '🦾',
+    badge: '[ STARK MARK LXXXV // TONY STARK ]',
+  },
+  batman: {
+    id: 'batman',
+    name: 'Batman',
+    short: 'BATMAN',
+    tagline: 'Dark Knight Tactical Cowl',
+    icon: '🦇',
+    badge: '[ WAYNETECH BATCOMPUTER // THE DARK KNIGHT ]',
+  },
+  bumblebee: {
+    id: 'bumblebee',
+    name: 'Bumblebee',
+    short: 'BUMBLEBEE',
+    tagline: 'Autobot Scout Radio Core',
+    icon: '🐝',
+    badge: '[ AUTOBOT SCOUT // BUMBLEBEE RADIO ]',
   },
 };
 
@@ -201,33 +233,52 @@ export const SPEECH_PROFILES = {
     ],
     langPreference: ['en-US', 'en-GB', 'en'],
   },
+  ironman: {
+    // Fast, confident, witty American cadence inside the Mark 85 helmet.
+    rate: 1.08,
+    pitch: 1.02,
+    volume: 1.0,
+    preferredVoices: [
+      'Microsoft Roger',
+      'Microsoft Eric',
+      'Microsoft Christopher',
+      'Google US English',
+      'Microsoft Guy',
+      'en-US-Neural2-J',
+    ],
+    langPreference: ['en-US', 'en'],
+  },
+  batman: {
+    // Gravelly, brooding Dark Knight tactical baritone.
+    rate: 0.86,
+    pitch: 0.52,
+    volume: 1.0,
+    preferredVoices: [
+      'Microsoft Christopher',
+      'Microsoft Eric',
+      'Microsoft David',
+      'Google US English',
+      'en-US-Neural2-D',
+    ],
+    langPreference: ['en-US', 'en'],
+  },
+  bumblebee: {
+    // Energetic, bright Autobot scout radio-synth cadence.
+    rate: 1.08,
+    pitch: 1.18,
+    volume: 1.0,
+    preferredVoices: [
+      'Microsoft Andrew',
+      'Microsoft Brian',
+      'Google US English',
+      'Microsoft Guy',
+    ],
+    langPreference: ['en-US', 'en'],
+  },
 };
 
 /**
  * Web Audio DSP for the Optimus persona (Optimus spec §4.2).
- *
- * Only ever reaches recorded audio: speechSynthesis output cannot be routed
- * through Web Audio, so the TTS fallback takes its character from
- * SPEECH_PROFILES instead.
- *
- * OFF, because the clips in /public/audio/narration/optimus/ are ALREADY
- * processed. scripts/generate_optimus_audio.py bakes its own chain in at
- * render time — bass=g=9:f=120, treble=g=3:f=3000, flanger — before it writes
- * the mp3. Verified by re-rendering hero-1 raw from Edge-TTS and applying that
- * filter: the result matches the shipped file exactly (RMS -21.87, sub-200 Hz
- * -24.07, 161464 bps).
- *
- * Running this chain on top of that would stack ~+17 dB of cumulative low
- * shelf and a second comb against the baked flanger — measured at +2.9 dB more
- * sub-200 Hz on an already bass-heavy render. Muddy and phasey, not commanding.
- *
- * Turn it back on only for RAW narration audio: neutral TTS or a plain deep
- * male recording with no processing of its own. If you re-render the clips,
- * drop the ffmpeg filter from the generator first, then flip this to true.
- *
- * outputTrim is then not cosmetic. Measured on hero-1.mp3, the chain without
- * it peaks at 0.0 dBFS — clipping, which on a voice reads as buzz rather than
- * bass. At 0.72 the same file peaks at -2.8 dBFS.
  */
 export const OPTIMUS_DSP = {
   enabled: false,
@@ -241,8 +292,6 @@ export const OPTIMUS_DSP = {
   /** Metallic slapback. */
   combDelaySeconds: 0.015,
   combFeedback: 0.25,
-  /** How much of the comb is summed back in. Spec ran it at unity, which
-      buries the dry signal; this keeps it as a sheen. */
   combMix: 0.35,
   /** Headroom for the boosts above, so a normalised file cannot clip. */
   outputTrim: 0.72,
