@@ -2460,3 +2460,181 @@
     opacity: 0;
   }
 }
+
+
+/* ============================================================================
+   HERO & ROBOTIC PERSONAS EXPANSION: IRON MAN, BATMAN, BUMBLEBEE
+   ============================================================================ */
+
+/* --- Iron Man: Hot-Rod Crimson over Brushed Stark Gold --- */
+.vg-hud-card[data-vg-persona='ironman'],
+.vg-caption-head[data-vg-persona='ironman'],
+.vg-agent-controls[data-vg-persona='ironman'],
+.vg-pill[data-vg-persona='ironman'],
+.vg-pill-sheet[data-vg-persona='ironman'],
+.vg-persona-pill[data-persona='ironman'],
+.vg-pill-sheet-item[data-persona='ironman'] {
+  --accent: #ff5964;
+  --accent-strong: #e63946;
+  --accent-line: rgba(230, 57, 70, 0.55);
+  --accent-wash: rgba(230, 57, 70, 0.18);
+  --vg-persona-2: #fbbf24;
+}
+
+/* --- Batman: WayneTech Bat-Signal Gold over Carbon Stealth Slate --- */
+.vg-hud-card[data-vg-persona='batman'],
+.vg-caption-head[data-vg-persona='batman'],
+.vg-agent-controls[data-vg-persona='batman'],
+.vg-pill[data-vg-persona='batman'],
+.vg-pill-sheet[data-vg-persona='batman'],
+.vg-persona-pill[data-persona='batman'],
+.vg-pill-sheet-item[data-persona='batman'] {
+  --accent: #facc15;
+  --accent-strong: #eab308;
+  --accent-line: rgba(234, 179, 8, 0.55);
+  --accent-wash: rgba(234, 179, 8, 0.16);
+  --vg-persona-2: #94a3b8;
+}
+
+/* --- Bumblebee: Cybertronian Scout Yellow over Autobot Optic Cyan --- */
+.vg-hud-card[data-vg-persona='bumblebee'],
+.vg-caption-head[data-vg-persona='bumblebee'],
+.vg-agent-controls[data-vg-persona='bumblebee'],
+.vg-pill[data-vg-persona='bumblebee'],
+.vg-pill-sheet[data-vg-persona='bumblebee'],
+.vg-persona-pill[data-persona='bumblebee'],
+.vg-pill-sheet-item[data-persona='bumblebee'] {
+  --accent: #fde047;
+  --accent-strong: #eab308;
+  --accent-line: rgba(250, 204, 21, 0.55);
+  --accent-wash: rgba(250, 204, 21, 0.16);
+  --vg-persona-2: #38bdf8;
+}
+
+.vg-hud-card[data-vg-persona='ironman'],
+.vg-hud-card[data-vg-persona='batman'],
+.vg-hud-card[data-vg-persona='bumblebee'] {
+  background:
+    linear-gradient(155deg, var(--accent-wash) 0%, transparent 46%),
+    linear-gradient(
+      20deg,
+      color-mix(in srgb, var(--vg-persona-2) 9%, transparent) 0%,
+      transparent 40%
+    ),
+    color-mix(in srgb, var(--vg-panel) 90%, transparent) !important;
+}
+
+.vg-hud-card[data-vg-persona='ironman'] .vg-hud-corner:nth-child(2),
+.vg-hud-card[data-vg-persona='ironman'] .vg-hud-corner:nth-child(3),
+.vg-hud-card[data-vg-persona='batman'] .vg-hud-corner:nth-child(2),
+.vg-hud-card[data-vg-persona='batman'] .vg-hud-corner:nth-child(3),
+.vg-hud-card[data-vg-persona='bumblebee'] .vg-hud-corner:nth-child(2),
+.vg-hud-card[data-vg-persona='bumblebee'] .vg-hud-corner:nth-child(3) {
+  border-color: var(--vg-persona-2) !important;
+}
+
+/* Compact 7-persona pill grid inside the floating HUD card */
+.vg-persona-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.vg-persona-pill {
+  padding: 4px 8px;
+  font-size: 9.5px;
+}
+
+/* --- Avatar Containers & Audio-Reactive Auras --- */
+.vg-ironman,
+.vg-batman,
+.vg-bumblebee {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.vg-ironman-aura,
+.vg-batman-aura,
+.vg-bumblebee-aura {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  filter: blur(14px);
+  opacity: calc(0.35 + var(--vg-level, 0) * 0.55);
+  transition: transform 80ms linear, opacity 80ms linear;
+  pointer-events: none;
+}
+
+.vg-ironman-aura {
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.65) 0%, rgba(251, 191, 36, 0.35) 55%, transparent 75%);
+}
+
+.vg-batman-aura {
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.55) 0%, rgba(148, 163, 184, 0.28) 55%, transparent 75%);
+}
+
+.vg-bumblebee-aura {
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.6) 0%, rgba(56, 189, 248, 0.32) 55%, transparent 75%);
+}
+
+/* Rotating outer HUD telemetry rings */
+.vg-ironman-ring,
+.vg-batman-sonar,
+.vg-bumblebee-ring {
+  transform-origin: 48px 48px;
+  animation: vg-hero-ring-spin 16s linear infinite;
+}
+
+@keyframes vg-hero-ring-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Phase Choreography for Iron Man, Batman & Bumblebee */
+.vg-ironman.vg-phase-enter,
+.vg-batman.vg-phase-enter,
+.vg-bumblebee.vg-phase-enter {
+  animation: vg-hero-enter calc(750 * var(--vg-ms, 1ms)) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vg-ironman.vg-phase-exit,
+.vg-batman.vg-phase-exit,
+.vg-bumblebee.vg-phase-exit {
+  animation: vg-hero-exit calc(380 * var(--vg-ms, 1ms)) ease-in both;
+}
+
+@keyframes vg-hero-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.78);
+    filter: brightness(2.2);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes vg-hero-exit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.84);
+  }
+}

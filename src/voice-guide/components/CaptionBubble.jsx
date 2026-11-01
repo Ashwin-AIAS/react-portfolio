@@ -18,31 +18,27 @@ import { getPulseSeen, setPulseSeen } from '../utils/storage';
 
 /**
  * On-air callsigns — holo spec §2.2.2, movie-persona pass.
- *
- * Each character transmits under its own command authority rather than under a
- * generic `LIVE TRANSMISSION // <name>`: the header is the first thing that
- * tells you which universe the HUD currently belongs to, and it recolours in
- * CSS off the same data-vg-persona attribute the frame does. Ashwin keeps the
- * plain broadcast label — the creator is not a franchise.
- *
- * Anything missing here falls back to the persona's own badge in config.js.
  */
 const LIVE_LABEL = {
   optimus: 'AUTOBOT COMMAND // OPTIMUS PRIME',
   jarvis: 'STARK INDUSTRIES // J.A.R.V.I.S.',
   megatron: 'DECEPTICON WAR MATRIX // LORD MEGATRON',
+  ironman: 'STARK MARK LXXXV // TONY STARK',
+  batman: 'WAYNETECH BATCOMPUTER // BATMAN',
+  bumblebee: 'AUTOBOT SCOUT // BUMBLEBEE',
   ashwin: 'LIVE TRANSMISSION // ASHWIN',
 };
 
 /**
- * The same slot before the visitor unlocks audio (personas spec §3.5), so the
- * muted state reads as an offer from *that* character rather than as a voice
- * that simply is not talking.
+ * The same slot before the visitor unlocks audio (personas spec §3.5).
  */
 const READY_LABEL = {
   optimus: '[ AUTOBOT BRIEFING READY ]',
   jarvis: '[ STARK PROTOCOL READY ]',
   megatron: '[ DECEPTICON MATRIX READY ]',
+  ironman: '[ MARK LXXXV HUD READY ]',
+  batman: '[ BATCOMPUTER LINK READY ]',
+  bumblebee: '[ SCOUT RADIO LINK READY ]',
   ashwin: '[ AUDIO BRIEFING READY ]',
 };
 
@@ -65,25 +61,6 @@ const SpeakerOn = () => (
   </svg>
 );
 
-/**
- * Tactical transmission header — Optimus spec §5.2, e.g.
- * `[ ● AUTOBOT COMMAND // OPTIMUS PRIME ]`. Before the visitor unlocks audio
- * the same slot advertises the tour instead (personas spec §3.5).
- *
- * Reads the persona straight off the store rather than taking it as a prop, so
- * AvatarGuide.jsx (the eager consumer) needs no changes. It comes from
- * ../config, which holds no script imports — importing the persona metadata
- * from data/narrationScript.js here would drag all three narration scripts
- * into the initial bundle and undo the lazy split (§8).
- *
- * data-vg-persona is the only hook the movie theming needs: the badge, the live
- * lamp and the spectrum all read their colour from tokens the stylesheet scopes
- * to that attribute, so switching character repaints them with no re-render of
- * anything below.
- *
- * Hidden until the provider is ready: before that the bubble is still showing
- * AvatarGuide's own tour copy, which nobody is narrating.
- */
 export const PersonaBadge = ({ style }) => {
   const { ready, enabled, persona } = useVoiceGuide();
   if (!ready) return null;
@@ -105,8 +82,6 @@ export const PersonaBadge = ({ style }) => {
         )}
       </span>
 
-      {/* Live spectrum. Bar heights come straight off --vg-level in CSS, so the
-          header moves with the voice without a single re-render (§6.1). */}
       {enabled && (
         <span className="vg-caption-spectrum" aria-hidden="true">
           {SPECTRUM_BARS.map((i) => (
@@ -118,13 +93,6 @@ export const PersonaBadge = ({ style }) => {
   );
 };
 
-/**
- * @param {Object} props
- * @param {string} props.text        current caption text
- * @param {string} [props.fallback]  shown when the guide has nothing to say yet
- * @param {boolean} [props.showBadge] render the persona transmission header
- * @param {React.CSSProperties} [props.style]
- */
 export const CaptionText = ({ text, fallback = '', showBadge = true, style }) => {
   const value = text || fallback;
   const [shown, setShown] = useState(value);
@@ -134,7 +102,6 @@ export const CaptionText = ({ text, fallback = '', showBadge = true, style }) =>
   useEffect(() => {
     if (value === shown) return undefined;
 
-    // Fade out, swap, fade back in.
     setVisible(false);
     timerRef.current = setTimeout(() => {
       setShown(value);
@@ -165,24 +132,11 @@ export const CaptionText = ({ text, fallback = '', showBadge = true, style }) =>
   );
 };
 
-/**
- * The unmute CTA, the mute toggle and the persona selector, docked at the foot
- * of the agent bubble — personas spec §3.5.
- *
- * This replaces components/VoiceToggle.jsx, which floated the same controls in
- * their own box at bottom-left. One widget now, so the thing that offers the
- * tour is the same thing that gives it.
- *
- * Renders nothing until the provider is ready, which is also what guarantees
- * voice-guide.css has landed — this component is imported eagerly by
- * AvatarGuide.jsx but never styled before the lazy chunk arrives (§8).
- */
 export const AgentControls = () => {
   const { ready, enabled, persona, caption, toggle, setPersona } = useVoiceGuide();
   const [shouldPulse, setShouldPulse] = useState(false);
 
   useEffect(() => {
-    // Don't pulse at a visitor who has already interacted with this, ever.
     setShouldPulse(!getPulseSeen());
   }, []);
 
@@ -200,16 +154,10 @@ export const AgentControls = () => {
     if (id !== persona) setPersona(id);
   };
 
-  // Clip n of m for the section being narrated. Single-clip sections get no
-  // bar — a permanently full progress bar reads as a bug.
   const total = caption?.total ?? 0;
   const progress = total > 1 ? ((caption.clipIndex + 1) / total) * 100 : null;
 
   return (
-    /* data-vg-persona carries the active character's palette down to the
-       progress bar, the CTA and the live pill. The pills below carry their OWN
-       data-persona instead, because each one has to advertise the character it
-       switches to, not the one currently speaking. */
     <div className="vg-agent-controls" data-vg-persona={persona}>
       {enabled ? (
         progress !== null && (
@@ -240,9 +188,6 @@ export const AgentControls = () => {
             >
               <span aria-hidden="true">{meta.icon}</span>
               {meta.name}
-              {/* Sound indicator: only the pill that is actually on air gets
-                  one, so the neon border is never ambiguous about which voice
-                  is speaking. */}
               {isActive && enabled && (
                 <span className="vg-pill-sound" aria-hidden="true">
                   <i />
@@ -264,8 +209,6 @@ export const AgentControls = () => {
         aria-pressed={enabled}
         title={enabled ? 'Mute voice tour (Esc)' : 'Play voice tour'}
       >
-        {/* Soundwave ripple behind the muted CTA — the one control that has to
-            be found before anything else on this widget does anything. */}
         {!enabled && <span className="vg-cta-ripple" aria-hidden="true" />}
         {enabled ? <SpeakerOn /> : <SpeakerMuted />}
         {enabled ? 'Mute tour' : 'Unmute tour'}
