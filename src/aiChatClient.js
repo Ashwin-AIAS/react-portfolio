@@ -34,6 +34,7 @@ export function toApiMessages(uiMessages) {
       (m) =>
         (m.role === 'user' || m.role === 'model') &&
         !m.isSystemNotice &&
+        !m.isError &&
         typeof m.content === 'string' &&
         m.content.trim().length > 0,
     )

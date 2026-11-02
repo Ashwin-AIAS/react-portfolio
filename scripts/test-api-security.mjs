@@ -8,6 +8,13 @@ import assert from 'node:assert/strict';
 import { createChatHandler } from '../api/_lib/chatHandler.js';
 import { isAllowedOrigin, PRODUCTION_ORIGIN, DEV_ORIGIN } from '../api/_lib/security.js';
 import { validateChatBody } from '../api/_lib/validate.js';
+import {
+  getBackends,
+  createMemoryLimiter,
+  redisCredentials,
+  LIMITS,
+} from '../api/_lib/rateLimit.js';
+import { getGithubContext } from '../api/_lib/github.js';
 
 const FAKE_KEY = 'test-gemini-key-not-real';
 const PREVIEW_ORIGIN = 'https://react-portfolio-abc123xyz-ashwins-projects-8d106fa7.vercel.app';
@@ -78,9 +85,34 @@ function req({
   return new Request('https://example.test/api/chat', init);
 }
 
-async function call(env, request, fetchOpts) {
+/** In-memory stand-in for the Upstash client (GitHub cache only). */
+function fakeRedis({ failGet = false } = {}) {
+  const store = new Map();
+  const ops = [];
+  return {
+    store,
+    ops,
+    async get(k) {
+      ops.push(['get', k]);
+      if (failGet) throw new Error('redis down');
+      return store.get(k) ?? null;
+    },
+    async set(k, v, opts) {
+      ops.push(['set', k, opts]);
+      store.set(k, v);
+      return 'OK';
+    },
+  };
+}
+
+const allowAll = { kind: 'fake', check: async () => ({ ok: true }) };
+
+/** Default test backends: a limiter that allows everything plus a fake Redis. */
+const fakeBackends = (limiter = allowAll, redis = fakeRedis()) => () => ({ limiter, redis });
+
+async function call(env, request, fetchOpts, backends = fakeBackends()) {
   const f = fakeFetch(fetchOpts);
-  const handler = createChatHandler({ env, fetchImpl: f.impl });
+  const handler = createChatHandler({ env, fetchImpl: f.impl, backends });
   const res = await handler(request);
   return { res, calls: f.calls };
 }
@@ -278,10 +310,166 @@ await test('502 with a generic body when every model fails; upstream detail not 
   assert.deepEqual(JSON.parse(text), { error: 'upstream_error' });
 });
 
-await test('dev mode works with ALLOW_DEV_AI=1 from localhost', async () => {
-  const { res } = await call(DEV_ENV, req({ origin: DEV_ORIGIN, ip: null }));
+await test('dev mode works with ALLOW_DEV_AI=1 from localhost (real in-memory limiter)', async () => {
+  const { res } = await call(DEV_ENV, req({ origin: DEV_ORIGIN, ip: null }), undefined, getBackends);
   assert.equal(res.status, 200);
   await res.text();
+});
+
+// --- rate limiting (P4) ------------------------------------------------------------
+
+await test('Redis credentials: Upstash names win, KV names are the fallback', () => {
+  assert.equal(redisCredentials({}), null);
+  assert.equal(redisCredentials({ KV_REST_API_URL: 'https://kv' }), null);
+  assert.deepEqual(redisCredentials({ KV_REST_API_URL: 'https://kv', KV_REST_API_TOKEN: 'k' }), {
+    url: 'https://kv',
+    token: 'k',
+  });
+  assert.deepEqual(
+    redisCredentials({
+      UPSTASH_REDIS_REST_URL: 'https://up',
+      UPSTASH_REDIS_REST_TOKEN: 'u',
+      KV_REST_API_URL: 'https://kv',
+      KV_REST_API_TOKEN: 'k',
+    }),
+    { url: 'https://up', token: 'u' },
+  );
+});
+
+await test('503 in production without Redis credentials (fail closed)', async () => {
+  const { res, calls } = await call(PROD_ENV, req(), undefined, getBackends);
+  assert.equal(res.status, 503);
+  assert.equal(calls.length, 0);
+});
+
+await test('503 in a preview without Redis credentials (fail closed)', async () => {
+  const env = { ...PROD_ENV, VERCEL_ENV: 'preview' };
+  const { res, calls } = await call(env, req({ origin: PREVIEW_ORIGIN }), undefined, getBackends);
+  assert.equal(res.status, 503);
+  assert.equal(calls.length, 0);
+});
+
+await test('only local dev with ALLOW_DEV_AI=1 gets the in-memory limiter', () => {
+  assert.equal(getBackends({ ...PROD_ENV, ALLOW_DEV_AI: '1' }, 'production'), null);
+  assert.equal(getBackends({ ALLOW_DEV_AI: '1' }, 'preview'), null);
+  assert.equal(getBackends({}, 'development'), null);
+  assert.equal(getBackends({ ALLOW_DEV_AI: '1' }, 'development').limiter.kind, 'memory');
+});
+
+await test('503 when Redis is unreachable (real Upstash client, fail closed)', async () => {
+  const env = {
+    ...PROD_ENV,
+    UPSTASH_REDIS_REST_URL: 'http://127.0.0.1:9',
+    UPSTASH_REDIS_REST_TOKEN: 'not-a-real-token',
+  };
+  const { res, calls } = await call(env, req(), undefined, getBackends);
+  assert.equal(res.status, 503);
+  assert.equal(calls.length, 0);
+});
+
+await test('503 when the limiter throws', async () => {
+  const broken = {
+    check: async () => {
+      throw new Error('boom');
+    },
+  };
+  const { res, calls } = await call(PROD_ENV, req(), undefined, fakeBackends(broken));
+  assert.equal(res.status, 503);
+  assert.equal(calls.length, 0);
+});
+
+await test('429 with Retry-After when a limit is hit; Gemini not called', async () => {
+  const refuse = { check: async () => ({ ok: false, limit: 'minute', retryAfter: 42 }) };
+  const { res, calls } = await call(PROD_ENV, req(), undefined, fakeBackends(refuse));
+  assert.equal(res.status, 429);
+  assert.equal(res.headers.get('retry-after'), '42');
+  assert.deepEqual(await res.json(), { error: 'rate_limited', retryAfter: 42 });
+  assert.equal(calls.length, 0);
+});
+
+await test('limiter is checked before the body is read', async () => {
+  const refuse = { check: async () => ({ ok: false, limit: 'day', retryAfter: 5 }) };
+  const { res } = await call(PROD_ENV, req({ raw: '{not json' }), undefined, fakeBackends(refuse));
+  assert.equal(res.status, 429);
+});
+
+await test('plan limits: chat 10/min, 60/day, 1500/day global; voice 1/10 min, 3/day, 25/day global', () => {
+  const pick = (r) => LIMITS[r].map((l) => [l.name, l.scope, l.tokens, l.window]);
+  assert.deepEqual(pick('chat'), [
+    ['minute', 'ip', 10, '1 m'],
+    ['day', 'ip', 60, '1 d'],
+    ['global', 'global', 1500, '1 d'],
+  ]);
+  assert.deepEqual(pick('live-token'), [
+    ['10min', 'ip', 1, '10 m'],
+    ['day', 'ip', 3, '1 d'],
+    ['global', 'global', 25, '1 d'],
+  ]);
+});
+
+await test('memory limiter: per-minute, per-day and global limits, in order', async () => {
+  let t = 0;
+  const lim = createMemoryLimiter(() => t);
+  for (let i = 0; i < 10; i++) assert.equal((await lim.check('chat', 'a')).ok, true);
+  const r = await lim.check('chat', 'a');
+  assert.equal(r.ok, false);
+  assert.equal(r.limit, 'minute');
+  assert.equal(r.retryAfter, 60);
+  assert.equal((await lim.check('chat', 'b')).ok, true, 'other IPs unaffected');
+
+  // Keep sending 10 a minute until 60 have been allowed, then the daily cap applies.
+  let used = 10;
+  while (used < 60) {
+    t += 60_000;
+    for (let i = 0; i < 10 && used < 60; i++, used++) {
+      assert.equal((await lim.check('chat', 'a')).ok, true);
+    }
+  }
+  t += 60_000;
+  const d = await lim.check('chat', 'a');
+  assert.equal(d.ok, false);
+  assert.equal(d.limit, 'day');
+
+  const v = createMemoryLimiter(() => 0);
+  assert.equal((await v.check('live-token', 'x')).ok, true);
+  const v2 = await v.check('live-token', 'x');
+  assert.equal(v2.ok, false);
+  assert.equal(v2.limit, '10min');
+  assert.equal(v2.retryAfter, 600);
+
+  const g = createMemoryLimiter(() => 0);
+  for (let i = 0; i < 25; i++) assert.equal((await g.check('live-token', 'ip' + i)).ok, true);
+  const g2 = await g.check('live-token', 'ip-new');
+  assert.equal(g2.ok, false);
+  assert.equal(g2.limit, 'global');
+});
+
+// --- GitHub cache (P2) ---------------------------------------------------------------
+
+await test('GitHub context is cached in Redis for 10 minutes', async () => {
+  const redis = fakeRedis();
+  const f1 = fakeFetch();
+  const first = await getGithubContext({ env: {}, redis, fetchImpl: f1.impl });
+  assert.match(first, /repo: desc/);
+  assert.equal(f1.calls.length, 1);
+  const set = redis.ops.find((o) => o[0] === 'set');
+  assert.deepEqual(set[2], { ex: 600 });
+
+  const f2 = fakeFetch();
+  const second = await getGithubContext({ env: {}, redis, fetchImpl: f2.impl });
+  assert.equal(second, first);
+  assert.equal(f2.calls.length, 0, 'served from cache');
+});
+
+await test('GitHub fallback text is not cached; Redis errors do not break chat', async () => {
+  const redis = fakeRedis();
+  const down = async () => new Response('nope', { status: 503 });
+  assert.equal(await getGithubContext({ env: {}, redis, fetchImpl: down }), 'GitHub data unavailable.');
+  assert.equal(redis.store.size, 0);
+
+  const broken = fakeRedis({ failGet: true });
+  const out = await getGithubContext({ env: {}, redis: broken, fetchImpl: fakeFetch().impl });
+  assert.match(out, /repo: desc/);
 });
 
 // --- logging (P9) -------------------------------------------------------------------

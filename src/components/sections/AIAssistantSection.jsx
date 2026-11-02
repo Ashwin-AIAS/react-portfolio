@@ -247,6 +247,40 @@ const SAMPLE_JD_PRESETS = [
   }
 ];
 
+// Shown when /api/chat answers 429. Each persona stays in character.
+const RATE_LIMIT_LINES = {
+    jarvis: 'Forgive me, Sir. My power reserves need a brief recharge.',
+    optimus: 'Even a Prime must pause to let his energon flow.',
+    megatron: 'Silence! Even my war core demands a moment of restraint.',
+    ashwin: "I've been chatting a lot. Give me a moment to catch my breath.",
+    ironman: "Okay, the suit's running hot. Cooling down the repulsors.",
+    batman: 'The Batcomputer is cooling down. Patience.',
+    bumblebee: 'Bzt-chk—radio overheated! Cooling my circuits.',
+};
+
+function formatRetryAfter(seconds) {
+    if (!seconds || seconds < 60) return 'in a few seconds';
+    if (seconds < 3600) {
+        const m = Math.ceil(seconds / 60);
+        return `in about ${m} minute${m === 1 ? '' : 's'}`;
+    }
+    return 'later today or tomorrow';
+}
+
+function chatErrorMessage(err, personaId) {
+    if (err?.kind === 'rate_limited') {
+        const line = RATE_LIMIT_LINES[personaId] || RATE_LIMIT_LINES.ashwin;
+        return `${line} Please try again ${formatRetryAfter(err.retryAfter)}.`;
+    }
+    if (err?.kind === 'unavailable') {
+        return 'The AI assistant is temporarily unavailable. Please try again later, or reach out via the contact form below.';
+    }
+    if (err?.kind === 'bad_request') {
+        return "I couldn't process that message. Try shortening it, or start a fresh question.";
+    }
+    return 'Sorry, I encountered an error connecting to my core processor. Please check your network connection and try again.';
+}
+
 const TYPING_STATUSES = {
   jarvis: {
     fitReport: [
@@ -853,7 +887,12 @@ export const AIAssistantSection = ({ t }) => {
             setShowSuggestions(true);
         } catch (err) {
             if (err?.kind === 'aborted') return;
-            setLastModelText("Sorry, I encountered an error connecting to my core processor. Please check your network connection and try again.");
+            // isError keeps this line out of the history sent to the model.
+            setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { role: 'model', content: chatErrorMessage(err, persona), isError: true };
+                return updated;
+            });
         } finally {
             if (chatAbortRef.current === controller) {
                 chatAbortRef.current = null;
