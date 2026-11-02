@@ -167,7 +167,7 @@ function runConv2D(grid10x10, weights3x3, useRelu = true) {
     return out;
 }
 
-const CNNQuantizationLab = ({ t }) => {
+const CNNQuantizationLab = () => {
     const [activePreset, setActivePreset] = useState('7');
     const [grid, setGrid] = useState(() => [...DIGIT_PRESETS['7']]);
     const [kernelKey, setKernelKey] = useState('sobelX');
@@ -1213,7 +1213,7 @@ export const NeuralSandbox = ({ t }) => {
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.22 }}
                     >
-                        {activeTab === 'cnn' ? <CNNQuantizationLab t={t} /> : <SensorFusionLab t={t} />}
+                        {activeTab === 'cnn' ? <CNNQuantizationLab /> : <SensorFusionLab t={t} />}
                     </motion.div>
                 </AnimatePresence>
             </div>

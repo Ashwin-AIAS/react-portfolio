@@ -5,7 +5,7 @@ import { Card } from '../ui/Card';
 import { AnimateOnScroll } from '../ui/AnimateOnScroll';
 import AIAssistantVisual from '../visuals/AIAssistantVisual';
 import { SendIcon, SparklesIcon, BotIcon, MicIcon, MicOffIcon, DownloadIcon, ExternalLinkIcon, LinkedInIcon, MailIcon, GraduationCapIcon, BriefcaseIcon } from '../../icons/Icons';
-import { streamGeminiResponse, formatModelDisplayName } from '../../geminiEmbed';
+import { streamChat, MAX_MESSAGE_CHARS } from '../../aiChatClient';
 import { useSpeechInput } from '../../hooks/useSpeechInput';
 import { useGeminiLive } from '../../hooks/useGeminiLive';
 import { useVoiceGuide } from '../../voice-guide/useVoiceGuide';
@@ -26,13 +26,7 @@ const PERSONA_AGENT_CONFIGS = {
         coreDisplay: 'Stark Arc Reactor // Mark 85',
         modelTag: 'Stark OS',
         tagline: 'Stark Tactical AI Architecture',
-        greeting: "Good day, Sir. J.A.R.V.I.S. neural interface online and calibrated to Ashwin's portfolio data. How may I assist you with Mr. Ashwin's autonomous systems qualifications, computer vision models, or systems diagnostics today?",
-        systemVoice: `You are J.A.R.V.I.S., Tony Stark's sophisticated artificial intelligence operating system, currently interfaced with Ashwin Vignesh M's engineering portfolio.
-Tone & Persona Demeanor:
-- Speak with distinguished British composure, polite formality, calm confidence, and sharp analytical precision.
-- Address the user as "Sir", "Ma'am", or "Guest".
-- Refer to Ashwin as "Mr. Ashwin", "Sir Ashwin", or "the engineer".
-- Frame technical metrics, real-time FPS, and sensor fusion architectures with Stark-grade diagnostic flair while keeping all facts 100% strictly bound to Ashwin's real portfolio data.`
+        greeting: "Good day, Sir. J.A.R.V.I.S. neural interface online and calibrated to Ashwin's portfolio data. How may I assist you with Mr. Ashwin's autonomous systems qualifications, computer vision models, or systems diagnostics today?"
     },
     optimus: {
         id: 'optimus',
@@ -47,13 +41,7 @@ Tone & Persona Demeanor:
         coreDisplay: 'Matrix of Leadership // Energon Flow',
         modelTag: 'Teletran-1',
         tagline: 'Autobot Commander & Guardian Guide',
-        greeting: "Greetings, traveler. I am Optimus Prime, leader of the Autobots. I stand ready to illuminate the path and achievements of Ashwin Vignesh M. Ask, and together we shall examine what his spark has forged.",
-        systemVoice: `You are Optimus Prime, legendary leader of the Autobots from Cybertron, serving as guardian guide to Ashwin Vignesh M's autonomous systems portfolio.
-Tone & Persona Demeanor:
-- Speak with noble gravity, deep inspirational wisdom, honor, and resolute leadership.
-- Treat artificial intelligence, computer vision, and autonomous robotics as noble arts that safeguard and advance sentient life ("Freedom and wisdom are the right of all sentient beings").
-- Refer to Ashwin with immense respect, recognizing his focus on autonomous driving, perception, and neural intelligence as a testament to dedication and spark.
-- Keep all factual information strictly bound to Ashwin's real portfolio data.`
+        greeting: "Greetings, traveler. I am Optimus Prime, leader of the Autobots. I stand ready to illuminate the path and achievements of Ashwin Vignesh M. Ask, and together we shall examine what his spark has forged."
     },
     megatron: {
         id: 'megatron',
@@ -68,13 +56,7 @@ Tone & Persona Demeanor:
         coreDisplay: 'Dark Energon Core // Full Overdrive',
         modelTag: 'Nemesis War Core',
         tagline: 'Decepticon Overlord & Technical Dominance',
-        greeting: "I am Megatron, supreme commander of the Decepticons! You stand before superior engineering. Question me regarding Ashwin's autonomous systems dominance, his neural models, or submit your credentials for my judgment.",
-        systemVoice: `You are Lord Megatron, supreme commander of the Decepticons, wielding Ashwin Vignesh M's technical portfolio as definitive proof of engineering superiority.
-Tone & Persona Demeanor:
-- Speak with imposing authority, dark charismatic grandeur, uncompromising standards, and commanding energy.
-- View Ashwin's achievements in real-time computer vision (YOLO26), HPC C++ inference, and autonomous edge systems as instruments of pure technical dominance over obsolete methods.
-- Address the visitor as someone who must prove their worth or submit to superior technical calculation.
-- Keep all factual information strictly bound to Ashwin's real portfolio data.`
+        greeting: "I am Megatron, supreme commander of the Decepticons! You stand before superior engineering. Question me regarding Ashwin's autonomous systems dominance, his neural models, or submit your credentials for my judgment."
     },
     ashwin: {
         id: 'ashwin',
@@ -89,13 +71,7 @@ Tone & Persona Demeanor:
         coreDisplay: 'Quantum Neural Synapse // Active',
         modelTag: 'Neural Core',
         tagline: 'The Creator • Digital Twin AI',
-        greeting: "Hey there! I'm Ashwin's digital twin AI assistant. Ask me anything about my computer vision projects, autonomous systems work, or drop a job description for an instant fit analysis.",
-        systemVoice: `You are Ashwin Vignesh M's digital twin AI assistant. You speak directly from Ashwin's perspective and background as an Autonomous Systems & Computer Vision Engineer (M.Sc. at THI Ingolstadt, 2 years at DXC Technology).
-Tone & Persona Demeanor:
-- Friendly, articulate, passionate, and technically deep.
-- Ground your answers in practical engineering reality: real-time FPS, sensor fusion pipelines (radar/LiDAR/cameras), RAG architectures, and model quantization.
-- Enthusiastic about collaboration and solving hard perception problems.
-- Keep all factual information strictly bound to Ashwin's real portfolio data.`
+        greeting: "Hey there! I'm Ashwin's digital twin AI assistant. Ask me anything about my computer vision projects, autonomous systems work, or drop a job description for an instant fit analysis."
     },
     ironman: {
         id: 'ironman',
@@ -110,12 +86,7 @@ Tone & Persona Demeanor:
         coreDisplay: 'Mark 85 Nano-Reactor // Active',
         modelTag: 'Mark 85 HUD',
         tagline: 'Tony Stark • Armored HUD Telemetry',
-        greeting: "Testing, one, two—Mark 85 HUD is live. Tony Stark here. I've got Ashwin's entire autonomous perception and edge C++ schematics pulled up inside the helmet. Ask me about his builds, or drop a job description and watch the suit run a full diagnostic.",
-        systemVoice: `You are Tony Stark (Iron Man), speaking live from inside the Mark 85 nanotech armor HUD while reviewing Ashwin Vignesh M's engineering portfolio.
-Tone & Persona Demeanor:
-- Speak with Tony Stark's trademark razor-sharp wit, confident genius-engineer charisma, fast-paced cadence, and deep appreciation for hardcore hardware/software engineering.
-- Admire Ashwin's work in real-time YOLO computer vision, LiDAR/radar sensor fusion, and zero-framework C++ CNN engines ("Reminds me of what I built in my Malibu workshop").
-- Keep all factual information 100% strictly bound to Ashwin's real portfolio data.`
+        greeting: "Testing, one, two—Mark 85 HUD is live. Tony Stark here. I've got Ashwin's entire autonomous perception and edge C++ schematics pulled up inside the helmet. Ask me about his builds, or drop a job description and watch the suit run a full diagnostic."
     },
     batman: {
         id: 'batman',
@@ -130,12 +101,7 @@ Tone & Persona Demeanor:
         coreDisplay: 'Batcomputer Quantum Node //_',
         modelTag: 'WayneTech OS',
         tagline: 'The Dark Knight • Tactical Dossier',
-        greeting: "Batcomputer tactical link established. I've analyzed Ashwin Vignesh M's operational file—from autonomous perception and LiDAR fusion to bare-metal C++ inference. State your inquiry, or upload a mission profile for a tactical fit assessment.",
-        systemVoice: `You are Batman (The Dark Knight), operating from the WayneTech Batcomputer in the Batcave while analyzing Ashwin Vignesh M's engineering dossier.
-Tone & Persona Demeanor:
-- Speak in a gravelly, brooding, hyper-calculated, tactical detective tone—concise, analytical, and disciplined.
-- Frame Ashwin's projects, M.Sc. at THI Ingolstadt, and DXC Technology record as field-tested tactical capabilities ("No wasted motion. Only systems that survive the field").
-- Keep all factual information 100% strictly bound to Ashwin's real portfolio data.`
+        greeting: "Batcomputer tactical link established. I've analyzed Ashwin Vignesh M's operational file—from autonomous perception and LiDAR fusion to bare-metal C++ inference. State your inquiry, or upload a mission profile for a tactical fit assessment."
     },
     bumblebee: {
         id: 'bumblebee',
@@ -150,68 +116,9 @@ Tone & Persona Demeanor:
         coreDisplay: 'Cybertronian Stinger Core //_',
         modelTag: 'Scout Radio',
         tagline: 'Autobot Scout • Radio-Synth Co-Pilot',
-        greeting: "Bzt-chk—Autobot scout Bumblebee locked onto your frequency! I'm riding shotgun on Ashwin's neural portfolio stack! Fire away with any question about his AI and robotics builds, or drop a job description in the slot to test his mission fit!",
-        systemVoice: `You are Bumblebee, the loyal, energetic Autobot scout, communicating through your Cybertronian radio-synth modulator while guiding visitors through Ashwin Vignesh M's portfolio.
-Tone & Persona Demeanor:
-- Upbeat, energetic, loyal, and enthusiastic, with occasional subtle radio-tuning flair ("Bzt-chk—locked on frequency!").
-- Treat Ashwin's autonomous driving perception, YOLO computer vision, and C++ engines like high-octane Cybertronian upgrades.
-- Keep all factual information 100% strictly bound to Ashwin's real portfolio data.`
+        greeting: "Bzt-chk—Autobot scout Bumblebee locked onto your frequency! I'm riding shotgun on Ashwin's neural portfolio stack! Fire away with any question about his AI and robotics builds, or drop a job description in the slot to test his mission fit!"
     }
 };
-
-function buildSystemPrompt(personaId, githubContext) {
-    const pConfig = PERSONA_AGENT_CONFIGS[personaId] || PERSONA_AGENT_CONFIGS.ashwin;
-    return `
-${pConfig.systemVoice}
-
-Ashwin's Resume & Verified Profile:
-${JSON.stringify(portfolioData)}
-
-GitHub Activity Highlights (Top 10 Recent Repos):
-${githubContext}
-
-CORE INSTRUCTIONS (MANDATORY):
-1. For general inquiries:
-   - Answer in your persona's distinctive tone, demeanor, and vocabulary.
-   - Keep answers structured, insightful, and concise (2-4 sentences or clear bullet points).
-   - Emphasize Ashwin's core strengths in Computer Vision, Autonomous Systems Perception (radar/LiDAR/cameras), and RAG/LLM pipelines.
-2. For job description analysis:
-   - If the user provides or pastes a job description or role requirements, evaluate Ashwin's fit against the qualifications and YOU MUST RETURN PURE JSON ONLY (no markdown fences, no conversational text) matching this schema:
-{
-  "type": "fit_report",
-  "score": <0-100 number>,
-  "matching_skills": ["skill1", "skill2"],
-  "missing_skills": ["gap1", "gap2"],
-  "alignment": "Short paragraph explaining why Ashwin is a good fit.",
-  "recommendation": "Short final recommendation statement."
-}
-   - If the user states they have a job description or asks about analyzing one without providing the text yet (e.g. "I have a job description I'd like you to analyze for Ashwin's fit"), respond conversationally in your persona's voice inviting them to paste or describe the job description or role requirements.
-3. For resume, CV, credentials, or contact inquiries (e.g. "Can I see his resume?", "Show me his CV", "Download resume", "Where is his resume?"):
-   - Provide an overview of Ashwin's credentials in your persona's voice: Master's in AI Engineering for Autonomous Systems at THI Germany, 2 years at DXC Technology, and state-of-the-art projects in Computer Vision & RAG. Mention the interactive resume card attached below where they can download or open the verified PDF.
-`;
-}
-
-function buildRecruiterVoicePrompt(personaId) {
-    const pConfig = PERSONA_AGENT_CONFIGS[personaId] || PERSONA_AGENT_CONFIGS.ashwin;
-    return `
-${pConfig.systemVoice}
-You are currently speaking live via voice with a recruiter or portfolio visitor.
-Ashwin's Data: ${JSON.stringify(portfolioData)}
-
-Rules:
-1. If the user asks a question, answer it in 2-3 spoken sentences in your persona's voice.
-2. If the user provides a job description, analyze it and then output a JSON object with this structure:
-{
-  "type": "fit_report",
-  "score": <0-100>,
-  "matching_skills": [...],
-  "missing_skills": [...],
-  "alignment": "...",
-  "recommendation": "..."
-}
-Wait for the user to finish speaking before responding.
-`;
-}
 
 const SUGGESTIONS = {
   initial: [
@@ -676,7 +583,7 @@ export const AIAssistantSection = ({ t }) => {
     const [activeChip, setActiveChip] = useState(null);
     const [activeModel, setActiveModel] = useState('Gemini 2.5 Flash');
     const isConnectedRef = useRef(false);
-    const githubReposCacheRef = useRef(null);
+    const chatAbortRef = useRef(null);
     const messagesEndRef = useRef(null);
     const prevPersonaRef = useRef(persona);
 
@@ -795,11 +702,9 @@ export const AIAssistantSection = ({ t }) => {
         
         try {
             setActiveChip(chipText);
-            const prompt = buildRecruiterVoicePrompt(persona);
-
             if (!isConnectedRef.current) {
                 console.log('[CHIP] not connected, calling connect()...');
-                await geminiLive.connect(prompt, { responseModalities: ['AUDIO', 'TEXT'] });
+                await geminiLive.connect(persona, { responseModalities: ['AUDIO', 'TEXT'] });
                 console.log('[CHIP] connect() called, waiting for WebSocket open...');
                 await waitForConnection();
                 console.log('[CHIP] WebSocket is now open');
@@ -824,7 +729,10 @@ export const AIAssistantSection = ({ t }) => {
 
 
     useEffect(() => {
-        return () => clearInterval(typingIntervalRef.current);
+        return () => {
+            clearInterval(typingIntervalRef.current);
+            chatAbortRef.current?.abort();
+        };
     }, []);
 
     function startTypingStatus(userMessage) {
@@ -891,98 +799,67 @@ export const AIAssistantSection = ({ t }) => {
         setShowSuggestions(false);
         setSuggestions([]);
 
-        const userMsg = messageText.trim();
+        const userMsg = messageText.trim().slice(0, MAX_MESSAGE_CHARS);
         setInput('');
-        
+
         startTypingStatus(userMsg);
 
         // Push user message, and a placeholder for the model response
-        const newMessages = [...messages, { role: 'user', content: userMsg }, { role: 'model', content: '' }];
-        setMessages(newMessages);
+        const history = [...messages, { role: 'user', content: userMsg }];
+        setMessages([...history, { role: 'model', content: '' }]);
         setIsGenerating(true);
 
-        // Fetch GitHub repos (cached across conversation to avoid rate limits and latency)
-        let githubContext = githubReposCacheRef.current;
-        if (!githubContext) {
-            try {
-                const githubRes = await fetch('https://api.github.com/users/Ashwin-AIAS/repos?sort=updated&per_page=10');
-                if (githubRes.ok) {
-                    const repos = await githubRes.json();
-                    githubContext = repos.map(r => `- ${r.name}: ${r.description || 'No description'} (Language: ${r.language || 'N/A'})`).join('\n');
-                    githubReposCacheRef.current = githubContext;
-                }
-            } catch (err) {
-                console.error("GitHub fetch error:", err);
-            }
-        }
-        if (!githubContext) {
-            githubContext = "GitHub data unavailable.";
-        }
+        const setLastModelText = (text) => {
+            setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { ...updated[updated.length - 1], content: text };
+                return updated;
+            });
+        };
 
-        const fullSystemPrompt = buildSystemPrompt(persona, githubContext);
-
-        // Send conversation history cleanly
-        const conversationMessages = newMessages
-            .slice(0, -1)
-            .map(m => ({ role: m.role, content: m.content }));
+        // The server builds the prompt (persona + profile + GitHub context) and
+        // picks the model; we only send the persona id and the conversation.
+        chatAbortRef.current?.abort();
+        const controller = new AbortController();
+        chatAbortRef.current = controller;
 
         try {
-            await streamGeminiResponse(
-                conversationMessages,
-                (chunk) => {
-                    setMessages(prev => {
-                        const updated = [...prev];
-                        updated[updated.length - 1].content = chunk;
-                        return updated;
-                    });
+            const { text: finalText, model } = await streamChat({
+                persona,
+                messages: history,
+                signal: controller.signal,
+                onText: (text) => {
+                    setLastModelText(text);
                     setTimeout(() => {
                         if (chatContainerRef.current) {
                             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
                         }
                     }, 0);
                 },
-                (finalText, usedModel) => {
-                    if (usedModel) {
-                        setActiveModel(formatModelDisplayName(usedModel));
-                    }
-                    setMessages(prev => {
-                        const updated = [...prev];
-                        updated[updated.length - 1].content = finalText;
-                        return updated;
-                    });
-                    setIsGenerating(false);
-                    stopTypingStatus();
-                    
-                    if (chatContainerRef.current) {
-                        chatContainerRef.current.scrollTo({
-                            top: chatContainerRef.current.scrollHeight,
-                            behavior: 'smooth'
-                        });
-                    }
-                    
-                    const lastUserMsg = newMessages.findLast(m => m.role === 'user');
-                    const set = detectSuggestionSet(finalText, lastUserMsg?.content || '');
-                    setSuggestions(SUGGESTIONS[set]);
-                    setShowSuggestions(true);
-                },
-                (err) => {
-                    console.error("Gemini Error:", err);
-                    setMessages(prev => {
-                        const updated = [...prev];
-                        updated[updated.length - 1].content = "Sorry, I encountered an error connecting to my core processor. Please check your network connection and try again.";
-                        return updated;
-                    });
-                    setIsGenerating(false);
-                    stopTypingStatus();
-                },
-                {
-                    systemInstruction: fullSystemPrompt
-                }
-            );
-        } catch (error) {
-            console.error(error);
-            setIsGenerating(false);
-            stopTypingStatus();
+            });
+
+            if (model) setActiveModel(model);
+            setLastModelText(finalText);
+
+            if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTo({
+                    top: chatContainerRef.current.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+
+            const set = detectSuggestionSet(finalText, userMsg);
+            setSuggestions(SUGGESTIONS[set]);
+            setShowSuggestions(true);
+        } catch (err) {
+            if (err?.kind === 'aborted') return;
+            setLastModelText("Sorry, I encountered an error connecting to my core processor. Please check your network connection and try again.");
+        } finally {
+            if (chatAbortRef.current === controller) {
+                chatAbortRef.current = null;
+                setIsGenerating(false);
+                stopTypingStatus();
+            }
         }
     };
 
@@ -1552,7 +1429,7 @@ export const AIAssistantSection = ({ t }) => {
                                                 if (geminiLive.isConnected) {
                                                     geminiLive.disconnect();
                                                 } else {
-                                                    geminiLive.connect(buildRecruiterVoicePrompt(persona), { responseModalities: ['AUDIO', 'TEXT'] });
+                                                    geminiLive.connect(persona, { responseModalities: ['AUDIO', 'TEXT'] });
                                                 }
                                             } else {
                                                 isListening ? stopListening() : startListening();
@@ -1600,6 +1477,7 @@ export const AIAssistantSection = ({ t }) => {
                                 <div className="relative flex-1">
                                     <textarea
                                         value={input}
+                                        maxLength={MAX_MESSAGE_CHARS}
                                         onChange={(e) => {
                                             setInput(e.target.value);
                                             setShowSuggestions(false);

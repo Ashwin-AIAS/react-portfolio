@@ -33,6 +33,13 @@ export default defineConfig([
     },
   },
   {
+    // Vercel Functions, server-only shared code and Node test/build scripts.
+    files: ['api/**/*.js', 'shared/**/*.js', 'scripts/**/*.{js,mjs}'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
+  {
     // Node debugging script (CommonJS + puppeteer), not part of the app.
     files: ['dump_errors.js'],
     languageOptions: {

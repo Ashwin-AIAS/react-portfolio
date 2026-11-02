@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeContext } from '../../ThemeContext';
 
-export const THEMES = [
+const THEMES = [
     // ── TRI-NEON COLLECTION (Dark Base + Primary Neon + Secondary Neon) ──
     {
         id: 'viper',

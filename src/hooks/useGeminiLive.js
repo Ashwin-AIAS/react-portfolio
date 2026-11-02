@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { getApiKey } from '../geminiEmbed';
 
 const INPUT_SAMPLE_RATE = 16000;
 const OUTPUT_SAMPLE_RATE = 24000;
@@ -274,16 +273,20 @@ export function useGeminiLive() {
     };
   }, [disconnectCleanup]);
 
-  const connect = useCallback(async (systemPrompt, options = {}) => {
+  // `persona` is an allowlisted id; the server owns the voice prompt.
+  const connect = useCallback(async (persona, options = {}) => {
     const {
       responseModalities = ['AUDIO'],
       voiceName = 'Aoede',
       onTextChunk = null
     } = options;
+    const systemPrompt = '';
+    const apiKey = '';
 
-    const apiKey = getApiKey();
-    if (!apiKey) {
-      setError('API key is missing. Please set VITE_GEMINI_API_KEY in your .env file.');
+    // The API key no longer ships to the browser. Voice mode comes back in
+    // the next step on short-lived, server-issued tokens (/api/live-token).
+    if (!apiKey || !persona) {
+      setError('Voice mode is temporarily unavailable.');
       return;
     }
 
