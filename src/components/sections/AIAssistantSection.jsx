@@ -1564,7 +1564,13 @@ export const AIAssistantSection = ({ t }) => {
                                     {geminiLive.notice}
                                 </p>
                             )}
-                            <div className="label text-center mt-3">
+                            <p className="mt-3 text-[11px] leading-relaxed text-ink-muted text-center max-w-xl mx-auto">
+                                {t.assistant.privacyNote}{' '}
+                                <a href="#privacy" className="underline underline-offset-2 hover:text-accent transition-colors">
+                                    {t.assistant.privacyLink}
+                                </a>
+                            </p>
+                            <div className="label text-center mt-2">
                                 Enter to send &middot; Shift+Enter for new line
                             </div>
                         </div>

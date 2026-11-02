@@ -34,6 +34,7 @@ import { ProjectsSection } from './components/sections/ProjectsSection';
 import { AIAssistantSection } from './components/sections/AIAssistantSection';
 import { CertificationsSection } from './components/sections/CertificationsSection';
 import { ContactSection } from './components/sections/ContactSection';
+import { PrivacySection } from './components/sections/PrivacySection';
 
 // Boot readout. Replaces a 2.5s screen that ran 8 concurrent animation
 // tracks in a monospace/conic-gradient/green palette used nowhere else on
@@ -350,6 +351,7 @@ export default function App() {
                     <CertificationsSection t={t} />
                     <SectionSeam />
                     <ContactSection t={t} />
+                    <PrivacySection t={t} />
                 </main>
 
                 <Footer t={t} />

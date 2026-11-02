@@ -36,6 +36,8 @@ export const Footer = ({ t }) => (
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <p className="label">
                     &copy; {new Date().getFullYear()} {portfolioData.personalInfo.name}. {t.footer.rights}
+                    {' · '}
+                    <a href="#privacy" className="hover:text-accent transition-colors">{t.footer.privacy}</a>
                 </p>
                 <div className="flex items-center gap-2">
                     <a

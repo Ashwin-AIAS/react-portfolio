@@ -80,7 +80,9 @@ export const translations = {
       reportLabel: "Candidate Fit Report",
       disclaimer: "This report is an automated technical evaluation based on the candidate's verified portfolio data.",
       initialMessage: "Hi! I'm Ashwin's AI assistant. Paste a job description for a fit analysis, or ask me anything about his background and projects.",
-      presetLabel: "Instant Recruiter JD Fit Presets:"
+      presetLabel: "Instant Recruiter JD Fit Presets:",
+      privacyNote: "Messages and voice audio are processed by Google Gemini (free tier) and may be used by Google to improve its products. Don't share sensitive info.",
+      privacyLink: "Privacy"
     },
     certifications: {
       title: "Certifications",
@@ -114,7 +116,57 @@ export const translations = {
       days: "days"
     },
     footer: {
-      rights: "All rights reserved."
+      rights: "All rights reserved.",
+      privacy: "Privacy"
+    },
+    privacy: {
+      title: "Privacy",
+      subtitle: "What happens to your data on this site, in plain language",
+      updated: "Last updated: November 2026",
+      items: [
+        {
+          heading: "AI assistant (chat and voice)",
+          body: [
+            "Your chat messages, and in voice mode your microphone audio, are sent to Google's Gemini API to generate replies. Text goes through this site's server; voice is streamed directly from your browser to Google once the microphone is on.",
+            "This site uses Gemini's free tier. Under Google's terms for unpaid services, Google may use what you send, and the replies, to improve its products, and human reviewers may read it. Please don't share personal, confidential or sensitive information.",
+            "This site doesn't store your messages or audio, and doesn't write them to its logs. The conversation only lives in your open browser tab."
+          ]
+        },
+        {
+          heading: "Abuse protection (rate limiting)",
+          body: [
+            "To stop abuse and keep the AI features free to run, requests to them are counted per visitor. Your IP address is combined with a secret value and hashed (SHA-256). Only this hash is stored, in Upstash Redis, and every entry expires automatically within 24 hours.",
+            "The hash also appears in short-lived server logs with the time, the endpoint and the response status. A hashed IP is pseudonymous data, which still counts as personal data under the GDPR."
+          ]
+        },
+        {
+          heading: "Hosting",
+          body: [
+            "The site is hosted on Vercel; its server functions run in Frankfurt (EU). Like any web host, Vercel processes technical request data such as your IP address in order to deliver the site."
+          ]
+        },
+        {
+          heading: "Contact form",
+          body: [
+            "Messages sent through the contact form are delivered to my inbox by Formspree (formspree.io), which processes your name, email address and message for that purpose."
+          ]
+        },
+        {
+          heading: "Third-party content",
+          body: [
+            "Fonts are loaded from Google Fonts, the GitHub section from GitHub and a GitHub contributions service, skill icons from Simple Icons, and a project demo video from Vercel Blob. Loading them reveals your IP address to those services."
+          ]
+        },
+        {
+          heading: "Cookies and local storage",
+          body: [
+            "No cookies and no analytics or tracking. Your theme, language and voice-guide settings are saved in your browser's local storage and never leave your device."
+          ]
+        }
+      ],
+      contact: "Questions about your data, or want something removed? Email me at",
+      googleTerms: "Gemini API terms",
+      googlePrivacy: "Google Privacy Policy"
     }
   },
   de: {
@@ -197,7 +249,9 @@ export const translations = {
       reportLabel: "Kandidaten-Analysebericht",
       disclaimer: "Dieser Bericht ist eine automatisierte technische Bewertung auf Basis des verifizierten Portfolios.",
       initialMessage: "Hallo! Ich bin Ashwins KI-Assistent. Füge eine Stellenbeschreibung ein oder stelle mir Fragen zu seinem Hintergrund und seinen Projekten.",
-      presetLabel: "Sofort-Analyse für Beispiel-Stellenprofile:"
+      presetLabel: "Sofort-Analyse für Beispiel-Stellenprofile:",
+      privacyNote: "Nachrichten und Sprachaufnahmen werden von Google Gemini (kostenlose Stufe) verarbeitet und können von Google zur Verbesserung seiner Produkte genutzt werden. Bitte keine sensiblen Daten teilen.",
+      privacyLink: "Datenschutz"
     },
     certifications: {
       title: "Zertifikate",
@@ -231,7 +285,57 @@ export const translations = {
       days: "Tage"
     },
     footer: {
-      rights: "Alle Rechte vorbehalten."
+      rights: "Alle Rechte vorbehalten.",
+      privacy: "Datenschutz"
+    },
+    privacy: {
+      title: "Datenschutz",
+      subtitle: "Was mit deinen Daten auf dieser Website passiert, in einfachen Worten",
+      updated: "Stand: November 2026",
+      items: [
+        {
+          heading: "KI-Assistent (Chat und Sprache)",
+          body: [
+            "Deine Chat-Nachrichten und im Sprachmodus deine Mikrofonaufnahme werden an die Gemini API von Google gesendet, um Antworten zu erzeugen. Text läuft über den Server dieser Website; Sprache wird, sobald das Mikrofon an ist, direkt von deinem Browser zu Google übertragen.",
+            "Diese Website nutzt die kostenlose Stufe von Gemini. Nach Googles Bedingungen für kostenlose Dienste kann Google deine Eingaben und die Antworten zur Verbesserung seiner Produkte nutzen, und menschliche Prüfer können sie lesen. Bitte teile keine persönlichen, vertraulichen oder sensiblen Informationen.",
+            "Diese Website speichert deine Nachrichten und Aufnahmen nicht und schreibt sie nicht in ihre Logs. Das Gespräch existiert nur in deinem geöffneten Browser-Tab."
+          ]
+        },
+        {
+          heading: "Schutz vor Missbrauch (Rate Limiting)",
+          body: [
+            "Um Missbrauch zu verhindern und die KI-Funktionen kostenlos betreiben zu können, werden Anfragen pro Besucher gezählt. Deine IP-Adresse wird mit einem geheimen Wert kombiniert und gehasht (SHA-256). Gespeichert wird nur dieser Hash, in Upstash Redis, und jeder Eintrag läuft innerhalb von 24 Stunden automatisch ab.",
+            "Der Hash erscheint außerdem zusammen mit Zeit, Endpunkt und Antwortstatus in kurzlebigen Server-Logs. Eine gehashte IP ist ein pseudonymes Datum und gilt nach der DSGVO weiterhin als personenbezogenes Datum."
+          ]
+        },
+        {
+          heading: "Hosting",
+          body: [
+            "Die Website wird bei Vercel gehostet; die Serverfunktionen laufen in Frankfurt (EU). Wie jeder Webhoster verarbeitet Vercel technische Anfragedaten wie deine IP-Adresse, um die Website auszuliefern."
+          ]
+        },
+        {
+          heading: "Kontaktformular",
+          body: [
+            "Nachrichten über das Kontaktformular werden von Formspree (formspree.io) an mein Postfach zugestellt. Formspree verarbeitet dafür deinen Namen, deine E-Mail-Adresse und deine Nachricht."
+          ]
+        },
+        {
+          heading: "Inhalte von Drittanbietern",
+          body: [
+            "Schriftarten werden von Google Fonts geladen, der GitHub-Bereich von GitHub und einem Dienst für GitHub-Beiträge, Skill-Icons von Simple Icons und ein Projekt-Demovideo von Vercel Blob. Beim Laden erfahren diese Dienste deine IP-Adresse."
+          ]
+        },
+        {
+          heading: "Cookies und lokaler Speicher",
+          body: [
+            "Keine Cookies, keine Analyse- oder Tracking-Tools. Deine Einstellungen für Design, Sprache und Sprachführung werden im lokalen Speicher deines Browsers gespeichert und verlassen dein Gerät nicht."
+          ]
+        }
+      ],
+      contact: "Fragen zu deinen Daten oder soll etwas gelöscht werden? Schreib mir an",
+      googleTerms: "Nutzungsbedingungen der Gemini API",
+      googlePrivacy: "Datenschutzerklärung von Google"
     }
   }
 };
