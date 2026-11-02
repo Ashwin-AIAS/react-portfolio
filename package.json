@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/check-no-secrets.mjs env && vite build && node scripts/check-no-secrets.mjs dist",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test:api": "node scripts/test-api-security.mjs"
+    "test:api": "node scripts/test-api-security.mjs",
+    "hooks:install": "git config core.hooksPath scripts/hooks"
   },
   "dependencies": {
     "@upstash/ratelimit": "2.2.0",

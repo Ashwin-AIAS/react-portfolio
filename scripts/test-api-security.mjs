@@ -1,10 +1,11 @@
 /**
- * API security tests (SECURITY_PLAN.md, P12).
+ * API and deployment-config security tests (SECURITY_PLAN.md, P12).
  *
  * Calls the handlers directly with injected env and a fake fetch, so it needs
  * no real secrets and makes no network calls. Run: npm run test:api
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { createChatHandler } from '../api/_lib/chatHandler.js';
 import { isAllowedOrigin, PRODUCTION_ORIGIN, DEV_ORIGIN } from '../api/_lib/security.js';
 import { validateChatBody } from '../api/_lib/validate.js';
@@ -587,6 +588,100 @@ await test('live-token: 502 with a generic body when Google fails or returns jun
     const text = await res.text();
     assert.ok(!text.includes('SECRET UPSTREAM DETAIL'));
     assert.ok(!text.includes('not-a-token'));
+  }
+});
+
+// --- deployment config (P8 / P1) ---------------------------------------------------------
+
+const ROOT_URL = new URL('../', import.meta.url);
+const readRoot = (p) => readFileSync(new URL(p, ROOT_URL), 'utf8');
+
+function headerRule(cfg, source) {
+  const rule = cfg.headers.find((h) => h.source === source);
+  assert.ok(rule, `header rule for ${source}`);
+  return Object.fromEntries(rule.headers.map((h) => [h.key, h.value]));
+}
+
+function parseCsp(value) {
+  return Object.fromEntries(
+    value
+      .split(';')
+      .map((d) => d.trim())
+      .filter(Boolean)
+      .map((d) => {
+        const [name, ...sources] = d.split(/\s+/);
+        return [name, sources];
+      }),
+  );
+}
+
+await test('vercel.json: functions pinned to fra1', () => {
+  const cfg = JSON.parse(readRoot('vercel.json'));
+  assert.deepEqual(cfg.regions, ['fra1']);
+});
+
+await test('vercel.json: security headers on every path', () => {
+  const h = headerRule(JSON.parse(readRoot('vercel.json')), '/(.*)');
+  assert.match(h['Strict-Transport-Security'], /max-age=\d{8,}/);
+  assert.equal(h['X-Content-Type-Options'], 'nosniff');
+  assert.equal(h['Referrer-Policy'], 'strict-origin-when-cross-origin');
+  assert.match(h['Permissions-Policy'], /microphone=\(self\)/);
+  assert.match(h['Permissions-Policy'], /camera=\(\)/);
+  assert.ok(!('Content-Security-Policy' in h), 'step A: CSP is report-only, not enforced yet');
+  const page = headerRule(JSON.parse(readRoot('vercel.json')), '/((?!.*\\.pdf$).*)');
+  assert.equal(page['X-Frame-Options'], 'DENY');
+  assert.ok(!('Content-Security-Policy' in page));
+});
+
+await test('vercel.json: report-only CSP matches the plan allowlist', () => {
+  const h = headerRule(JSON.parse(readRoot('vercel.json')), '/((?!.*\\.pdf$).*)');
+  const csp = parseCsp(h['Content-Security-Policy-Report-Only']);
+  assert.deepEqual(csp['default-src'], ["'self'"]);
+  assert.deepEqual(csp['script-src'], ["'self'"], 'no inline or eval scripts');
+  assert.deepEqual(csp['object-src'], ["'none'"]);
+  assert.deepEqual(csp['frame-ancestors'], ["'none'"]);
+  assert.deepEqual(csp['base-uri'], ["'self'"]);
+  assert.deepEqual(csp['form-action'], ["'self'", 'https://formspree.io']);
+  assert.ok(csp['img-src'].includes('https://*.public.blob.vercel-storage.com'));
+  assert.ok(csp['media-src'].includes('https://*.public.blob.vercel-storage.com'));
+  assert.ok(csp['connect-src'].includes('wss://generativelanguage.googleapis.com'));
+  assert.ok(!csp['connect-src'].some((s) => s.startsWith('https://generativelanguage')), 'no browser REST calls to Gemini');
+  for (const [name, sources] of Object.entries(csp)) {
+    assert.ok(!sources.includes("'unsafe-eval'"), `${name} allows unsafe-eval`);
+    assert.ok(!sources.includes('*'), `${name} allows *`);
+    if (name !== 'style-src') assert.ok(!sources.includes("'unsafe-inline'"), `${name} allows unsafe-inline`);
+  }
+});
+
+await test('vercel.json: PDFs can be framed by this site only (resume viewer)', () => {
+  const h = headerRule(JSON.parse(readRoot('vercel.json')), '/(.*)\\.pdf');
+  assert.equal(h['X-Frame-Options'], 'SAMEORIGIN');
+  assert.equal(h['Content-Security-Policy-Report-Only'], "frame-ancestors 'self'");
+});
+
+await test('vercel.json: /api responses are never cached', () => {
+  const h = headerRule(JSON.parse(readRoot('vercel.json')), '/api/(.*)');
+  assert.equal(h['Cache-Control'], 'no-store');
+});
+
+await test('index.html has no inline scripts (CSP script-src self)', () => {
+  const html = readRoot('index.html');
+  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
+  assert.ok(scripts.length > 0);
+  for (const [, attrs, body] of scripts) {
+    assert.match(attrs, /\bsrc=/, 'every script has a src');
+    assert.equal(body.trim(), '', 'no inline script body');
+  }
+  assert.match(html, /<script src="\/theme-init\.js"><\/script>/);
+});
+
+await test('.env.example lists names only and no VITE_ secrets', () => {
+  const lines = readRoot('.env.example').split(/\r?\n/);
+  for (const line of lines) {
+    const m = line.match(/^\s*#?\s*([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+    if (!m) continue;
+    assert.ok(!/^VITE_/.test(m[1]), `${m[1]} must not be VITE_`);
+    if (m[1] !== 'ALLOW_DEV_AI') assert.equal(m[2].trim(), '', `${m[1]} must be empty`);
   }
 });
 

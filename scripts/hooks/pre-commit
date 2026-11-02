@@ -1,0 +1,17 @@
+#!/bin/sh
+# Opt-in local secret scan before each commit (SECURITY_PLAN.md, P11).
+#
+# Enable once per clone:   npm run hooks:install
+#   (same as: git config core.hooksPath scripts/hooks)
+# Needs the gitleaks binary: https://github.com/gitleaks/gitleaks#installing
+#
+# Findings are printed redacted. The GitHub Action scans every push as well.
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks is not installed, so staged changes can't be scanned." >&2
+  echo "  Install it (https://github.com/gitleaks/gitleaks#installing)," >&2
+  echo "  or turn the hook off with: git config --unset core.hooksPath" >&2
+  exit 1
+fi
+
+exec gitleaks git --pre-commit --staged --redact --no-banner --verbose
