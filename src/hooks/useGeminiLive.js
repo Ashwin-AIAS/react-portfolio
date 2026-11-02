@@ -3,7 +3,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 const INPUT_SAMPLE_RATE = 16000;
 const OUTPUT_SAMPLE_RATE = 24000;
 
-// System instructions removed. They are now passed to connect() by the component.
+// Prompts, model and voice are chosen server-side (/api/live-token).
 
 
 /**
@@ -63,6 +63,7 @@ export function useGeminiLive() {
   const [audioLevel, setAudioLevel] = useState(0);
   const [structuredOutput, setStructuredOutput] = useState(null);
   const [isResponseComplete, setIsResponseComplete] = useState(false);
+  const [notice, setNotice] = useState('');
 
 
   const wsRef = useRef(null);
@@ -77,6 +78,8 @@ export function useGeminiLive() {
   const analyserRef = useRef(null);
   const animFrameRef = useRef(null);
   const isConnectedRef = useRef(false);
+  const sessionTimerRef = useRef(null);
+  const connectAbortRef = useRef(null);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -136,8 +139,8 @@ export function useGeminiLive() {
       if (!isPlayingRef.current) {
         playNextInQueue();
       }
-    } catch (e) {
-      console.error('Error playing audio chunk:', e);
+    } catch {
+      // Drop a chunk we can't decode rather than break playback.
     }
   }, [playNextInQueue]);
 
@@ -195,22 +198,21 @@ export function useGeminiLive() {
 
           ws.send(JSON.stringify({
             realtimeInput: {
-              mediaChunks: [{
+              audio: {
                 data: base64,
                 mimeType: `audio/pcm;rate=${INPUT_SAMPLE_RATE}`
-              }]
+              }
             }
           }));
         }
       };
     }).catch((err) => {
-      console.error('Mic access error:', err);
       if (err.name === 'NotAllowedError') {
         setError('Microphone access denied. Please allow microphone access in your browser settings.');
       } else if (err.name === 'NotFoundError') {
         setError('No microphone detected. Please connect a microphone.');
       } else {
-        setError('Microphone error: ' + err.message);
+        setError('Microphone error. Please check your audio settings.');
       }
       throw err;
     });
@@ -242,7 +244,17 @@ export function useGeminiLive() {
     setIsUserSpeaking(false);
   }, []);
 
+  const clearSessionTimer = () => {
+    if (sessionTimerRef.current) {
+      clearTimeout(sessionTimerRef.current);
+      sessionTimerRef.current = null;
+    }
+  };
+
   const disconnectCleanup = useCallback(() => {
+    clearSessionTimer();
+    connectAbortRef.current?.abort();
+    connectAbortRef.current = null;
     stopMicCapture();
 
     if (wsRef.current) {
@@ -273,151 +285,160 @@ export function useGeminiLive() {
     };
   }, [disconnectCleanup]);
 
-  // `persona` is an allowlisted id; the server owns the voice prompt.
+  /**
+   * Starts a voice session for an allowlisted persona id.
+   *
+   * The browser never sees the API key or the prompt: /api/live-token returns
+   * a single-use token whose setup (model, prompt, voice, audio-only output)
+   * is locked server-side, and the setup message we send is ignored by Google.
+   *
+   * @returns {Promise<boolean>} false if no session could be started.
+   */
   const connect = useCallback(async (persona, options = {}) => {
-    const {
-      responseModalities = ['AUDIO'],
-      voiceName = 'Aoede',
-      onTextChunk = null
-    } = options;
-    const systemPrompt = '';
-    const apiKey = '';
-
-    // The API key no longer ships to the browser. Voice mode comes back in
-    // the next step on short-lived, server-issued tokens (/api/live-token).
-    if (!apiKey || !persona) {
-      setError('Voice mode is temporarily unavailable.');
-      return;
-    }
+    const { onTextChunk = null } = options;
 
     // Clean up any existing connection
     disconnectCleanup();
 
     setIsConnecting(true);
     setError('');
+    setNotice('');
     setTranscript('');
     setStructuredOutput(null);
     setIsResponseComplete(false);
 
-    try {
-      const model = 'gemini-3.1-flash-live-preview';
-      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+    const controller = new AbortController();
+    connectAbortRef.current = controller;
 
-      console.log('[WS] connecting to:', wsUrl);
+    let session;
+    try {
+      const res = await fetch('/api/live-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ persona }),
+        signal: controller.signal,
+      });
+      if (res.status === 429) {
+        const wait = Number(res.headers.get('retry-after')) || 0;
+        const when = wait >= 3600 ? 'tomorrow' : wait >= 60 ? `in about ${Math.ceil(wait / 60)} minutes` : 'in a moment';
+        setError(`Voice mode is limited to keep this site free to run. Please try again ${when}, or use text chat.`);
+        setIsConnecting(false);
+        return false;
+      }
+      if (!res.ok) throw new Error('token');
+      session = await res.json();
+      if (typeof session?.token !== 'string' || typeof session?.model !== 'string') throw new Error('token');
+    } catch {
+      if (controller.signal.aborted) return false;
+      setError('Voice mode is temporarily unavailable. Text chat still works.');
+      setIsConnecting(false);
+      return false;
+    } finally {
+      if (connectAbortRef.current === controller) connectAbortRef.current = null;
+    }
+
+    try {
+      const wsUrl =
+        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained' +
+        `?access_token=${encodeURIComponent(session.token)}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('[WS] connected, state:', ws.readyState);
-        // Use camelCase for the Gemini Multimodal Live API
-        const setupMsg = {
-          setup: {
-            model: `models/${model}`,
-            generationConfig: {
-              responseModalities: responseModalities,
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: {
-                    voiceName: voiceName
-                  }
-                }
-              }
-            },
-            systemInstruction: {
-              parts: [{ text: systemPrompt }]
-            }
-          }
-        };
-
-        console.log('[WS] sending setup:', JSON.stringify(setupMsg, null, 2));
-        ws.send(JSON.stringify(setupMsg));
+        // The token carries the full setup; this message only opens the session.
+        ws.send(JSON.stringify({ setup: { model: `models/${session.model}` } }));
       };
 
+      const appendText = (text) => {
+        setTranscript(prev => {
+          const newTranscript = prev + text;
+
+          // Try to detect and parse structured output (JSON)
+          try {
+            const jsonMatch = newTranscript.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              setStructuredOutput(JSON.parse(jsonMatch[0]));
+            }
+          } catch {
+            // Not valid JSON yet
+          }
+
+          if (onTextChunk) onTextChunk(text);
+          return newTranscript;
+        });
+      };
 
       ws.onmessage = async (event) => {
         try {
-          if (event.data instanceof Blob) {
-            // Binary data (likely audio PCM)
-            // console.log('[WS] binary message received:', event.data.size, 'bytes');
-            // In a full implementation, you'd send this to an AudioWorklet
-            return;
-          }
+          const raw = event.data instanceof Blob ? await event.data.text() : event.data;
+          const data = JSON.parse(raw);
 
-          const data = JSON.parse(event.data);
-          // console.log('[WS] message received:', JSON.stringify(data).substring(0, 500));
-
-          // Setup complete
           if (data.setupComplete) {
-            console.log('[WS] setup complete');
             setIsConnected(true);
             setIsConnecting(false);
-            // Start mic after setup is complete if requested
-            startMicCapture(ws).catch((err) => {
-              console.error('[WS] mic capture failed:', err);
-              // disconnectCleanup();
+
+            // UX cap: end the session after a few minutes. The real cost
+            // limits are the token's constraints and the server-side quotas.
+            const maxSeconds = Number(session.maxSessionSeconds) || 300;
+            clearSessionTimer();
+            sessionTimerRef.current = setTimeout(() => {
+              disconnectCleanup();
+              setNotice(`Voice session ended after ${Math.round(maxSeconds / 60)} minutes. Tap the mic to start a new one.`);
+            }, maxSeconds * 1000);
+
+            startMicCapture(ws).catch(() => {
+              // startMicCapture already set a user-facing error.
             });
             return;
           }
 
-          // Server content (audio/text responses)
+          // Google is about to close the connection; end cleanly instead.
+          if (data.goAway) {
+            disconnectCleanup();
+            setNotice('Voice session ended. Tap the mic to start a new one.');
+            return;
+          }
+
           if (data.serverContent) {
             const parts = data.serverContent.modelTurn?.parts || [];
-
             for (const part of parts) {
               if (part.inlineData?.mimeType?.startsWith('audio/')) {
                 playAudioChunk(part.inlineData.data);
               }
-              if (part.text) {
-                setTranscript(prev => {
-                  const newTranscript = prev + part.text;
-                  
-                  // Try to detect and parse structured output (JSON)
-                  try {
-                    const jsonMatch = newTranscript.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                      const possibleJson = jsonMatch[0];
-                      const parsed = JSON.parse(possibleJson);
-                      setStructuredOutput(parsed);
-                    }
-                  } catch {
-                    // Not valid JSON yet
-                  }
-
-                  if (onTextChunk) onTextChunk(part.text);
-                  return newTranscript;
-                });
-              }
+              if (part.text && !part.thought) appendText(part.text);
             }
+
+            const spoken = data.serverContent.outputTranscription?.text;
+            if (spoken) appendText(spoken);
 
             if (data.serverContent.turnComplete) {
               setTranscript(prev => prev ? prev + '\n\n' : prev);
               setIsResponseComplete(true);
             }
           }
-
-        } catch (e) {
-          console.error('[WS] message parse error:', e);
+        } catch {
+          // Ignore frames we can't parse.
         }
       };
 
-      ws.onerror = (err) => {
-        console.error('[WS] error:', err);
+      ws.onerror = () => {
         setError('Connection error. Please try again.');
         setIsConnecting(false);
         setIsConnected(false);
       };
 
-      ws.onclose = (event) => {
-        console.log('[WS] closed:', event.code, event.reason);
+      ws.onclose = () => {
+        clearSessionTimer();
         setIsConnected(false);
         setIsConnecting(false);
         stopMicCapture();
       };
+      return true;
 
-    } catch (err) {
-      console.error('[WS] connection critical error:', err);
+    } catch {
       setError('Failed to connect. Please try again.');
       setIsConnecting(false);
+      return false;
     }
   }, [startMicCapture, stopMicCapture, playAudioChunk, disconnectCleanup]);
 
@@ -427,11 +448,8 @@ export function useGeminiLive() {
 
   const sendMessage = useCallback((obj) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      console.log('[WS] sending message:', JSON.stringify(obj, null, 2));
       setIsResponseComplete(false);
       wsRef.current.send(JSON.stringify(obj));
-    } else {
-      console.error('[WS] sendMessage called but WebSocket is not open, state:', wsRef.current?.readyState);
     }
   }, []);
 
@@ -466,6 +484,7 @@ export function useGeminiLive() {
     structuredOutput,
     isResponseComplete,
     error,
+    notice,
     audioLevel,
   };
 }

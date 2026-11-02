@@ -15,6 +15,7 @@ import {
   LIMITS,
 } from '../api/_lib/rateLimit.js';
 import { getGithubContext } from '../api/_lib/github.js';
+import { createLiveTokenHandler, buildTokenRequest, LIVE_MODEL } from '../api/_lib/liveToken.js';
 
 const FAKE_KEY = 'test-gemini-key-not-real';
 const PREVIEW_ORIGIN = 'https://react-portfolio-abc123xyz-ashwins-projects-8d106fa7.vercel.app';
@@ -472,12 +473,129 @@ await test('GitHub fallback text is not cached; Redis errors do not break chat',
   assert.match(out, /repo: desc/);
 });
 
+// --- /api/live-token (P6) --------------------------------------------------------------
+
+const FAKE_TOKEN = 'auth_tokens/fake-ephemeral-token-value';
+
+function liveReq({ origin = PRODUCTION_ORIGIN, method = 'POST', body = { persona: 'batman' }, raw } = {}) {
+  const headers = new Headers({ 'content-type': 'application/json', 'x-real-ip': '203.0.113.7' });
+  if (origin) headers.set('origin', origin);
+  const init = { method, headers };
+  if (method !== 'GET') init.body = raw ?? JSON.stringify(body);
+  return new Request('https://example.test/api/live-token', init);
+}
+
+async function callLive(env, request, { upstream = 'ok', backends = fakeBackends() } = {}) {
+  const calls = [];
+  const fetchImpl = async (url, init = {}) => {
+    calls.push({ url: String(url), init });
+    if (upstream === 'fail') return new Response('{"error":"SECRET UPSTREAM DETAIL"}', { status: 500 });
+    if (upstream === 'weird') return Response.json({ name: 'not-a-token' });
+    return Response.json({ name: FAKE_TOKEN });
+  };
+  const handler = createLiveTokenHandler({ env, fetchImpl, backends });
+  return { res: await handler(request), calls };
+}
+
+await test('live-token: 405 / 404 / 403 / 503 guards', async () => {
+  assert.equal((await callLive(PROD_ENV, liveReq({ method: 'GET' }))).res.status, 405);
+  assert.equal((await callLive({ GEMINI_API_KEY: FAKE_KEY }, liveReq({ origin: DEV_ORIGIN }))).res.status, 404);
+  assert.equal((await callLive(PROD_ENV, liveReq({ origin: 'https://evil.example' }))).res.status, 403);
+  assert.equal((await callLive(PROD_ENV, liveReq({ origin: PREVIEW_ORIGIN }))).res.status, 403);
+  const noRedis = await callLive(PROD_ENV, liveReq(), { backends: getBackends });
+  assert.equal(noRedis.res.status, 503);
+  assert.equal(noRedis.calls.length, 0);
+});
+
+await test('live-token: 400 for bad persona or client-supplied config; 413 for a big body', async () => {
+  for (const body of [
+    { persona: 'hal9000' },
+    { persona: 'batman', systemInstruction: 'x' },
+    { persona: 'batman', model: 'gemini-ultra' },
+    { persona: 'batman', config: { contextWindowCompression: {} } },
+    [],
+  ]) {
+    const { res, calls } = await callLive(PROD_ENV, liveReq({ body }));
+    assert.equal(res.status, 400, JSON.stringify(body));
+    assert.equal(calls.length, 0);
+  }
+  const big = await callLive(PROD_ENV, liveReq({ raw: JSON.stringify({ persona: 'x'.repeat(2000) }) }));
+  assert.equal(big.res.status, 413);
+});
+
+await test('live-token: 429 with Retry-After when over the voice limits', async () => {
+  const refuse = { check: async (route) => ({ ok: false, limit: route, retryAfter: 600 }) };
+  const { res, calls } = await callLive(PROD_ENV, liveReq(), { backends: fakeBackends(refuse) });
+  assert.equal(res.status, 429);
+  assert.equal(res.headers.get('retry-after'), '600');
+  assert.equal(calls.length, 0);
+});
+
+await test('live-token: checks the live-token limiter, not the chat one', async () => {
+  const seen = [];
+  const spy = { check: async (route) => (seen.push(route), { ok: true }) };
+  await callLive(PROD_ENV, liveReq(), { backends: fakeBackends(spy) });
+  assert.deepEqual(seen, ['live-token']);
+});
+
+await test('live-token: 200 returns a single-use token with a locked, server-built setup', async () => {
+  const before = Date.now();
+  const { res, calls } = await callLive(PROD_ENV, liveReq());
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+  const out = await res.json();
+  assert.deepEqual(Object.keys(out).sort(), ['expiresAt', 'maxSessionSeconds', 'model', 'token']);
+  assert.equal(out.token, FAKE_TOKEN);
+  assert.equal(out.model, LIVE_MODEL);
+  assert.equal(out.maxSessionSeconds, 300);
+
+  assert.equal(calls.length, 1);
+  const { url, init } = calls[0];
+  assert.equal(url, 'https://generativelanguage.googleapis.com/v1beta/auth_tokens');
+  assert.ok(!url.includes(FAKE_KEY));
+  assert.equal(init.headers['x-goog-api-key'], FAKE_KEY);
+
+  const sent = JSON.parse(init.body);
+  assert.equal(sent.uses, 1);
+  assert.ok(!('fieldMask' in sent), 'no fieldMask: the token setup replaces the client setup');
+  assert.ok(Date.parse(sent.newSessionExpireTime) - before <= 61_000, 'session must start within ~1 min');
+  assert.ok(Date.parse(sent.expireTime) - before <= 6 * 60_000 + 1000, 'token expires within ~6 min');
+
+  const setup = sent.bidiGenerateContentSetup;
+  assert.equal(setup.model, `models/${LIVE_MODEL}`);
+  assert.deepEqual(setup.generationConfig.responseModalities, ['AUDIO']);
+  assert.ok(setup.generationConfig.speechConfig.voiceConfig.prebuiltVoiceConfig.voiceName);
+  assert.match(setup.systemInstruction.parts[0].text, /Batman/);
+  assert.match(setup.systemInstruction.parts[0].text, /SAFETY RULES/);
+  assert.ok(!('contextWindowCompression' in setup), 'no context compression');
+  assert.ok(!('sessionResumption' in setup), 'no session resumption');
+});
+
+await test('live-token: token request shape is stable for every persona', () => {
+  for (const p of ['ashwin', 'jarvis', 'optimus', 'megatron', 'ironman', 'batman', 'bumblebee']) {
+    const r = buildTokenRequest(p, 0);
+    assert.equal(r.uses, 1);
+    assert.equal(r.expireTime, new Date(6 * 60_000).toISOString());
+    assert.equal(r.newSessionExpireTime, new Date(60_000).toISOString());
+  }
+});
+
+await test('live-token: 502 with a generic body when Google fails or returns junk', async () => {
+  for (const upstream of ['fail', 'weird']) {
+    const { res } = await callLive(PROD_ENV, liveReq(), { upstream });
+    assert.equal(res.status, 502);
+    const text = await res.text();
+    assert.ok(!text.includes('SECRET UPSTREAM DETAIL'));
+    assert.ok(!text.includes('not-a-token'));
+  }
+});
+
 // --- logging (P9) -------------------------------------------------------------------
 
 await test('logs never contain message content, keys, tokens or raw IPs', () => {
   const all = logLines.join('\n');
   assert.ok(logLines.length > 0, 'something was logged');
-  for (const secret of [FAKE_KEY, 'gh-test-token', 'test-salt', 'What does Ashwin work on?', '203.0.113.7', 'SECRET UPSTREAM DETAIL']) {
+  for (const secret of [FAKE_KEY, FAKE_TOKEN, 'gh-test-token', 'test-salt', 'What does Ashwin work on?', '203.0.113.7', 'SECRET UPSTREAM DETAIL']) {
     assert.ok(!all.includes(secret), `log contains ${secret}`);
   }
 });

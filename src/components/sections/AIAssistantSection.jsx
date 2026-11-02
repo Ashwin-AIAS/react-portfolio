@@ -716,7 +716,6 @@ export const AIAssistantSection = ({ t }) => {
     const waitForConnection = (timeoutMs = 8000) => {
         return new Promise((resolve, reject) => {
             if (isConnectedRef.current) { resolve(); return; }
-            console.log('[CHIP] waiting for connection...');
             const start = Date.now();
             const interval = setInterval(() => {
                 if (isConnectedRef.current) {
@@ -731,30 +730,25 @@ export const AIAssistantSection = ({ t }) => {
     };
 
     const handleChipClick = async (chipText) => {
-        console.log('[CHIP] clicked:', chipText);
         if (isGenerating || activeChip) return;
         
         try {
             setActiveChip(chipText);
             if (!isConnectedRef.current) {
-                console.log('[CHIP] not connected, calling connect()...');
-                await geminiLive.connect(persona, { responseModalities: ['AUDIO', 'TEXT'] });
-                console.log('[CHIP] connect() called, waiting for WebSocket open...');
+                // On failure the hook already set a user-facing error.
+                const started = await geminiLive.connect(persona);
+                if (!started) return;
                 await waitForConnection();
-                console.log('[CHIP] WebSocket is now open');
             }
 
             if (isConnectedRef.current) {
-                console.log('[CHIP] sending message to WebSocket');
                 setMessages(prev => [...prev, { role: 'user', content: chipText }]);
                 setIsGenerating(true);
                 startTypingStatus(chipText);
 
                 geminiLive.sendText(chipText);
-                console.log('[CHIP] message sent successfully');
             }
-        } catch (err) {
-            console.error("[CHIP] error:", err);
+        } catch {
             setVoiceError("Connection lost. Please try again.");
         } finally {
             setActiveChip(null);
@@ -1468,7 +1462,7 @@ export const AIAssistantSection = ({ t }) => {
                                                 if (geminiLive.isConnected) {
                                                     geminiLive.disconnect();
                                                 } else {
-                                                    geminiLive.connect(persona, { responseModalities: ['AUDIO', 'TEXT'] });
+                                                    geminiLive.connect(persona);
                                                 }
                                             } else {
                                                 isListening ? stopListening() : startListening();
@@ -1560,9 +1554,14 @@ export const AIAssistantSection = ({ t }) => {
                                     </button>
                                 </div>
                             </form>
-                            {voiceError && (
+                            {(voiceError || (isVoiceMode && geminiLive.error)) && (
                                 <p className="label mt-2 text-center" style={{ color: 'var(--err)' }}>
-                                    {voiceError}
+                                    {voiceError || geminiLive.error}
+                                </p>
+                            )}
+                            {isVoiceMode && geminiLive.notice && !geminiLive.error && (
+                                <p className="label mt-2 text-center">
+                                    {geminiLive.notice}
                                 </p>
                             )}
                             <div className="label text-center mt-3">
