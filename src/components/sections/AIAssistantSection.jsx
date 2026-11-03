@@ -1453,8 +1453,12 @@ export const AIAssistantSection = ({ t }) => {
                                     </button>
                                 ))}
                             </div>
-                            <form onSubmit={(e) => handleSend(e)} className="relative flex items-center gap-2">
-                                <div className="flex items-center gap-2">
+                            {/* Field and send button sit side by side (no overlay), so a long
+                                label such as the German one can never cover the input. The form
+                                wraps: when the row is too narrow, field + button drop below the
+                                mic/mode controls instead of squeezing the field. */}
+                            <form onSubmit={(e) => handleSend(e)} className="flex flex-wrap items-center gap-2">
+                                <div className="flex shrink-0 items-center gap-2">
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -1507,7 +1511,7 @@ export const AIAssistantSection = ({ t }) => {
                                     </button>
                                 </div>
 
-                                <div className="relative flex-1">
+                                <div className="flex flex-1 items-center gap-2 min-w-[min(100%,26rem)]">
                                     <textarea
                                         value={input}
                                         maxLength={MAX_MESSAGE_CHARS}
@@ -1520,7 +1524,8 @@ export const AIAssistantSection = ({ t }) => {
                                         }}
                                         disabled={isVoiceMode && geminiLive.isConnected}
                                         placeholder={isVoiceMode && geminiLive.isConnected ? "Listening for your voice..." : t.assistant.placeholder}
-                                        className="input-field pr-28 resize-none min-h-[50px] max-h-[150px]"
+                                        title={isVoiceMode && geminiLive.isConnected ? undefined : t.assistant.placeholder}
+                                        className="input-field chat-input flex-1 min-w-0 resize-none min-h-[50px] max-h-[150px]"
                                         rows="1"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -1533,7 +1538,9 @@ export const AIAssistantSection = ({ t }) => {
                                     <button
                                         type="submit"
                                         disabled={!input.trim() || isGenerating}
-                                        className="btn btn-primary absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 py-0 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                        aria-label={t.assistant.button}
+                                        title={t.assistant.button}
+                                        className="btn btn-primary shrink-0 whitespace-nowrap h-[50px] w-[50px] px-0 py-0 min-[480px]:w-auto min-[480px]:px-4 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                         style={{
                                             backgroundColor: activePersonaConfig.accentColor,
                                             borderColor: activePersonaConfig.accentColor,
@@ -1547,8 +1554,8 @@ export const AIAssistantSection = ({ t }) => {
                                             />
                                         ) : (
                                             <>
-                                                <SparklesIcon className="w-3.5 h-3.5" />
-                                                {t.assistant.button}
+                                                <SparklesIcon className="w-4 h-4 min-[480px]:w-3.5 min-[480px]:h-3.5" />
+                                                <span className="hidden min-[480px]:inline" aria-hidden="true">{t.assistant.button}</span>
                                             </>
                                         )}
                                     </button>

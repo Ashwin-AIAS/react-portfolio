@@ -1457,6 +1457,18 @@
     color: var(--text-dim);
   }
 
+  /* Chat input: a long placeholder (e.g. German) stays on one line with an
+     ellipsis instead of wrapping into a clipped second line with a scrollbar. */
+  .chat-input:placeholder-shown {
+    overflow: hidden;
+  }
+
+  .chat-input::placeholder {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .input-field:focus {
     border-color: var(--accent);
     box-shadow: none;
