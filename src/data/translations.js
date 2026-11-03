@@ -243,7 +243,7 @@ export const translations = {
       subtitle: "Frag nach meinem Hintergrund, Fähigkeiten und Projekten oder füge eine Stellenbeschreibung für eine Analyse ein",
       badge: "KI-gestützt",
       cardTitle: "Technische Übereinstimmungsanalyse",
-      placeholder: "Frag nach Ashwin oder füg eine Stellenbeschreibung ein...",
+      placeholder: "Frag nach Ashwin oder füg eine Stelle ein…",
       button: "Analysebericht erstellen",
       generating: "Analyse läuft...",
       reportLabel: "Kandidaten-Analysebericht",
